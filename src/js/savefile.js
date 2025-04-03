@@ -88,11 +88,11 @@ const saveFileData = async () => {
         if (!goobooSavefile) return;
 
         const res = await saveData(goobooSavefile, userId, tokenId); 
-        if (res.message === "Save data saved successfully."){
+        if (res.success){
             store.commit('system/addNotification', { color: 'info', timeout: 2000, message: { type: 'save', name: 'auto' } });
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: error.data } });
+        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: "cloudsave error" } });
     } finally {
         isSaving = false;
     }
@@ -118,11 +118,6 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
         if (res.save_data) {
             cleanStore();
             loadGame(res.save_data);
-            store.commit('system/addNotification', { 
-                color: 'success', 
-                timeout: 2000, 
-                message: { type: 'load', name: 'cloud' } 
-            });
         } else {
             store.commit('system/addNotification', { 
                 color: 'warning', 
@@ -148,7 +143,7 @@ const getCloudSaveFileList = async () => {
             store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'clouduser or cloudpwd error' } });
             return null;
         }
-        const saveFiles = await getLatestDataList(userId, tokenId, 5);
+        const saveFiles = await getLatestDataList(userId, tokenId);
         console.log('saveFileData res:', saveFiles);
         return saveFiles;
     } catch (error) {
@@ -167,19 +162,20 @@ const loadSelectedFileData = async (selectedSavefile) => {
             return;
         }
 
-        const res = await loadSaveFile(selectedSavefile, userId, tokenId);
-        console.log('saveFileData res:', res.save_data);
-        if (res.save_data) {
+        const saveData = await loadSaveFile(selectedSavefile.id, userId, tokenId);
+        console.log('saveFileData res:', saveData);
+        if (saveData) {
             cleanStore();
-            loadGame(res.save_data);
+            loadGame(saveData);
             store.commit('system/addNotification', { color: 'success', timeout: 2000, message: { type: 'load', name: 'cloud' } });
         } else {
             store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'Failed to load cloud save' } });
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: error.data.message } });
+        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: error.data?.message || 'Failed to load cloud save' } });
     }
 };
+
 
 function cleanStore() {
     Object.keys(store._modules.root._children).forEach(module => {

@@ -513,16 +513,16 @@
       <v-card class="default-card" elevation="5" shaped>
         <v-card-title primary-title class="title">选择云存档</v-card-title>
         <v-card-text>
-          <v-list rounded>
+          <v-list rounded style="max-height: 250px; overflow-y: auto;">
             <v-list-item
-              v-for="file in saveFiles"
-              :key="file"
+              v-for="file in formattedSaveFiles"
+              :key="file.id"
               @click="selectedSavefile = file"
               ripple
               :active="selectedSavefile === file"
               active-class="primary--text"
             >
-              <v-list-item-title>{{ file }}</v-list-item-title>
+              <v-list-item-title>{{ file.formattedText }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -739,6 +739,12 @@ export default {
       }
       return null;
     },
+    formattedSaveFiles() {
+      return this.saveFiles.map(saveFile => ({
+        ...saveFile,
+        formattedText: `存档时间: ${saveFile.created_at}`,
+      }));
+    },
     featureBadges() {
       let badges = 0;
       if (this.$store.state.system.noteHint.length > 0) {
@@ -806,6 +812,7 @@ export default {
       }
       this.isSaving = true;
       try {
+        saveLocal();
         await saveFileData();
       } finally {
         this.isSaving = false;
@@ -819,7 +826,8 @@ export default {
     },
     async CloudLoadList() {
       try {
-        this.saveFiles = await getCloudSaveFileList();
+        const saveFiles = await getCloudSaveFileList();
+        this.saveFiles = saveFiles || [];
         this.dialogSaveList = true;
       } catch (error) {
         console.error("获取云存档列表失败:", error);

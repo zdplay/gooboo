@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: "https://save.agenslot.eu.org",
+    baseURL: "https://gamesaves.ggff.eu.org",
     timeout: 30000
 });
 
@@ -32,42 +32,54 @@ instance.interceptors.response.use(
 );
 
 
-export function loadSaveFile(savefile, userId, tokenId) {
+export function loadSaveFile(saveId, userId, tokenId) {
     const gameId = window.location.hostname;
 
-    const params = {
-        user_id: userId,
-        token_id: tokenId,
-        game_id: gameId,
-        savefile: savefile
+    const data = {
+        userId: userId,
+        tokenId: tokenId,
+        gameId: gameId
     };
 
     return instance({
-        url: '/load.php',
-        method: 'get',
-        params: params,
+        url: '/download',
+        method: 'post',
+        data: {
+            ...data,
+            saveId: parseInt(saveId)
+        }
+    }).then(response => {
+        if (response.success && response.save && response.save.save_data) {
+            return response.save.save_data;
+        } else {
+            console.error("下载存档失败:", response);
+            throw new Error("下载存档失败");
+        }
+    }).catch(error => {
+        console.error("下载存档请求出错:", error);
+        throw error;
     });
 }
+
 
 export async function getLatestData(userId, tokenId) {
     const gameId = window.location.hostname;
 
-    const params = {
-        user_id: userId,
-        token_id: tokenId,
-        game_id: gameId,
-        count: 1
+    const data = {
+        userId: userId,
+        tokenId: tokenId,
+        gameId: gameId
     };
 
     try {
         const response = await instance({
-            url: '/load.php',
-            method: 'get',
-            params: params,
+            url: '/latest',
+            method: 'post',
+            data: data,
         });
 
-        if (response.save_data) {
-            return response;
+        if (response.success && response.save && response.save.save_data) {
+            return response.save;
         } else {
             return null;
         }
@@ -77,25 +89,23 @@ export async function getLatestData(userId, tokenId) {
     }
 }
 
-export async function getLatestDataList(userId, tokenId, count = 5) {
+export async function getLatestDataList(userId, tokenId) {
     const gameId = window.location.hostname;
 
-    const params = {
-        user_id: userId,
-        token_id: tokenId,
-        game_id: gameId,
-        count: count
+    const data = {
+        userId: userId,
+        tokenId: tokenId,
+        gameId: gameId
     };
 
     try {
         const response = await instance({
-            url: '/load.php',
-            method: 'get',
-            params: params,
+            url: '/list',
+            method: 'post',
+            data: data
         });
-
-        if (response.save_files && response.save_files.length > 0) {
-            return response.save_files;
+        if (response.success && response.saves && response.saves.length > 0) {
+            return response.saves;
         } else {
             return [];
         }
@@ -103,20 +113,21 @@ export async function getLatestDataList(userId, tokenId, count = 5) {
         console.error("获取最新的存档列表失败:", error);
         throw error;
     }
+
 }
 
 
-export function saveData(save_data, userId, tokenId) {
+export function saveData(saveData, userId, tokenId) {
     const gameId = window.location.hostname;
 
     const data = {
-        user_id: userId,
-        token_id: tokenId,
-        game_id: gameId,
-        save_data: save_data
+        userId: userId,
+        tokenId: tokenId,
+        gameId: gameId,
+        saveData: saveData
     };
     return instance({
-        url: '/save.php',
+        url: '/save',
         method: 'post',
         data: data
     });
