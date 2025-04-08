@@ -167,7 +167,7 @@ const loadSelectedFileData = async (selectedSavefile) => {
         if (saveData) {
             cleanStore();
             loadGame(saveData);
-            store.commit('system/addNotification', { color: 'success', timeout: 2000, message: { type: 'load', name: 'cloud' } });
+            //store.commit('system/addNotification', { color: 'success', timeout: 2000, message: { type: 'load', name: 'cloud' } });
         } else {
             store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'Failed to load cloud save' } });
         }

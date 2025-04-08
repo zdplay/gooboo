@@ -70,7 +70,22 @@
               <v-chip v-if="coll.cacheShinyCards < coll.cards.length" class="card-count-chip justify-center flex-grow-0 mr-2 px-2" color="dark-blue" label small><v-icon class="mr-2">mdi-shimmer</v-icon>{{ coll.cacheShinyCards }} / {{ coll.cards.length }}</v-chip>
               <v-chip v-else class="card-count-chip justify-center flex-grow-0 mr-2 px-2" color="pale-light-blue" label small><v-icon>mdi-shimmer</v-icon><v-icon class="mr-2">mdi-crown</v-icon>{{ coll.cards.length }}</v-chip>
             </template>
-            {{ $vuetify.lang.t(`$vuetify.card.collection.${key}`) }}
+            <span class="mr-1">{{ $vuetify.lang.t(`$vuetify.card.collection.${key}`) }}</span>
+            <template v-if="coll.cacheCards < coll.cards.length">
+              <span class="ml-1 text--secondary caption font-weight-light">
+                (
+                <template v-if="getMissingCardSourcePacks(coll).length > 0">
+                  <span v-for="(packName, index) in getMissingCardSourcePacks(coll)" :key="`${key}-pack-${packName}`">
+                    {{ $vuetify.lang.t(`$vuetify.card.pack.${packName}`) }}<span v-if="index < getMissingCardSourcePacks(coll).length - 1">, </span>
+                  </span>
+                </template>
+                <template v-else>
+                  未解锁
+                </template>
+                )
+              </span>
+            </template>
+            <v-spacer></v-spacer>
           </v-expansion-panel-header>
           <v-expansion-panel-content class="card-panel-content" :class="{'card-panel-no-padding': $vuetify.breakpoint.xsOnly}">
             <div class="ml-1">{{ $vuetify.lang.t(`$vuetify.card.fullCollectionReward`) }}:</div>
@@ -109,12 +124,13 @@ export default {
       feature: state => state.card.feature,
       unlock: state => state.unlock,
       packList: state => state.card.pack,
-      stat: state => state.stat
+      stat: state => state.stat,
+      allCards: state => state.card.card
     }),
     collection() {
       let obj = {};
       for (const [key, elem] of Object.entries(this.$store.state.card.collection)) {
-        if (elem.cacheCards > 0) {
+        if (elem.cacheCards > 0 || (elem.cards && elem.cards.length > 0)) {
           obj[key] = elem;
         }
       }
@@ -168,6 +184,31 @@ export default {
       } else {
         this.$store.dispatch('card/buyPack', {name: this.selectedPack, notify: true, max});
       }
+    },
+    getMissingCardSourcePacks(collectionData) {
+      if (!collectionData || !collectionData.cards) {
+        return [];
+      }
+      const missingCardIds = collectionData.cards.filter(cardId => {
+        const cardState = this.allCards[cardId];
+        return !cardState || cardState.amount === 0;
+      });
+      if (missingCardIds.length === 0) {
+        return [];
+      }
+      const relevantPackNames = new Set();
+      const allPacks = this.packList;
+      const unlocks = this.unlock;
+      for (const cardId of missingCardIds) {
+        for (const [packKey, packData] of Object.entries(allPacks)) {
+          if (packData.content && packData.content[cardId] !== undefined) {
+            if (packData.unlock === null || (unlocks[packData.unlock] && unlocks[packData.unlock].see)) {
+              relevantPackNames.add(packKey);
+            }
+          }
+        }
+      }
+      return Array.from(relevantPackNames);
     }
   }
 }
