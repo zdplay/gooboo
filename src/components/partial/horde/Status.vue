@@ -134,7 +134,7 @@
     <v-row no-gutters>
       <v-col cols="12" sm="6">
         <v-card min-height="52" class="d-flex flex-wrap ma-1 mb-2 pa-1">
-          <active class="ma-1" v-for="(item, key) in itemsActiveCombat" :key="'active-' + key" :name="key" :pretend="isFrozen" show-autocast></active>
+          <active class="ma-1" v-for="(item, key, i) in itemsActiveCombat" :key="'active-' + key" :name="key" :pretend="isFrozen" show-autocast :shortcut="getShortcut(i)" ></active>
           <v-spacer></v-spacer>
           <active class="ma-1" v-for="(item, key) in itemsActiveUtility" :key="'active-' + key" :name="key" :pretend="isFrozen"></active>
         </v-card>
@@ -198,10 +198,16 @@ export default {
     showMap: false,
     selectedArea: 'warzone',
     bossBonusDifficulty: 0,
+    activeShortcutMap: {}
   }),
   mounted() {
     this.selectedArea = this.$store.state.horde.selectedArea;
     this.bossBonusDifficulty = this.$store.state.horde.bossBonusDifficulty;
+    window.addEventListener('keydown', this.handleGlobalKeyDown);
+    this.updateShortcutMap();
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleGlobalKeyDown);
   },
   computed: {
     ...mapState({
@@ -255,13 +261,15 @@ export default {
     itemsActiveBase() {
       if (this.subfeature === 1) {
         let obj = {};
-        for (const [key] of Object.entries(this.$store.state.horde.skillActive)) {
-          const split = key.split('_');
-          if (split[0] === 'skill') {
+        const skillKeys = Object.keys(this.$store.state.horde.skillActive).filter(k => k.startsWith('skill_'));
+        const trinketKeys = Object.keys(this.$store.state.horde.skillActive).filter(k => k.startsWith('trinket_'));
+        for (const key of skillKeys) {
+            const split = key.split('_');
             obj[key] = this.$store.state.horde.fighterClass[this.selectedClass].skills[split[1]];
-          } else if (split[0] === 'trinket') {
+        }
+         for (const key of trinketKeys) {
+            const split = key.split('_');
             obj[key] = this.$store.state.horde.trinket[split[1]];
-          }
         }
         return obj;
       }
@@ -358,6 +366,38 @@ export default {
     }
   },
   methods: {
+    updateShortcutMap() {
+        this.activeShortcutMap = {};
+        let index = 0;
+        for (const key of Object.keys(this.itemsActiveCombat)) {
+            const shortcut = this.getShortcut(index);
+            if (shortcut) {
+                this.activeShortcutMap[shortcut] = key;
+            }
+            index++;
+        }
+    },
+
+    handleGlobalKeyDown(event) {
+      const key = event.key;
+      if (/^[0-9]$/.test(key)) {
+        const activeName = this.activeShortcutMap[key];
+        if (activeName) {
+          const currentlyChosen = this.$store.state.horde.chosenActive;
+          if (activeName !== currentlyChosen) {
+            this.$store.dispatch('horde/useActive', activeName);
+          }
+        }
+      }
+    },
+    getShortcut(index) {
+      if (index < 9) {
+        return (index + 1).toString();
+      } else if (index === 9) {
+        return '0';
+      }
+      return '';
+    },
     fightBoss() {
       if (!this.isFrozen && this.currentTower === null && this.respawn <= 0) {
         if (this.isMaxZone && this.bossAvailable && !this.bossFight) {
@@ -415,6 +455,26 @@ export default {
       if (this.bossFight === 0 && newVal !== null && parseInt(newVal) >= 0 && parseInt(newVal) <= 999) {
         this.$store.commit('horde/updateKey', {key: 'bossBonusDifficulty', value: parseInt(newVal)});
       }
+    },
+    itemsActiveCombat: {
+        handler() {
+            this.updateShortcutMap();
+        },
+        deep: true
+    },
+
+    subfeature() {
+        this.$nextTick(() => {
+             this.updateShortcutMap();
+        });
+    },
+
+    selectedClass() {
+        if (this.subfeature === 1) {
+             this.$nextTick(() => {
+                this.updateShortcutMap();
+            });
+        }
     }
   }
 }

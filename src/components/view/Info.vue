@@ -57,31 +57,35 @@
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
         <span class="d-flex ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>增加运存档功能，在【设置】-【通用】设置使用。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
-          <span>增加卡片页面在目录处增加对应卡包显示。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>调整低分辨率的画面布局。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
-          <span>修改学校参考考试为直接满分通过。（借鉴自baicy）</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">部落</v-chip>
+          <span>增加战斗技能快捷键使用，数字按钮1到0</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">画廊</v-chip>
           <span>增加画廊的形状游戏显示各个形状的个数。（借鉴自baicy）</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">画廊</v-chip>
           <span>增加画廊点击形状数量按钮可自动移动对应形状。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">功能</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">学校</v-chip>
+          <span>修改学校参考考试为直接满分通过。（借鉴自baicy）</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">卡片</v-chip>
+          <span>增加卡片页面在目录处增加对应卡包显示。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">实验室</v-chip>
           <span>增加冷冻实验室显示升级所需天数。（借鉴自baicy）</span>
         </span>
       </v-card-text>
