@@ -186,6 +186,7 @@ export default {
       }
     },
     getMissingCardSourcePacks(collectionData) {
+      console.log(collectionData);
       if (!collectionData || !collectionData.cards) {
         return [];
       }
