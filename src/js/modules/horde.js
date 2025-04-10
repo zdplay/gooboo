@@ -400,7 +400,6 @@ export default {
                                 if (damage > 0) {
                                     hitShield = true;
                                 }
-
                                 if (activeCost.health !== undefined) {
                                     store.commit('horde/updatePlayerKey', {key: 'health', value: store.state.horde.player.health * (1 - activeCost.health)});
                                 }
@@ -414,7 +413,9 @@ export default {
                                     store.dispatch('currency/spend', {feature: 'horde', name: 'mysticalShard', amount: activeCost.mysticalShard});
                                     store.dispatch('horde/checkPlayerHealth');
                                 }
-
+                                if (item.activeType === "utility") {
+                                    store.dispatch('horde/useActive', usedAttack);
+                                }
                                 const cooldown = Math.ceil(item.cooldown(activeLevel) / ((subfeature === 0 && item.masteryLevel >= 4) ? 2 : 1));
                                 if (subfeature === 0) {
                                     store.commit('horde/updateItemKey', {name: usedAttack, key: 'cooldownLeft', value: cooldown});
