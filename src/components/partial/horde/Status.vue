@@ -136,7 +136,7 @@
         <v-card min-height="52" class="d-flex flex-wrap ma-1 mb-2 pa-1">
           <active class="ma-1" v-for="(item, key, i) in itemsActiveCombat" :key="'active-' + key" :name="key" :pretend="isFrozen" show-autocast :shortcut="getShortcut(i)" ></active>
           <v-spacer></v-spacer>
-          <active class="ma-1" v-for="(item, key) in itemsActiveUtility" :key="'active-' + key" :name="key" :pretend="isFrozen"></active>
+          <active class="ma-1" v-for="(item, key) in itemsActiveUtility" :key="'active-' + key" :name="key" :pretend="isFrozen" show-autocast></active>
         </v-card>
         <player-status class="ma-1"></player-status>
         <v-card v-if="Object.keys(playerBuffParsed).length > 0" class="d-flex flex-wrap ma-1 mb-2 pa-1">

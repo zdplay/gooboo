@@ -503,7 +503,7 @@ export default {
                                 }
                             }
                             return {};
-                        }).filter(elem => elem.ready && elem.type === 'combat' &&
+                        }).filter(elem => elem.ready &&
                             (elem.cost.health === undefined || (store.state.horde.player.health >= elem.cost.health) && (store.state.horde.player.health / playerStats.health) >= 0.5) &&
                             (elem.cost.energy === undefined || (store.state.horde.player.energy >= elem.cost.energy) && (store.state.horde.player.energy / playerStats.energy) >= 0.5) &&
                             (elem.cost.mana === undefined || (store.state.horde.player.mana >= elem.cost.mana) && (store.state.horde.player.mana / playerStats.mana) >= 0.5) &&

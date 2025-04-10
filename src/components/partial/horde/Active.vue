@@ -196,7 +196,7 @@ export default {
       return this.$store.state.horde.autocast.length < this.$store.getters['mult/get']('hordeAutocast');
     },
     canSeeAutocast() {
-      return this.showAutocast && this.item.activeType === 'combat' && this.$store.getters['mult/get']('hordeAutocast') >= 1;
+      return this.showAutocast && this.$store.getters['mult/get']('hordeAutocast') >= 1;
     }
   },
   methods: {
