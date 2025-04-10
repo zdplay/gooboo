@@ -69,6 +69,10 @@
           <span>增加战斗技能快捷键使用，数字按钮1到0</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">部落</v-chip>
+          <span>调整自动施法槽默认为3</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">画廊</v-chip>
           <span>增加画廊的形状游戏显示各个形状的个数。（借鉴自baicy）</span>
         </span>

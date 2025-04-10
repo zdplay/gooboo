@@ -950,7 +950,7 @@ export default {
         hordeExpIncrement: {display: 'mult', min: 0},
         hordeMaxTrinkets: {baseValue: 1, round: true},
         hordeSkillPointsPerLevel: {baseValue: 10, round: true},
-        hordeAutocast: {round: true},
+        hordeAutocast: {round: true, baseValue: 3},
 
         hordePrestigeIncome: {group: ['currencyHordeSoulCorruptedGain', 'currencyHordeSoulCorruptedCap', 'currencyHordeCourageGain']}
     },
