@@ -50,9 +50,9 @@
 }
 .currency-labels {
   position: absolute;
-  font-size: 12px;
-  bottom: -8px;
-  left: 32px;
+  font-size: 10px;
+  bottom: -1px;
+  left: 15px;
   right: 0;
 }
 .render-currency-mobile .currency-labels {
@@ -61,7 +61,7 @@
   left: 32px;
 }
 .currency-label {
-  border: 2px solid white;
+  border: none;
 }
 </style>
 
@@ -103,14 +103,12 @@
         <div v-if="hasLabels" class="currency-labels d-flex justify-center">
           <div
             v-if="!currency.hideGainTag && gainTimerAmount > 0"
-            class="currency-label balloon-text-dynamic rounded mx-1 px-1"
-            :style="`background-color: var(--v-${ currency.color }-base);`"
-          >+{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+            class="currency-label balloon-text-dynamic mx-2 px-1"
+          >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
           <div
             v-if="capTimerNeeded !== null"
-            class="currency-label balloon-text-dynamic rounded mx-1 px-1"
-            :style="`background-color: var(--v-${ currency.color }-base);`"
-          >{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatTime(capTimerNeeded) }}</div>
+            class="currency-label balloon-text-dynamic mx-2 px-1"
+          >{{ $formatTime(capTimerNeeded) }}</div>
         </div>
       </div>
     </template>
