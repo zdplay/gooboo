@@ -41,6 +41,13 @@ if (localFile) {
 
 Vue.component('gb-tooltip', GoobooTooltip);
 
+Vue.config.warnHandler = function (msg, vm, trace) {
+    if (msg.includes("Translation key") && msg.includes("Vuetify")) {
+      return;
+    }
+    console.warn(msg, vm, trace);
+  };
+
 new Vue({
     vuetify,
     store,
