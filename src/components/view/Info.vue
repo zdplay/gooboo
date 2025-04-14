@@ -65,6 +65,10 @@
           <span>调整低分辨率的画面布局。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
+          <span>调整实验性显示货币标签下的画面布局。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="grey">采矿</v-chip>
           <span>修改冶炼最大按钮为指定数量按钮。</span>
         </span>

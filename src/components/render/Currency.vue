@@ -1,4 +1,5 @@
 <style scoped>
+/* 旧样式 - 当 hasLabels 为 false 时使用 */
 .render-currency-small {
   width: 210px;
   font-size: 16px;
@@ -31,37 +32,82 @@
   height: 24px;
   left: 50%;
 }
-.currency-container {
+.currency-container-old {
   position: relative;
   height: 44px;
 }
-.render-currency-mobile {
+.render-currency-mobile.currency-container-old {
   font-size: 80%;
   height: 40px;
 }
-.render-currency-mobile.render-currency-small {
-  width: 160px;
-}
-.render-currency-mobile.render-currency-large {
-  width: 288px;
-}
-.currency-clickable {
-  cursor: pointer;
-}
-.currency-labels {
+.currency-container-old .currency-labels {
   position: absolute;
   font-size: 10px;
   bottom: -1px;
   left: 15px;
   right: 0;
 }
-.render-currency-mobile .currency-labels {
+.render-currency-mobile.currency-container-old .currency-labels {
   font-size: 10px;
   bottom: -5px;
   left: 32px;
 }
+
+/* 新样式 - 当 hasLabels 为 true 时使用 */
+.currency-container-new {
+  position: relative;
+  height: 30px;
+  padding-top: 0px !important;
+}
+.render-currency-mobile.currency-container-new {
+  font-size: 80%;
+  height: 30px;
+}
+.currency-container-new .currency-labels {
+  position: absolute;
+  font-size: 12px;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between !important;
+  padding: 0 2px;
+}
+.render-currency-mobile.currency-container-new .currency-labels {
+  font-size: 10px;
+  bottom: 0px;
+  padding: 0 2px;
+}
+.currency-clickable {
+  cursor: pointer;
+}
 .currency-label {
   border: none;
+}
+.custom-progress-wrapper {
+  position: relative;
+  margin-top: -12px;
+}
+.custom-progress-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.custom-progress-text-left {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.custom-progress-text-right {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
 }
 </style>
 
@@ -69,7 +115,7 @@
   <gb-tooltip v-if="alwaysShow || stat > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ name }.name`)">
     <template v-slot:activator="{ on, attrs }">
       <div
-        class="currency-container rounded d-flex flex-nowrap pa-2"
+        class="rounded d-flex flex-nowrap pa-2"
         :class="[transparent ? 'transparent' : currency.color, $vnode.data.class, $vnode.data.staticClass, {
           'render-currency-small': !large,
           'render-currency-large': large,
@@ -77,39 +123,71 @@
           'darken-2': $vuetify.theme.dark,
           'render-currency-mobile': $vuetify.breakpoint.xsOnly,
           'mb-2': $vuetify.breakpoint.xsOnly && hasLabels,
-          'mb-3': $vuetify.breakpoint.smAndUp && hasLabels
+          'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
+          'currency-container-old': !hasLabels,
+          'currency-container-new': hasLabels,
+          'mt-3': hasLabels
         }]"
         v-bind="attrs"
         v-on="{...$listeners, ...on}"
         @mouseover="handleHover"
       >
-        <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
-        <div class="currency-border rounded" :class="{'mt-n1 mb-1': hasLabels}">
-          <v-progress-linear
-            :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
-            :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
-            :value="percent"
-            :height="$vuetify.breakpoint.xsOnly ? 20 : 24"
-            style="overflow: visible;"
-          >
-            <span class="balloon-text-dynamic currency-text text-center">{{ $formatNum(currency.value) }}{{ finalCap !== null ? (' / ' + $formatNum(finalCap)) : '' }}</span>
-            <template v-if="finalCap !== null">
-              <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
-              <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
-              <div class="currency-line currency-line--large"></div>
-            </template>
-          </v-progress-linear>
-        </div>
-        <div v-if="hasLabels" class="currency-labels d-flex justify-center">
-          <div
-            v-if="!currency.hideGainTag && gainTimerAmount > 0"
-            class="currency-label balloon-text-dynamic mx-1 px-1"
-          >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
-          <div
-            v-if="capTimerNeeded !== null"
-            class="currency-label balloon-text-dynamic mx-1 px-1"
-          >{{ $formatTime(capTimerNeeded) }}</div>
-        </div>
+        <template v-if="!hasLabels">
+          <!-- 旧样式内容 -->
+          <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
+          <div class="currency-border rounded">
+            <v-progress-linear
+              :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
+              :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
+              :value="percent"
+              :height="$vuetify.breakpoint.xsOnly ? 20 : 24"
+              style="overflow: visible;"
+            >
+              <span class="balloon-text-dynamic currency-text text-center">{{ $formatNum(currency.value) }}{{ finalCap !== null ? (' / ' + $formatNum(finalCap)) : '' }}</span>
+              <template v-if="finalCap !== null">
+                <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
+                <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
+                <div class="currency-line currency-line--large"></div>
+              </template>
+            </v-progress-linear>
+          </div>
+        </template>
+        
+        <template v-else>
+          <!-- 新样式内容 -->
+          <div class="w-100">
+            <div class="custom-progress-wrapper">
+              <div class="currency-border rounded">
+                <v-progress-linear
+                  :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
+                  :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
+                  :value="percent"
+                  height="24"
+                  style="overflow: visible;"
+                >
+                  <span class="custom-progress-text-left">{{ $formatNum(currency.value) }}</span>
+                  <v-icon class="custom-progress-icon" :color="transparent ? currency.color : undefined">{{ icon }}</v-icon>
+                  <span class="custom-progress-text-right" v-if="finalCap !== null">{{ $formatNum(finalCap) }}</span>
+                  <template v-if="finalCap !== null">
+                    <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
+                    <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
+                    <div class="currency-line currency-line--large"></div>
+                  </template>
+                </v-progress-linear>
+              </div>
+            </div>
+            <div class="currency-labels d-flex justify-center">
+              <div
+                v-if="!currency.hideGainTag && gainTimerAmount > 0"
+                class="currency-label balloon-text-dynamic mx-1 px-1"
+              >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+              <div
+                v-if="capTimerNeeded !== null"
+                class="currency-label balloon-text-dynamic mx-1 px-1"
+              >{{ $formatTime(capTimerNeeded) }}</div>
+            </div>
+          </div>
+        </template>
       </div>
     </template>
     <currency-tooltip :name="name" :gain-base="gainBase" :base-array="baseArray" :mult-array="multArray" :bonus-array="bonusArray">
@@ -117,6 +195,7 @@
     </currency-tooltip>
   </gb-tooltip>
 </template>
+
 
 <script>
 import CurrencyTooltip from '../partial/render/CurrencyTooltip.vue';
@@ -277,7 +356,8 @@ export default {
       return Math.ceil((this.currency.cap * (this.overcapStage + 1) - this.currency.value) * this.gainTimeMult / (gainAmount * this.overcapMult));
     },
     hasLabels() {
-      return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value && this.showTimer && ((!this.currency.hideGainTag && this.gainTimerAmount > 0) || this.capTimerNeeded !== null);
+      //return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value && this.showTimer && ((!this.currency.hideGainTag && this.gainTimerAmount > 0) || this.capTimerNeeded !== null);
+      return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value;
     }
   },
   methods: {
