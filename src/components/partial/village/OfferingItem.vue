@@ -49,7 +49,7 @@
       </v-chip>
       <v-spacer></v-spacer>
       <price-tag class="ma-1" currency="village_offering" :amount="upgradeCost"></price-tag>
-      <v-btn small class="ma-1" color="primary" :disabled="!canAffordUpgrade || disabled" @click="buyUpgrade(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+      <v-btn small class="ma-1" color="primary" :disabled="!canAffordUpgrade || disabled" @click="openUpgradeDialog">指定</v-btn>
       <gb-tooltip>
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on">
@@ -60,6 +60,32 @@
         <alert-text v-if="!isUnlocked" type="warning">{{ $vuetify.lang.t('$vuetify.village.offering.notUnlockedHint') }}</alert-text>
       </gb-tooltip>
     </div>
+    <v-dialog v-model="showUpgradeDialog" max-width="400px" persistent scrollable>
+      <v-card class="default-card">
+        <v-card-title>
+          指定【{{ $vuetify.lang.t(`$vuetify.currency.village_${name}.name`) }}】升级数量
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model.number="upgradeAmount"
+            label="数量"
+            type="number"
+            :max="maxUpgradeAmount"
+            :min="0"
+            :rules="[v => v <= maxUpgradeAmount || '超过最大可购买量']"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="ma-1" color="error" @click="handleCancelUpgrade">
+            {{ $vuetify.lang.t('$vuetify.gooboo.cancel') }}
+          </v-btn>
+          <v-btn class="ma-1" color="success" :disabled="!canAffordUpgrade || upgradeAmount <= 0 || upgradeAmount > maxUpgradeAmount" @click="buyUpgradeAmount(upgradeAmount)">
+            {{ $vuetify.lang.t('$vuetify.gooboo.convert') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -85,6 +111,12 @@ export default {
       required: false,
       default: false
     }
+  },
+  data() {
+    return {
+      showUpgradeDialog: false,
+      upgradeAmount: 0,
+    };
   },
   computed: {
     ...mapState({
@@ -122,6 +154,36 @@ export default {
     },
     offeringPassiveGain() {
       return VILLAGE_OFFERING_PASSIVE_GAIN;
+    },
+    maxUpgradeAmount() {
+      const offering = this.offering;
+      const offeringOwned = this.$store.getters['currency/value']('village_offering');
+      const baseCost = offering.amount + offering.increment * offering.upgradeBought;
+      if (offeringOwned < baseCost) {
+        return 0;
+      }
+      if (offering.increment <= 0) {
+        return Math.floor(offeringOwned / baseCost);
+      }
+      let step = 1;
+      while (this.deltaLinear(offering.amount, offering.increment, step, offering.upgradeBought) <= offeringOwned) {
+        step *= 2;
+      }
+      let amount = step / 2;
+      while (step > 1) {
+        step /= 2;
+        if (this.deltaLinear(offering.amount, offering.increment, amount + step, offering.upgradeBought) <= offeringOwned) {
+          amount += step;
+        }
+      }
+      return amount;
+    },
+  },
+  watch: {
+    showUpgradeDialog(newVal) {
+      if (newVal) {
+        this.upgradeAmount = this.maxUpgradeAmount;
+      }
     }
   },
   methods: {
@@ -130,7 +192,20 @@ export default {
     },
     buyUpgrade(max) {
       this.$store.dispatch('village/upgradeOffering', {name: this.name, buyMax: max});
-    }
+    },
+    buyUpgradeAmount(count) {
+      this.$store.dispatch('village/upgradeOffering', {name: this.name, maxSteps: count});
+      this.showUpgradeDialog = false;
+    },
+    openUpgradeDialog() {
+      this.showUpgradeDialog = true;
+    },
+    handleCancelUpgrade() {
+      this.showUpgradeDialog = false;
+    },
+    deltaLinear(base, increment, amount, current) {
+    return amount * base + increment * amount * (2 * current + amount - 1) / 2;
+    },
   }
 }
 </script>

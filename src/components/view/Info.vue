@@ -65,37 +65,48 @@
           <span>调整低分辨率的画面布局。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">采矿</v-chip>
-          <span>修改冶炼最大按钮为指定数量按钮（借鉴自baicy）</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="grey">采矿</v-chip>
+          <span>修改冶炼最大按钮为指定数量按钮。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">部落</v-chip>
-          <span>增加战斗技能快捷键使用，数字按钮1到0</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="purple">村庄</v-chip>
+          <span>修改牺牲最大按钮为指定数量按钮。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">部落</v-chip>
-          <span>调整自动施法槽默认为3，普通技能也能自动施法</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
+          <span>增加战斗技能快捷键使用，数字按钮1到0。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">画廊</v-chip>
-          <span>增加画廊的形状游戏显示各个形状的个数。（借鉴自baicy）</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
+          <span>调整自动施法槽默认为3，普通技能也能自动施法。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">画廊</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
+          <span>增加画廊的形状游戏显示各个形状的个数。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
           <span>增加画廊点击形状数量按钮可自动移动对应形状。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">学校</v-chip>
-          <span>修改学校参考考试为直接满分通过。（借鉴自baicy）</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="green">学校</v-chip>
+          <span>修改学校参考考试为直接满分通过。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">卡片</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="balck">卡片</v-chip>
           <span>增加卡片页面在目录处增加对应卡包显示。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">实验室</v-chip>
-          <span>增加冷冻实验室显示升级所需天数。（借鉴自baicy）</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">实验室</v-chip>
+          <span>增加冷冻实验室显示升级所需天数。</span>
         </span>
+      </v-card-text>
+      <v-card-text class="text-center">
+        部分功能借鉴了
+        <a href="https://github.com/gityxs/gooboo" target="_blank"><b class="text-lg">gityx</b></a>,
+        <a href="https://github.com/baicy/gooboo" target="_blank"><b class="text-lg">baicy</b></a>,
+        <a href="https://github.com/pzgme/gooboo-zhHans" target="_blank"><b class="text-lg">pzgme</b></a>
+        感谢大佬们的支持。
       </v-card-text>
     </v-card>
     <v-card class="ma-2">

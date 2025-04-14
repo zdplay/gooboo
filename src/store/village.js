@@ -267,14 +267,18 @@ export default {
         },
         upgradeOffering({ state, rootState, rootGetters, commit, dispatch }, o) {
             const offering = state.offering[o.name];
-            const buyMax = o.buyMax ?? false;
+            const amountToBuy = o.maxSteps ?? (o.buyMax ? Math.floor(offeringOwned / offering.amount) : 1);
+            if (o.maxSteps && o.max && o.maxSteps > o.max) {
+                console.error(`Error: 购买的材料数量 (${o.maxSteps}) 超过最大数量 (${o.max}).`);
+                return;
+            }
             const baseCost = offering.amount + offering.increment * offering.upgradeBought;
             const offeringOwned = rootGetters['currency/value']('village_offering');
 
             if (offeringOwned >= baseCost) {
                 // Buy one or all if buyMax is enabled
-                let amount = buyMax ? Math.floor(offeringOwned / offering.amount) : 1;
-                if (buyMax && offering.increment > 0) {
+                let amount = amountToBuy;
+                if (o.buyMax && offering.increment > 0 && !o.maxSteps) {
                     let step = 1;
                     while (offeringOwned >= deltaLinear(offering.amount, offering.increment, step, offering.upgradeBought)) {
                         step *= 2;
