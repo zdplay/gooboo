@@ -27,11 +27,37 @@
       <price-tag class="ma-1" :currency="smeltery.output" :amount="1" add></price-tag>
       <v-spacer></v-spacer>
       <v-badge v-if="smeltery.stored > 0" inline color="secondary" :content="$formatNum(smeltery.stored)"></v-badge>
-      <v-btn class="ma-1" small color="primary" :disabled="isFrozen || !canAfford" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+      <v-btn class="ma-1" small color="primary" :disabled="isFrozen || !canAfford" @click="openSmeltDialog">指定</v-btn>
       <v-btn class="ma-1" color="primary" :disabled="isFrozen || !canAfford" @click="buy">{{ $vuetify.lang.t('$vuetify.mining.smelt') }}</v-btn>
     </div>
     <v-progress-linear class="rounded-b" height="4" :indeterminate="isHighspeed" :value="isHighspeed ? undefined : (smeltery.progress * 100)"></v-progress-linear>
-  </div>
+    <v-dialog v-model="showSmeltDialog" max-width="400px" persistent scrollable>
+      <v-card class="default-card">
+      <v-card-title>
+        指定【{{ $vuetify.lang.t(`$vuetify.currency.mining_bar${formattedName}.name`) }}】冶炼数量
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model.number="smeltAmount"
+          label="数量"
+          type="number"
+          :max="maxAmount"
+          :min="0"
+          :rules="[v => v <= maxAmount || '超过最大可购买量']"
+        ></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn class="ma-1" color="error" @click="handleCancelSmelt">
+        {{ $vuetify.lang.t('$vuetify.gooboo.cancel') }}
+      </v-btn>
+      <v-btn class="ma-1" color="success" :disabled="isFrozen || smeltAmount <= 0 || smeltAmount > maxAmount" @click="buyAmount(smeltAmount)">
+        {{ $vuetify.lang.t('$vuetify.gooboo.convert') }}
+      </v-btn>
+    </v-card-actions>
+    </v-card>
+  </v-dialog>
+</div>
 </template>
 
 <script>
@@ -47,6 +73,12 @@ export default {
       type: String,
       required: true
     }
+  },
+  data() {
+    return {
+      showSmeltDialog: false,
+      smeltAmount: 0,
+    };
   },
   computed: {
     ...mapState({
@@ -72,15 +104,51 @@ export default {
     },
     isHighspeed() {
       return this.timeNeeded < 1 && this.smeltery.stored > 0;
+    },
+    maxAmount() {
+      let amount = 0;
+      if (this.$store.getters['mining/smelteryCanAfford'](this.name)) {
+        amount = 1;
+        let step = 1;
+        while (this.$store.getters['mining/smelteryCanAfford'](this.name, step)) {
+          step *= 2;
+        }
+        amount = step / 2;
+        while (step > 1) {
+          step /= 2;
+          if (this.$store.getters['mining/smelteryCanAfford'](this.name, amount + step)) {
+            amount += step;
+          }
+        }
+      }
+      return amount;
+    },
+    formattedName() {
+      return this.name.charAt(0).toUpperCase() + this.name.slice(1);
+    }
+  },
+  watch: {
+    showSmeltDialog(newVal) {
+      if (newVal) {
+        this.smeltAmount = this.maxAmount;
+      }
     }
   },
   methods: {
     buy() {
-      this.$store.dispatch('mining/addToSmeltery', {name: this.name, max: false});
+      this.$store.dispatch('mining/addToSmelteryCustom', {name: this.name, amount: 1});
     },
-    buyMax() {
-      this.$store.dispatch('mining/addToSmeltery', {name: this.name, max: true});
-    }
+    buyAmount(count) {
+      console.log('Smelting:', this.name, 'Amount:', count);
+      this.$store.dispatch('mining/addToSmelteryCustom', {name: this.name, amount: count});
+      this.showSmeltDialog = false;
+    },
+    openSmeltDialog() {
+      this.showSmeltDialog = true;
+    },
+    handleCancelSmelt() {
+      this.showSmeltDialog = false;
+    },
   }
 }
 </script>

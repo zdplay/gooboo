@@ -1,3 +1,16 @@
+const originalWarn = console.warn;
+console.warn = function (...args) {
+  const message = args[0];
+  if (
+    typeof message === 'string' &&
+    message.includes('[Vuetify]') &&
+    message.includes('Translation key')
+  ) {
+    return;
+  }
+  originalWarn.apply(console, args);
+};
+
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
@@ -40,13 +53,6 @@ if (localFile) {
 }
 
 Vue.component('gb-tooltip', GoobooTooltip);
-
-Vue.config.warnHandler = function (msg, vm, trace) {
-    if (msg.includes("Translation key") && msg.includes("Vuetify")) {
-      return;
-    }
-    console.warn(msg, vm, trace);
-  };
 
 new Vue({
     vuetify,

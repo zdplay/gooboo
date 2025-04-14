@@ -103,11 +103,11 @@
         <div v-if="hasLabels" class="currency-labels d-flex justify-center">
           <div
             v-if="!currency.hideGainTag && gainTimerAmount > 0"
-            class="currency-label balloon-text-dynamic mx-2 px-1"
+            class="currency-label balloon-text-dynamic mx-1 px-1"
           >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
           <div
             v-if="capTimerNeeded !== null"
-            class="currency-label balloon-text-dynamic mx-2 px-1"
+            class="currency-label balloon-text-dynamic mx-1 px-1"
           >{{ $formatTime(capTimerNeeded) }}</div>
         </div>
       </div>

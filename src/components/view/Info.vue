@@ -65,6 +65,10 @@
           <span>调整低分辨率的画面布局。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">采矿</v-chip>
+          <span>修改冶炼最大按钮为指定数量按钮（借鉴自baicy）</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">部落</v-chip>
           <span>增加战斗技能快捷键使用，数字按钮1到0</span>
         </span>

@@ -562,30 +562,14 @@ export default {
             }
             dispatch('applyBeaconEffects');
         },
-        addToSmeltery({ state, getters, commit, dispatch }, o) {
+        addToSmelteryCustom({ state, getters, commit, dispatch }, o) {
             const smeltery = state.smeltery[o.name];
-            if (getters.smelteryCanAfford(o.name)) {
-                let amount = 1;
-                if (o.max) {
-                    let step = 1;
-                    while (getters.smelteryCanAfford(o.name, step)) {
-                        step *= 2;
-                    }
-                    amount = step / 2;
-                    while (step > 1) {
-                        step /= 2;
-                        if (getters.smelteryCanAfford(o.name, amount + step)) {
-                            amount += step;
-                        }
-                    }
-                }
-                for (const [key, elem] of Object.entries(getters.smelteryPrice(o.name, amount))) {
-                    dispatch('currency/spend', {feature: key.split('_')[0], name: key.split('_')[1], amount: elem}, {root: true});
-                }
-                commit('updateSmelteryKey', {name: o.name, key: 'stored', value: smeltery.stored + amount});
-                commit('updateSmelteryKey', {name: o.name, key: 'total', value: smeltery.total + amount});
+            for (const [key, elem] of Object.entries(getters.smelteryPrice(o.name, o.amount))) {
+                dispatch('currency/spend', {feature: key.split('_')[0], name: key.split('_')[1], amount: elem}, {root: true});
             }
-        },
+            commit('updateSmelteryKey', {name: o.name, key: 'stored', value: smeltery.stored + o.amount});
+            commit('updateSmelteryKey', {name: o.name, key: 'total', value: smeltery.total + o.amount});
+         },
         enhanceBars({ state, getters, rootGetters, commit, dispatch }) {
             if (state.enhancementIngredient !== null) {
                 const barsNeeded = getters.enhancementBarsNeeded - state.enhancementBars;
