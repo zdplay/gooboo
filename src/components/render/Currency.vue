@@ -165,9 +165,9 @@
                   height="24"
                   style="overflow: visible;"
                 >
-                  <span class="custom-progress-text-left">{{ $formatNum(currency.value) }}</span>
+                  <span class="balloon-text-dynamic custom-progress-text-left">{{ $formatNum(currency.value) }}</span>
                   <v-icon class="custom-progress-icon" :color="transparent ? currency.color : undefined">{{ icon }}</v-icon>
-                  <span class="custom-progress-text-right" v-if="finalCap !== null">{{ $formatNum(finalCap) }}</span>
+                  <span class="balloon-text-dynamic custom-progress-text-right" v-if="finalCap !== null">{{ $formatNum(finalCap) }}</span>
                   <template v-if="finalCap !== null">
                     <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
                     <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>

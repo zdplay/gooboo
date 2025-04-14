@@ -47,8 +47,10 @@
       </v-card-text>
       <v-card-actions class="flex-wrap justify-end">
         <v-spacer></v-spacer>
+        <v-btn class="ma-1" color="green" target="_blank" href="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz"> <v-icon class="mr-2">mdi-book-open-variant</v-icon>查看攻略</v-btn>
         <v-btn class="ma-1" color="primary" @click="toStatOverview"><v-icon class="mr-2">mdi-card-account-details</v-icon>{{ $vuetify.lang.t('$vuetify.info.statistics.name') }}</v-btn>
         <v-btn class="ma-1" color="primary" @click="toPatchnote"><v-icon class="mr-2">mdi-script-text</v-icon>{{ $vuetify.lang.t('$vuetify.info.viewPatchnotes') }}</v-btn>
+        <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/zdplay/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>修改源码</v-btn>
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/Tendsty/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.viewCode') }}</v-btn>
       </v-card-actions>
     </v-card>
