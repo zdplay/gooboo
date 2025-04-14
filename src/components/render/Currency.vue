@@ -54,6 +54,15 @@
 }
 
 /* 新样式 - 当 hasLabels 为 true 时使用 */
+.render-currency-small-new {
+  width: 200px;
+  font-size: 16px;
+}
+.render-currency-large-new {
+  width: 290px;
+  font-size: 16px;
+}
+
 .currency-container-new {
   position: relative;
   height: 30px;
@@ -117,8 +126,6 @@
       <div
         class="rounded d-flex flex-nowrap pa-2"
         :class="[transparent ? 'transparent' : currency.color, $vnode.data.class, $vnode.data.staticClass, {
-          'render-currency-small': !large,
-          'render-currency-large': large,
           'elevation-0': transparent,
           'darken-2': $vuetify.theme.dark,
           'render-currency-mobile': $vuetify.breakpoint.xsOnly,
@@ -126,6 +133,10 @@
           'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
           'currency-container-old': !hasLabels,
           'currency-container-new': hasLabels,
+          'render-currency-small': !large && !hasLabels,
+          'render-currency-large': large && !hasLabels,
+          'render-currency-small-new': !large && hasLabels,
+          'render-currency-large-new': large && hasLabels,
           'mt-3': hasLabels
         }]"
         v-bind="attrs"
