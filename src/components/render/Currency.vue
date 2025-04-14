@@ -55,11 +55,11 @@
 
 /* 新样式 - 当 hasLabels 为 true 时使用 */
 .render-currency-small-new {
-  width: 200px;
+  width: 190px;
   font-size: 16px;
 }
 .render-currency-large-new {
-  width: 290px;
+  width: 280px;
   font-size: 16px;
 }
 
