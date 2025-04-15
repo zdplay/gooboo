@@ -332,6 +332,13 @@
 .v-btn {
   color: var(--v-primary-base);
 }
+
+.v-dialog--fullscreen {
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
 }
 </style>
 
@@ -416,8 +423,7 @@
       <v-spacer></v-spacer>
       <v-btn 
         text
-        href="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz" 
-        target="_blank"
+        @click="showStrategyDialog = true"
         class="mr-2"
       >
         攻略
@@ -566,6 +572,20 @@
     </v-dialog>
     <input @change="importSave" type="file" accept="text/plain, application/json" id="gooboo-savefile-input" style="display: none;"/>
     <v-icon v-if="activeTutorialCss !== null" class="tutorial-arrow" :style="activeTutorialCss">mdi-arrow-up-bold</v-icon>
+    <v-dialog v-model="showStrategyDialog" max-width="1200" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-btn icon dark @click="showStrategyDialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>游戏攻略</v-toolbar-title>
+        </v-toolbar>
+        <iframe 
+          src="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz" 
+          style="width:100%; height:calc(100vh - 64px); border:none;"
+        ></iframe>
+      </v-card>
+    </v-dialog>
 </v-app>
 </template>
 
@@ -673,6 +693,7 @@ export default {
     intervalId: null,
     isSaving: false,
     showCloudLoadConfirm: false,
+    showStrategyDialog: false
   }),
   computed: {
     ...mapState({

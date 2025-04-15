@@ -111,7 +111,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue-grey">其他</v-chip>
-          <span>增加介绍页面攻略按钮。</span>
+          <span>增加攻略按钮。</span>
         </span>
       </v-card-text>
       <v-card-text class="text-center">
