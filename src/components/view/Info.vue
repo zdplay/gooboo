@@ -102,6 +102,10 @@
           <span>增加卡片页面在目录处增加对应卡包显示。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="yellow">宝藏</v-chip>
+          <span>增加宝藏属性显示显示。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">实验室</v-chip>
           <span>增加冷冻实验室显示升级所需天数。</span>
         </span>

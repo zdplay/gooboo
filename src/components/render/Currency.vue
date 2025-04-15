@@ -219,11 +219,11 @@
               <div
                 v-if="!currency.hideGainTag && gainTimerAmount > 0"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
-              >+{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+              >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
               <div
                 v-if="capTimerNeeded !== null"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
-              >{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatTime(capTimerNeeded) }}</div>
+              >{{ $formatTime(capTimerNeeded) }}</div>
             </div>
           </div>
         </template>
@@ -392,6 +392,9 @@ export default {
       }
       const gainAmount = this.currency.showGainTimer ? this.gainAmount : this.timerFunction;
       return Math.ceil((this.currency.cap * (this.overcapStage + 1) - this.currency.value) * this.gainTimeMult / (gainAmount * this.overcapMult));
+    },
+    hasLabels() {
+      return this.hasOldLabels || this.hasNewLabels;
     },
     hasOldLabels() {
       return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value && this.showTimer && ((!this.currency.hideGainTag && this.gainTimerAmount > 0) || this.capTimerNeeded !== null);

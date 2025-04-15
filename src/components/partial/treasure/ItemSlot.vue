@@ -29,6 +29,10 @@
           </div>
         </gb-tooltip>
       </v-badge>
+      <div class="text-center" v-for="(effect, index) in item.effect" :key="effect" style="margin-top: 5px;">
+        <display-row :name="effect" type="mult" :style="{ fontSize: '0.7em' }"></display-row>
+        <div :style="{ fontSize: '0.7em' }">{{ itemValue[index] }}</div>
+      </div>
     </v-badge>
     <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
     <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && deleting && destroyValue !== null" :content="'+' + $formatNum(destroyValue)" color="amber"></v-badge>
