@@ -229,6 +229,7 @@ export default {
     event: 'Event',
     treasure: 'Schätze',
     cryolab: 'Kryolabor',
+    strategy: 'Strategy',
     debug: 'Debug',
 
     // Subfeatures

@@ -421,13 +421,6 @@
         <div class="text-center">{{ $vuetify.lang.t('$vuetify.endOfContent.description') }}</div>
       </gb-tooltip>
       <v-spacer></v-spacer>
-      <v-btn 
-        text
-        @click="showStrategyDialog = true"
-        class="mr-2"
-      >
-        攻略
-      </v-btn>
       <v-btn icon @click="changeScreen('info')">
         <v-icon>mdi-information</v-icon>
       </v-btn>
@@ -572,20 +565,6 @@
     </v-dialog>
     <input @change="importSave" type="file" accept="text/plain, application/json" id="gooboo-savefile-input" style="display: none;"/>
     <v-icon v-if="activeTutorialCss !== null" class="tutorial-arrow" :style="activeTutorialCss">mdi-arrow-up-bold</v-icon>
-    <v-dialog v-model="showStrategyDialog" max-width="1200" fullscreen hide-overlay transition="dialog-bottom-transition">
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-btn icon dark @click="showStrategyDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>游戏攻略</v-toolbar-title>
-        </v-toolbar>
-        <iframe 
-          src="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz" 
-          style="width:100%; height:calc(100vh - 64px); border:none;"
-        ></iframe>
-      </v-card>
-    </v-dialog>
 </v-app>
 </template>
 
@@ -637,6 +616,7 @@ import Currency from './components/render/Currency.vue';
 import UpdateMessage from './components/partial/snackbar/UpdateMessage.vue';
 import { APP_ENV } from './js/constants';
 import ImportMessage from './components/partial/snackbar/ImportMessage.vue';
+import Strategy from './components/view/Strategy.vue';
 const semverCompare = require('semver/functions/compare');
 
 export default {
@@ -683,7 +663,8 @@ export default {
     GoldenDustMenu,
     Currency,
     UpdateMessage,
-    ImportMessage
+    ImportMessage,
+    Strategy,
   },
   data: () => ({
     dialogDust: false,
@@ -692,8 +673,7 @@ export default {
     selectedSavefile: null,
     intervalId: null,
     isSaving: false,
-    showCloudLoadConfirm: false,
-    showStrategyDialog: false
+    showCloudLoadConfirm: false
   }),
   computed: {
     ...mapState({

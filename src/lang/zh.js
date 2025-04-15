@@ -229,6 +229,7 @@ export default {
     event: '事件',
     treasure: '宝藏',
     cryolab: '冷冻实验室',
+    strategy: '攻略',
     debug: '调试',
 
     // Subfeatures

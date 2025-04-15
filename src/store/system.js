@@ -127,6 +127,12 @@ export default {
                 subfeatures: [],
                 icon: 'mdi-test-tube',
                 main: false
+            },
+            strategy: {
+                unlock: null,
+                subfeatures: [],
+                icon: 'mdi-book-open',
+                main: false
             }
         },
         settings: {
