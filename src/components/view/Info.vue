@@ -47,7 +47,6 @@
       </v-card-text>
       <v-card-actions class="flex-wrap justify-end">
         <v-spacer></v-spacer>
-        <v-btn class="ma-1" color="green" target="_blank" href="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz"> <v-icon class="mr-2">mdi-book-open-variant</v-icon>查看攻略</v-btn>
         <v-btn class="ma-1" color="primary" @click="toStatOverview"><v-icon class="mr-2">mdi-card-account-details</v-icon>{{ $vuetify.lang.t('$vuetify.info.statistics.name') }}</v-btn>
         <v-btn class="ma-1" color="primary" @click="toPatchnote"><v-icon class="mr-2">mdi-script-text</v-icon>{{ $vuetify.lang.t('$vuetify.info.viewPatchnotes') }}</v-btn>
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/zdplay/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>修改源码</v-btn>
@@ -68,7 +67,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>调整实验性显示货币标签下的画面布局。</span>
+          <span>增加新UI的布局，在【设置】-【实验性】设置使用，需要跟货币标签一起开启。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="grey">采矿</v-chip>
@@ -105,6 +104,10 @@
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">实验室</v-chip>
           <span>增加冷冻实验室显示升级所需天数。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue-grey">其他</v-chip>
+          <span>增加介绍页面攻略按钮。</span>
         </span>
       </v-card-text>
       <v-card-text class="text-center">

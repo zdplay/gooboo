@@ -414,6 +414,14 @@
         <div class="text-center">{{ $vuetify.lang.t('$vuetify.endOfContent.description') }}</div>
       </gb-tooltip>
       <v-spacer></v-spacer>
+      <v-btn 
+        text
+        href="https://docs.qq.com/sheet/DQlNPSHdVVkdxZ0l4?tab=qej3zz" 
+        target="_blank"
+        class="mr-2"
+      >
+        攻略
+      </v-btn>
       <v-btn icon @click="changeScreen('info')">
         <v-icon>mdi-information</v-icon>
       </v-btn>

@@ -1,5 +1,4 @@
 <style scoped>
-/* 旧样式 - 当 hasLabels 为 false 时使用 */
 .render-currency-small {
   width: 210px;
   font-size: 16px;
@@ -32,37 +31,58 @@
   height: 24px;
   left: 50%;
 }
-.currency-container-old {
+.currency-container {
   position: relative;
   height: 44px;
 }
-.render-currency-mobile.currency-container-old {
+.render-currency-mobile {
   font-size: 80%;
   height: 40px;
 }
-.currency-container-old .currency-labels {
+.render-currency-mobile.render-currency-small {
+  width: 160px;
+}
+.render-currency-mobile.render-currency-large {
+  width: 288px;
+}
+.currency-clickable {
+  cursor: pointer;
+}
+.currency-labels {
   position: absolute;
-  font-size: 10px;
-  bottom: -1px;
-  left: 15px;
+  font-size: 12px;
+  bottom: -8px;
+  left: 32px;
   right: 0;
 }
-.render-currency-mobile.currency-container-old .currency-labels {
+.render-currency-mobile .currency-labels {
   font-size: 10px;
   bottom: -5px;
   left: 32px;
 }
+.currency-label {
+  border: 2px solid white;
+}
 
-/* 新样式 - 当 hasLabels 为 true 时使用 */
+/* 新样式 */
 .render-currency-small-new {
-  width: 160px;
+  width: 190px;
   font-size: 16px;
 }
 .render-currency-large-new {
   width: 280px;
   font-size: 16px;
 }
-
+@media (max-width: 768px) {
+  .render-currency-small-new {
+    width: 160px;
+    font-size: 16px;
+  }
+  .render-currency-large-new {
+    width: 280px;
+    font-size: 16px;
+  }
+}
 .currency-container-new {
   position: relative;
   height: 30px;
@@ -82,16 +102,13 @@
   justify-content: space-between !important;
   padding: 0 2px;
 }
+.currency-container-new .currency-label {
+  border: none;
+}
 .render-currency-mobile.currency-container-new .currency-labels {
   font-size: 10px;
   bottom: 0px;
   padding: 0 2px;
-}
-.currency-clickable {
-  cursor: pointer;
-}
-.currency-label {
-  border: none;
 }
 .custom-progress-wrapper {
   position: relative;
@@ -124,29 +141,28 @@
   <gb-tooltip v-if="alwaysShow || stat > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ name }.name`)">
     <template v-slot:activator="{ on, attrs }">
       <div
-        class="rounded d-flex flex-nowrap pa-2"
+        class="currency-container rounded d-flex flex-nowrap pa-2"
         :class="[transparent ? 'transparent' : currency.color, $vnode.data.class, $vnode.data.staticClass, {
           'elevation-0': transparent,
           'darken-2': $vuetify.theme.dark,
           'render-currency-mobile': $vuetify.breakpoint.xsOnly,
           'mb-2': $vuetify.breakpoint.xsOnly && hasLabels,
           'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
-          'currency-container-old': !hasLabels,
-          'currency-container-new': hasLabels,
-          'render-currency-small': !large && !hasLabels,
-          'render-currency-large': large && !hasLabels,
-          'render-currency-small-new': !large && hasLabels,
-          'render-currency-large-new': large && hasLabels,
-          'mt-3': hasLabels
+          'render-currency-small': !large && (!hasNewLabels || !useNewStyle),
+          'render-currency-large': large && (!hasNewLabels || !useNewStyle),
+          'render-currency-small-new': !large && hasNewLabels && useNewStyle,
+          'render-currency-large-new': large && hasNewLabels && useNewStyle,
+          'currency-container-new': hasNewLabels && useNewStyle,
+          'mt-3': hasNewLabels && useNewStyle
         }]"
         v-bind="attrs"
         v-on="{...$listeners, ...on}"
         @mouseover="handleHover"
       >
-        <template v-if="!hasLabels">
-          <!-- 旧样式内容 -->
+        <template v-if="!hasNewLabels || !useNewStyle">
+          <!-- 原有样式 -->
           <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
-          <div class="currency-border rounded">
+          <div class="currency-border rounded" :class="{'mt-n1 mb-1': hasOldLabels}">
             <v-progress-linear
               :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
               :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
@@ -162,10 +178,22 @@
               </template>
             </v-progress-linear>
           </div>
+          <div v-if="hasOldLabels" class="currency-labels d-flex justify-center">
+            <div
+              v-if="!currency.hideGainTag && gainTimerAmount > 0"
+              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+              :style="`background-color: var(--v-${ currency.color }-base);`"
+            >+{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+            <div
+              v-if="capTimerNeeded !== null"
+              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+              :style="`background-color: var(--v-${ currency.color }-base);`"
+            >{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatTime(capTimerNeeded) }}</div>
+          </div>
         </template>
         
         <template v-else>
-          <!-- 新样式内容 -->
+          <!-- 新样式 -->
           <div class="w-100">
             <div class="custom-progress-wrapper">
               <div class="currency-border rounded">
@@ -191,11 +219,11 @@
               <div
                 v-if="!currency.hideGainTag && gainTimerAmount > 0"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
-              >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+              >+{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
               <div
                 v-if="capTimerNeeded !== null"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
-              >{{ $formatTime(capTimerNeeded) }}</div>
+              >{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatTime(capTimerNeeded) }}</div>
             </div>
           </div>
         </template>
@@ -206,7 +234,6 @@
     </currency-tooltip>
   </gb-tooltip>
 </template>
-
 
 <script>
 import CurrencyTooltip from '../partial/render/CurrencyTooltip.vue';
@@ -366,9 +393,14 @@ export default {
       const gainAmount = this.currency.showGainTimer ? this.gainAmount : this.timerFunction;
       return Math.ceil((this.currency.cap * (this.overcapStage + 1) - this.currency.value) * this.gainTimeMult / (gainAmount * this.overcapMult));
     },
-    hasLabels() {
-      //return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value && this.showTimer && ((!this.currency.hideGainTag && this.gainTimerAmount > 0) || this.capTimerNeeded !== null);
+    hasOldLabels() {
+      return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value && this.showTimer && ((!this.currency.hideGainTag && this.gainTimerAmount > 0) || this.capTimerNeeded !== null);
+    },
+    hasNewLabels() {
       return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value;
+    },
+    useNewStyle() {
+      return this.$store.state.system.settings.experiment.items.currencynewLabel.value;
     }
   },
   methods: {

@@ -1274,6 +1274,10 @@ export default {
       currencyLabel: {
         name: 'Zeige Währungsschilder',
         description: 'Währungseinkommen und Zeit bis zur Kapazität werden ohne Herüberfahren mit der Maus angezeigt'
+      },
+      currencynewLabel: {
+        name: 'New UI Tag',
+        description: 'Only effective when [Show Currency Tag] is enabled'
       }
     }
   },

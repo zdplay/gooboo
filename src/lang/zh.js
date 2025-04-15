@@ -1274,6 +1274,10 @@ export default {
         currencyLabel: {
           name: '显示货币标签',
           description: '显示货币收益和达到容量所需的时间，无需悬停'
+        },
+        currencynewLabel: {
+          name: '新UI标签',
+          description: '需要同时开启【显示货币标签】才生效'
         }
       }
   },

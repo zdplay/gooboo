@@ -407,6 +407,13 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
+                    },
+                    currencynewLabel: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
                     }
                 }
             }

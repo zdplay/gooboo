@@ -1274,6 +1274,10 @@ export default {
       currencyLabel: {
         name: 'Show currency labels',
         description: 'Display currency gain and time until you reach capacity without needing to hover'
+      },
+      currencynewLabel: {
+        name: 'New UI Tag',
+        description: 'Only effective when [Show Currency Tag] is enabled'
       }
     }
   },
