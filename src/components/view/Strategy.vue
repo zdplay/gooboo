@@ -1,13 +1,17 @@
 <template>
     <div class="strategy-container">
-      <div class="spacer"></div>
-  
-      <iframe
-        :src="iframeSrc"
-        style="width: 100%; height: 100%; border: none;"
-      ></iframe>
+      <div class="spacer-container">
+        <div class="spacer"></div>
+      </div>
+      <div class="iframe-container">
+        <iframe
+          :src="iframeSrc"
+          style="width: 100%; height: 100%; border: none;"
+        ></iframe>
+      </div>
     </div>
   </template>
+  
   
   <script>
   export default {
@@ -20,34 +24,37 @@
   </script>
   
   <style scoped>
-  .strategy-container {
-    width: 100%;
-    height: calc(100vh - 64px);
-    overflow: hidden;
-  }
-  
+.strategy-container {
+  width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.spacer-container {
+  width: 100%;
+}
+.spacer {
+  display: none;
+  width: 100%;
+  height: 48px;
+}
+.iframe-container {
+  flex-grow: 1;
+  overflow: hidden;
+}
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+@media (max-width: 767px) {
   .spacer {
-    display: none;
+    display: block;
   }
-  
-  iframe {
-    height: 100%;
+  .spacer-container{
+    display: block;
   }
-  
-  @media (max-width: 767px) {
-    .strategy-container {
-      height: calc(100vh - 64px);
-    }
-  
-    .spacer {
-      display: block;
-      width: 100%;
-      height: 48px;
-    }
-  
-    iframe {
-      height: calc(100% - 48px);
-    }
-  }
+}
   </style>
   
