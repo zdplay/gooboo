@@ -37,7 +37,7 @@
 .spacer {
   display: none;
   width: 100%;
-  height: 48px;
+  height: 64px;
 }
 .iframe-container {
   flex-grow: 1;
