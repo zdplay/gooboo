@@ -128,6 +128,13 @@
           <price-tag currency="gem_sapphire" :amount="motivationBuyCost"></price-tag>
         </div>
       </gb-tooltip>
+      <v-btn
+        color="primary"
+        @click="triggerAutoSort"
+        :loading="isAutoSorting"
+      >
+        自动
+      </v-btn>
     </div>
       <div class="d-flex flex-wrap justify-center align-center ma-1">
       <currency v-for="item in currencies.slice(1)" :key="item" class="ma-1" :name="item" :gainBase="1"></currency>
@@ -146,13 +153,16 @@ export default {
   components: { Currency, PriceTag, StatBreakdown },
   data: () => ({
     dragX: null,
-    dragY: null
+    dragY: null,
+    isAutoSorting: false,
+    autoSortInterval: null,
   }),
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleKeydown);
+    this.stopAutoSort();
   },
   computed: {
     ...mapState({
@@ -281,7 +291,6 @@ export default {
     async triggerSort(shapeName) {
     console.log(`\n===== 正在尝试为形状 "${shapeName}" 排序聚合 =====`);
 
-    // --- 配置参数 ---
     const config = {
         CONNECTIVITY_BONUS: 1000,
         MAX_ITERATIONS_FACTOR: 80,
@@ -290,7 +299,6 @@ export default {
         ENABLE_STATE_SYNC_CHECK: false
     };
 
-    // --- 内联辅助函数 ---
     const coordsToString = ({ x, y }) => `${x},${y}`;
     const stringToCoords = (str) => { const [x, y] = str.split(',').map(Number); return { x, y }; };
     const idFromCoords = ({ x, y }) => `galleryShape_${x}_${y}`;
@@ -329,7 +337,7 @@ export default {
         return Array.from(document.querySelectorAll('td.shape-cell'))
             .filter(cell => cell.querySelector(`i.${targetIconClass}`))
             .map(cell => {
-                const match = cell.id.match(/galleryShape_(\d+)_(\d+)/); // 使用正则提取数字
+                const match = cell.id.match(/galleryShape_(\d+)_(\d+)/);
                 if (match) {
                     return { id: cell.id, x: parseInt(match[1]), y: parseInt(match[2]) };
                 }
@@ -404,50 +412,38 @@ export default {
         return components;
     };
 
-    // --- 算法执行逻辑 ---
-    let solvedPath = null; // 用于存储最终结果
+    let solvedPath = null;
     try {
         const initialTargetCells = getTargetCells(shapeName);
         if (!initialTargetCells || initialTargetCells.length === 0) {
             console.log(`未找到任何形状为 "${shapeName}" 的单元格，操作取消。`);
             return;
         }
-        console.log(`找到 ${initialTargetCells.length} 个 "${shapeName}" 单元格，开始处理...`);
-
         const allCellCoordsSet = getAllCellCoordsSet();
         if (allCellCoordsSet.size === 0) {
-            console.error("错误：未能获取任何单元格坐标。");
             return;
         }
 
         let targetCoordsSet = new Set(initialTargetCells.map(c => coordsToString({ x: c.x, y: c.y })));
 
         if (isConnected(targetCoordsSet)) {
-            console.log("初始状态已经连接。");
-            solvedPath = []; // 空路径表示无需移动
-            return; // 直接结束
+            solvedPath = [];
+            return;
         }
 
         const centerCoords = calculateCenterOfMass(targetCoordsSet);
         if (!centerCoords) {
-            console.error("无法计算中心点。");
             return;
         }
-        const centerStr = coordsToString(centerCoords);
-        console.log(`目标中心点: ${centerStr}`);
-
         const history = [];
         let iterations = 0;
         const maxIterations = targetCoordsSet.size * config.MAX_ITERATIONS_FACTOR;
-        console.time("SolveConnectivity Algorithm");
 
         while (!isConnected(targetCoordsSet)) {
             iterations++;
             if (iterations > maxIterations) {
-                console.error(`超过最大迭代次数 (${maxIterations})，中止。`);
-                solvedPath = null; // 标记失败
-                console.timeEnd("SolveConnectivity Algorithm");
-                return; // 退出函数
+                solvedPath = null;
+                return;
             }
 
             const components = findComponents(targetCoordsSet);
@@ -484,92 +480,131 @@ export default {
                         if (totalScore > maxScore) {
                             maxScore = totalScore;
                             bestMove = { srcId: idFromCoords(targetCoords), tgtId: idFromCoords(adjCoords), srcStr: targetStr, tgtStr: adjStr, score: totalScore, bonus: connectBonus > 0 };
-                        } else if (totalScore === 0 && !lateralMove) { // 找到第一个得分为0的移动作为备选
+                        } else if (totalScore === 0 && !lateralMove) {
                             lateralMove = { srcId: idFromCoords(targetCoords), tgtId: idFromCoords(adjCoords), srcStr: targetStr, tgtStr: adjStr, score: 0, bonus: false };
                         }
                     }
                 }
-            } // end for targetStr
+            }
 
-            // 选择移动：优先选择得分 > 0 的最佳移动，否则选择得分 = 0 的横向移动
             const move = bestMove && maxScore > 0 ? bestMove : lateralMove;
 
             if (!move) {
-                console.error(`算法卡住：在迭代 ${iterations} 找不到有效移动 (得分>0 或 =0)。`);
-                if (isConnected(targetCoordsSet)) { // 双重检查
-                     console.log("卡住时检测到已连接，提前结束。");
-                     break; // 跳出 while 循环
+                if (isConnected(targetCoordsSet)) {
+                     break;
                  }
-                solvedPath = null; // 标记失败
-                console.timeEnd("SolveConnectivity Algorithm");
-                return; // 退出函数
+                solvedPath = null;
+                return;
             }
 
-            // console.log(`Iter ${iterations}: Move ${move.srcStr} -> ${move.tgtStr} (Score: ${move.score}${move.bonus ? ', Connects!' : ''})`);
-
-            // 执行移动
             const success = await simulateDragDrop(move.srcId, move.tgtId);
             if (!success) {
-                console.error(`移动 ${move.srcId} -> ${move.tgtId} 失败！中止。`);
-                solvedPath = null; // 标记失败
-                console.timeEnd("SolveConnectivity Algorithm");
-                return; // 退出函数
+                solvedPath = null;
+                return;
             }
 
-            // 等待 DOM 更新
             if (config.DOM_UPDATE_WAIT_MS > 0) await new Promise(resolve => setTimeout(resolve, config.DOM_UPDATE_WAIT_MS));
 
-            // 更新内部状态
             targetCoordsSet.delete(move.srcStr);
             targetCoordsSet.add(move.tgtStr);
             history.push({ sourceId: move.srcId, targetId: move.tgtId });
 
-            // 可选：状态同步检查
             if (config.ENABLE_STATE_SYNC_CHECK) {
-                const currentDomTargets = getTargetCells(shapeName); // 重新从 DOM 获取
+                const currentDomTargets = getTargetCells(shapeName);
                 const domTargetCoordsSet = new Set(currentDomTargets.map(c => coordsToString({x: c.x, y: c.y})));
                 if(domTargetCoordsSet.size !== targetCoordsSet.size || ![...domTargetCoordsSet].every(coord => targetCoordsSet.has(coord))) {
-                     console.warn(`状态不同步: DOM有 ${domTargetCoordsSet.size}, 集合有 ${targetCoordsSet.size}. 从DOM重新同步...`);
-                     targetCoordsSet = domTargetCoordsSet; // 使用从 DOM 获取的最新状态
-                     console.log(`重新同步后集合大小: ${targetCoordsSet.size}`);
+                     targetCoordsSet = domTargetCoordsSet;
                      if (isConnected(targetCoordsSet)) {
-                         console.log("重新同步后发现已连接状态，结束。");
-                         break; // 跳出 while 循环
+                         break;
                      }
                 }
             }
 
-            // 暂停以便观察
             if (config.MOVE_DELAY_MS > 0) await new Promise(resolve => setTimeout(resolve, config.MOVE_DELAY_MS));
 
-        } // end while
+        }
 
-        // 循环结束，检查最终状态
-        console.timeEnd("SolveConnectivity Algorithm");
+
         if (isConnected(targetCoordsSet)) {
             console.log(`成功连接所有目标块！总步数: ${history.length}, 总迭代: ${iterations}`);
-            solvedPath = history; // 成功找到路径
+            solvedPath = history;
         } else {
-            // 这种情况通常是因为达到了 maxIterations
-            console.log("算法结束，但未能连接所有块（可能达到最大迭代次数）。");
-            solvedPath = null; // 标记未完全成功
+            solvedPath = null;
         }
 
     } catch (error) {
         console.error(`为形状 "${shapeName}" 执行排序聚合时发生意外错误:`, error);
-        solvedPath = null; // 标记失败
-        console.timeEnd("SolveConnectivity Algorithm"); // 确保计时器停止
+        solvedPath = null;
     } finally {
-          // 将结果存储到全局变量（如果需要）或进行其他处理
           window.solvedPath = solvedPath;
-          if (solvedPath) {
-              console.log(`找到的路径 (${solvedPath.length} 步):`, solvedPath);
-          } else {
-              console.log(`未能为形状 "${shapeName}" 找到解决方案。`);
-          }
           console.log(`===== 形状 "${shapeName}" 处理结束 =====\n`);
     }
+    },
+    async triggerAutoSort() {
+      if (this.isAutoSorting) {
+        clearInterval(this.autoSortInterval);
+        this.isAutoSorting = false;
+        return;
+      }
+      this.isAutoSorting = true;
+      let isSorting = false;
+      const autoSort = async () => {
+        if (isSorting) return;
+        isSorting = true;
+        try {
+          if (this.$store.getters['currency/value']('gallery_motivation') <= 0) {
+            if (this.canBuyReroll) {
+              this.buyShapeReroll();
+              await new Promise(resolve => setTimeout(resolve, 300));
+              return;
+            } else {
+              this.stopAutoSort();
+              return;
+            }
+          }
+          const eligibleShapes = Object.entries(this.gridStat)
+          .filter(([, count]) => count > 4)
+          .sort((a, b) => a[1] - b[1]);
+          if (eligibleShapes.length > 0) {
+            const bestShape = eligibleShapes[0][0];
+            await this.triggerSort(bestShape);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (this.$store.getters['currency/value']('gallery_motivation') > 1) {
+              this.clickShapeByColor(bestShape);
+            }
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } else {
+            if (this.canBuyReroll) {
+              this.buyShapeReroll();
+              await new Promise(resolve => setTimeout(resolve, 300));
+            } else {
+              this.stopAutoSort();
+              return;
+            }
+          }
+        } finally {
+          isSorting = false;
+        }
+      };
+    this.autoSortInterval = setInterval(async () => {
+      if (!this.isAutoSorting) return;
+      await autoSort();
+    }, 350);
+  },
+  stopAutoSort() {
+    clearInterval(this.autoSortInterval);
+    this.isAutoSorting = false;
+  },
+  clickShapeByColor(shapeName) {
+    for (let y = 0; y < this.shapeGrid.length; y++) {
+      for (let x = 0; x < this.shapeGrid[y].length; x++) {
+        if (this.shapeGrid[y][x] === shapeName) {
+          this.selectTile(x, y);
+          return;
+        }
+      }
     }
+  },
   }
 }
 </script>
