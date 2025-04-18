@@ -131,9 +131,8 @@
       <v-btn
         color="primary"
         @click="triggerAutoSort"
-        :loading="isAutoSorting"
-      >
-        自动
+        >
+        {{ isAutoSorting ? "运行中" : "自动" }}
       </v-btn>
     </div>
       <div class="d-flex flex-wrap justify-center align-center ma-1">
@@ -289,8 +288,6 @@ export default {
       }
     },
     async triggerSort(shapeName) {
-    console.log(`\n===== 正在尝试为形状 "${shapeName}" 排序聚合 =====`);
-
     const config = {
         CONNECTIVITY_BONUS: 1000,
         MAX_ITERATIONS_FACTOR: 80,
@@ -311,6 +308,11 @@ export default {
         if (!sourceElement || !targetElement) {
             console.error(`错误: 找不到元素 ${sourceId} 或 ${targetId}`);
             return false;
+        }
+        if (this.$store.getters['currency/value']('gallery_motivation') <= 1) {
+            solvedPath = null;
+            this.stopAutoSort();
+            return;
         }
         try {
             const dataTransfer = new DataTransfer();
@@ -526,7 +528,6 @@ export default {
 
 
         if (isConnected(targetCoordsSet)) {
-            console.log(`成功连接所有目标块！总步数: ${history.length}, 总迭代: ${iterations}`);
             solvedPath = history;
         } else {
             solvedPath = null;
@@ -537,13 +538,12 @@ export default {
         solvedPath = null;
     } finally {
           window.solvedPath = solvedPath;
-          console.log(`===== 形状 "${shapeName}" 处理结束 =====\n`);
     }
     },
     async triggerAutoSort() {
+      console.log("开始自动运行");
       if (this.isAutoSorting) {
-        clearInterval(this.autoSortInterval);
-        this.isAutoSorting = false;
+        this.stopAutoSort();
         return;
       }
       this.isAutoSorting = true;
@@ -592,6 +592,7 @@ export default {
     }, 350);
   },
   stopAutoSort() {
+    console.log("停止自动运行");
     clearInterval(this.autoSortInterval);
     this.isAutoSorting = false;
   },
