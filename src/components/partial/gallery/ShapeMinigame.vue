@@ -106,7 +106,7 @@
       <gb-tooltip :min-width="0">
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on">
-            <v-btn class="ma-1" width="36" min-width="36" color="primary" :disabled="!canBuyReroll" @click="buyShapeReroll"><v-icon>mdi-cached</v-icon></v-btn>
+            <v-btn class="ma-1" width="36" min-width="36" color="primary" :disabled="!canBuyReroll" @click="buyShapeReroll" ref="rerollButton"><v-icon>mdi-cached</v-icon></v-btn>
           </div>
         </template>
         <div class="mt-0">
@@ -128,6 +128,8 @@
           <price-tag currency="gem_sapphire" :amount="motivationBuyCost"></price-tag>
         </div>
       </gb-tooltip>
+    </div>
+      <div class="d-flex flex-wrap justify-center align-center ma-1">
       <currency v-for="item in currencies.slice(1)" :key="item" class="ma-1" :name="item" :gainBase="1"></currency>
     </div>
   </div>
@@ -146,6 +148,12 @@ export default {
     dragX: null,
     dragY: null
   }),
+  mounted() {
+    window.addEventListener('keydown', this.handleKeydown);
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleKeydown);
+  },
   computed: {
     ...mapState({
       shapeList: state => state.gallery.shape,
@@ -258,6 +266,16 @@ export default {
         }});
       } else {
         this.$store.dispatch('gallery/buyMotivation');
+      }
+    },
+    handleKeydown(event) {
+      if (event.key === 'r' && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
+        if (this.canBuyReroll) {
+          this.buyShapeReroll();
+          if (this.$refs.rerollButton) {
+            this.$refs.rerollButton.$el.focus();
+          }
+        }
       }
     },
     async triggerSort(shapeName) {
