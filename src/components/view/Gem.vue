@@ -6,7 +6,7 @@
     <v-col class="px-2" cols="12" md="6" lg="3" :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container' : ''">
       <gem-list v-if="$vuetify.breakpoint.mdOnly"></gem-list>
       <v-progress-linear class="balloon-text-dynamic my-2 rounded" height="24" :value="genPercent">{{ $formatTime(timeToNext) }}</v-progress-linear>
-      <div v-if="canSeeAchievement" class="text-center">{{ $vuetify.lang.t('$vuetify.gem.newGemsTimeAchievement', $formatNum(genSpeedIncrease, true), $formatNum(totalAchievements), $formatNum(genSpeedIncreaseTotal, true), $formatTime(genSpeedBase), $formatTime(timeNeeded)) }}</div>
+      <div v-if="canSeeAchievement" class="text-center">{{ $vuetify.lang.t('$vuetify.gem.newGemsTimeAchievement', $formatNum(genSpeedIncrease, true), $formatNum(totalAchievements), $formatNum(genSpeedIncreaseTotal, true), $formatTime(genSpeedBase), $formatTime(timeNeeded)) }}<br>每日生产宝石：{{ $formatNum(gemsPerDay, true) }} 个</div>
       <div v-else class="text-center">{{ $vuetify.lang.t('$vuetify.gem.newGemsTime', $formatTime(timeNeeded)) }}</div>
     </v-col>
     <v-col cols="12" md="6" lg="3" :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container' : ''">
@@ -71,6 +71,11 @@ export default {
     },
     canSeeAchievement() {
       return this.$store.state.unlock.achievementFeature.see;
+    },
+    gemsPerDay() {
+      const secondsInDay = 24 * 60 * 60;
+      const gemsPerSecond = 1 / this.timeNeeded;
+      return gemsPerSecond * secondsInDay;
     }
   }
 }

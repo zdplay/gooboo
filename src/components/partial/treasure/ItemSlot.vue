@@ -87,7 +87,7 @@ export default {
       if (this.item === null) {
         return [];
       }
-      return this.item.valueCache.map(el => el + 1);
+      return this.item.valueCache.map(el => (el + 1).toFixed(2));
     },
     itemValueNext() {
       if (this.item === null) {
