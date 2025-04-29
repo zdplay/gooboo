@@ -17,6 +17,7 @@
       <div>
         <span>{{ $vuetify.lang.t(`$vuetify.card.card.${item.name}`) }}</span>
         <span v-if="item.power > 0">&nbsp;(+{{ item.power }})</span>
+        <span v-if="item.collection">&nbsp;-【{{ $vuetify.lang.t(`$vuetify.card.collection.${item.collection}`) }}】</span>
       </div>
       <div class="card-reward" v-for="(reward, rkey) in item.reward" :key="rkey">
         <span v-if="reward.type === 'addRareDrop'">{{ $vuetify.lang.t(`$vuetify.farm.addRareDrop`, $vuetify.lang.t(`$vuetify.currency.${ reward.name }.name`)) }}: +{{ $formatNum(reward.value) }}</span>
