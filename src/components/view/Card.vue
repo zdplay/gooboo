@@ -71,19 +71,21 @@
               <v-chip v-else class="card-count-chip justify-center flex-grow-0 mr-2 px-2" color="pale-light-blue" label small><v-icon>mdi-shimmer</v-icon><v-icon class="mr-2">mdi-crown</v-icon>{{ coll.cards.length }}</v-chip>
             </template>
             <span class="mr-1">{{ $vuetify.lang.t(`$vuetify.card.collection.${key}`) }}</span>
-            <template v-if="coll.cacheCards < coll.cards.length">
-              <span class="ml-1 text--secondary caption font-weight-light">
-                (
-                <template v-if="getMissingCardSourcePacks(coll).length > 0">
-                  <span v-for="(packName, index) in getMissingCardSourcePacks(coll)" :key="`${key}-pack-${packName}`">
-                    {{ $vuetify.lang.t(`$vuetify.card.pack.${packName}`) }}<span v-if="index < getMissingCardSourcePacks(coll).length - 1">, </span>
-                  </span>
-                </template>
-                <template v-else>
-                  未解锁
-                </template>
-                )
-              </span>
+            <template v-if="isCard1NewLabelEnabled">
+              <template v-if="coll.cacheCards < coll.cards.length">
+                <span class="ml-1 text--secondary caption font-weight-light">
+                  (
+                  <template v-if="getMissingCardSourcePacks(coll).length > 0">
+                    <span v-for="(packName, index) in getMissingCardSourcePacks(coll)" :key="`${key}-pack-${packName}`">
+                      {{ $vuetify.lang.t(`$vuetify.card.pack.${packName}`) }}<span v-if="index < getMissingCardSourcePacks(coll).length - 1">, </span>
+                    </span>
+                  </template>
+                  <template v-else>
+                    未解锁
+                  </template>
+                  )
+                </span>
+              </template>
             </template>
             <v-spacer></v-spacer>
           </v-expansion-panel-header>
@@ -169,6 +171,9 @@ export default {
         }
       }
       return hasCards && this.stat.mining_prestigeCount.total <= 0 && this.stat.village_prestigeCount.total <= 0 && this.stat.horde_prestigeCount.total <= 0;
+    },
+    isCard1NewLabelEnabled() {
+      return this.$store.state.system.settings.experiment.items.card1newLabel.value || false;
     }
   },
   methods: {

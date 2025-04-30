@@ -1279,6 +1279,12 @@ export default {
       currencynewLabel: {
         name: 'New UI Tag',
         description: 'Only effective when [Show Currency Tag] is enabled'
+      },
+      card1newLabel: {
+        name: 'Card draw display card pack',
+      },
+      card2newLabel: {
+        name: 'Reputation card display card pack',
       }
     }
   },

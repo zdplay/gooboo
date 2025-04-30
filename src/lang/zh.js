@@ -1279,6 +1279,12 @@ export default {
         currencynewLabel: {
           name: '新UI标签',
           description: '需要同时开启【显示货币标签】才生效'
+        },
+        card1newLabel: {
+          name: '卡片抽奖显示卡包',
+        },
+        card2newLabel: {
+          name: '声望卡片显示卡包',
         }
       }
   },

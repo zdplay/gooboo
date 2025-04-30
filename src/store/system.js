@@ -420,6 +420,20 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
+                    },
+                    card1newLabel: {
+                        unlock: null,
+                        hasDescription: false,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    card2newLabel: {
+                        unlock: null,
+                        hasDescription: false,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     }
                 }
             }
