@@ -65,6 +65,10 @@
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>调整低分辨率的画面布局。</span>
         </span>
+        <span class="d-flex ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
+          <span>增加2套主题，待调整。</span>
+        </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>增加新UI的布局，在【设置】-【实验性】设置使用，需要跟货币标签一起开启。</span>

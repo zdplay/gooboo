@@ -1104,6 +1104,8 @@ export default {
     waves: 'Waves',
     autumnForest: 'Autumn forest',
     frozen: 'Frozen',
+    dream: 'Dream',
+    scifi: 'Sci-Fi',
   },
   settings: {
     keybinds: {

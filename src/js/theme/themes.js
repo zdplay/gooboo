@@ -22,6 +22,7 @@ import polar from "./polar";
 import waves from "./waves";
 import yellow from "./yellow";
 import dream from "./dream";
+import scifi from "./scifi";
 
 export default {
     default: defaultTheme,
@@ -48,4 +49,5 @@ export default {
     autumnForest,
     frozen,
     dream,
+    scifi,
 }

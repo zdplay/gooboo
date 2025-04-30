@@ -1072,6 +1072,15 @@ export default {
     debug: '调试'
   },
   theme: {
+    name: '主题',
+    icon: {
+      hasCustomNavbar: '自定义导航栏',
+      hasCustomBackground: '自定义背景',
+      hasCustomColors: '自定义配色',
+      hasCustomUI: '自定义界面',
+      hasAnimations: '包含动画',
+      hasParticles: '包含粒子效果',
+    },
     default: '默认',
     cyan: '青色',
     green: '绿色',
@@ -1082,12 +1091,12 @@ export default {
     pink: '粉色',
     purple: '紫色',
     grey: '灰色',
-    sepia: '深褐色',
+    sepia: '复古',
     factory: '工厂',
     forest: '森林',
-    cherry: '樱桃',
-    polar: '极地',
+    cherry: '樱花',
     sky: '天空',
+    polar: '极地',
     prismatic: '棱镜',
     candlelight: '烛光',
     colorful: '多彩',
@@ -1096,14 +1105,7 @@ export default {
     autumnForest: '秋林',
     frozen: '冰冻',
     dream: '梦幻',
-    icon: {
-      hasCustomNavbar: '自定义导航栏',
-      hasCustomBackground: '自定义背景',
-      hasCustomColors: '自定义颜色',
-      hasCustomUI: '自定义界面',
-      hasAnimations: '动画效果',
-      hasParticles: '粒子效果'
-    }
+    scifi: '科幻',
   },
   settings: {
     keybinds: {
