@@ -365,21 +365,21 @@
 
 .theme--dark.background-theme-scifi >>> .main-app-bar {
   background: linear-gradient(90deg, 
-    rgba(0, 200, 255, 0.8),
-    rgba(100, 0, 255, 0.8),
-    rgba(0, 255, 200, 0.8),
-    rgba(0, 200, 255, 0.8));
-  backdrop-filter: blur(10px);
-  animation: prismatic-navbar 20s linear infinite;
+    rgba(0, 120, 180, 0.8),
+    rgba(0, 150, 200, 0.8),
+    rgba(0, 180, 220, 0.8),
+    rgba(0, 120, 180, 0.8));
+  backdrop-filter: blur(8px);
+  animation: scifi-navbar 15s ease-in-out infinite;
 }
 .theme--light.background-theme-scifi >>> .main-app-bar {
   background: linear-gradient(90deg, 
-    rgba(0, 200, 255, 0.6),
-    rgba(100, 0, 255, 0.6),
-    rgba(0, 255, 200, 0.6),
-    rgba(0, 200, 255, 0.6));
-  backdrop-filter: blur(10px);
-  animation: prismatic-navbar 20s linear infinite;
+    rgba(0, 150, 200, 0.6),
+    rgba(0, 180, 220, 0.6),
+    rgba(0, 200, 240, 0.6),
+    rgba(0, 150, 200, 0.6));
+  backdrop-filter: blur(8px);
+  animation: scifi-navbar 15s ease-in-out infinite;
 }
 
 .theme--dark.background-theme-rain >>> .main-app-bar {
@@ -450,6 +450,21 @@
   }
   100% {
     background-position: 100% 100%;
+  }
+}
+
+@keyframes scifi-navbar {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.8;
   }
 }
 </style>
