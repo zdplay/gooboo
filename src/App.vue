@@ -118,6 +118,27 @@
 .premium-glow-text {
   animation: premium-glow-text-shadow 15s linear infinite;
 }
+
+.v-chip {
+  transition: transform 0.2s ease-in-out;
+}
+.v-chip:hover {
+  transform: scale(1.15);
+}
+
+.currency-container {
+  transition: transform 0.2s ease-in-out;
+}
+.currency-container:hover {
+  transform: scale(1.05);
+}
+
+.ingredient-container {
+  transition: transform 0.2s ease-in-out;
+}
+.ingredient-container:hover {
+  transform: scale(1.05);
+}
 </style>
 <style scoped>
 @keyframes tutorial-arrow-color {
@@ -261,7 +282,9 @@
 }
 .theme--light.background-theme-prismatic {
   background: radial-gradient(#FFFFFF 1%, transparent 10% 25%, #FFFFFF80 60%, #FFFFFF),
-              conic-gradient(#FF0000, #FFFF00, #00FF00, #00FFFF, #0000FF, #FF00FF, #FF0000);
+              conic-gradient(#FFE0E0, #FFE0FF, #E0E0FF, #E0FFFF, #E0FFE0, #FFFFE0, #FFE0E0);
+  backdrop-filter: blur(8px);
+  animation: prismatic-bg 20s linear infinite;
 }
 .theme--dark.background-theme-prismatic >>> .main-app-bar {
   background: linear-gradient(transparent, #12121280 75%, #121212C0),
@@ -270,7 +293,8 @@
 }
 .theme--light.background-theme-prismatic >>> .main-app-bar {
   background: linear-gradient(transparent, #FFFFFF80 75%, #FFFFFFC0),
-              linear-gradient(90deg, #FF0000, #FFFF00, #00FF00, #00FFFF, #0000FF, #FF00FF, #FF0000);
+              linear-gradient(90deg, #FFE0E0, #FFE0FF, #E0E0FF, #E0FFFF, #E0FFE0, #FFFFE0, #FFE0E0);
+  backdrop-filter: blur(8px);
   animation: prismatic-navbar 20s linear infinite;
 }
 .theme--dark.background-theme-candlelight {
@@ -279,6 +303,49 @@
 .theme--light.background-theme-candlelight {
   background: radial-gradient(circle at 50% 99%, #FFFFE0, #FFFF80 1%, #FFFF00 2%, #FFC000 3%, #FFA820 4%, #FFB840 6%, #FFD080 9%, #FFE8C0 12%, #FFF4E0 15%, #FFFFFF 18%);
 }
+
+@keyframes dream-float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
+.theme--dark.background-theme-dream {
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(179, 136, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 128, 171, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(128, 216, 255, 0.2) 0%, transparent 50%),
+    linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  backdrop-filter: blur(10px);
+}
+.theme--light.background-theme-dream {
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(179, 136, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 128, 171, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(128, 216, 255, 0.15) 0%, transparent 50%),
+    linear-gradient(45deg, #f5f5f5, #ffffff);
+  backdrop-filter: blur(10px);
+}
+
+.theme--dark.background-theme-dream >>> .main-app-bar {
+  background: linear-gradient(90deg, 
+    rgba(179, 136, 255, 0.8),
+    rgba(255, 128, 171, 0.8),
+    rgba(128, 216, 255, 0.8),
+    rgba(179, 136, 255, 0.8));
+  backdrop-filter: blur(10px);
+  animation: prismatic-navbar 20s linear infinite;
+}
+.theme--light.background-theme-dream >>> .main-app-bar {
+  background: linear-gradient(90deg, 
+    rgba(179, 136, 255, 0.6),
+    rgba(255, 128, 171, 0.6),
+    rgba(128, 216, 255, 0.6),
+    rgba(179, 136, 255, 0.6));
+  backdrop-filter: blur(10px);
+  animation: prismatic-navbar 20s linear infinite;
+}
+
 .theme--dark.background-theme-rain >>> .main-app-bar {
   background: linear-gradient(90deg, #1536C2, #156BC2, #2481A5, #3B5496, #1536C2);
   animation: prismatic-navbar 20s linear infinite;
@@ -339,6 +406,15 @@
   padding: 0 !important;
   overflow: hidden;
 }
+}
+
+@keyframes prismatic-bg {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
 }
 </style>
 

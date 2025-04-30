@@ -21,6 +21,7 @@ import sky from "./sky";
 import polar from "./polar";
 import waves from "./waves";
 import yellow from "./yellow";
+import dream from "./dream";
 
 export default {
     default: defaultTheme,
@@ -46,4 +47,5 @@ export default {
     waves,
     autumnForest,
     frozen,
+    dream,
 }
