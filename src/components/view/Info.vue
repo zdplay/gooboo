@@ -65,7 +65,7 @@
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>调整低分辨率的画面布局。</span>
         </span>
-        <span class="d-flex ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>增加2套主题，待调整。</span>
         </span>
@@ -74,19 +74,11 @@
           <span>增加新UI的布局，在【设置】-【实验性】设置使用，需要跟货币标签一起开启。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="grey">采矿</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="indigo">设置</v-chip>
           <span>修改冶炼最大按钮为指定数量按钮。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="purple">村庄</v-chip>
-          <span>修改牺牲最大按钮为指定数量按钮。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
-          <span>增加战斗技能快捷键使用，数字按钮1到0。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="indigo">设置</v-chip>
           <span>调整自动施法槽默认为5，普通技能也能自动施法。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
@@ -106,7 +98,7 @@
           <span>修改学校参考考试为直接满分通过。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="balck">卡片</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>
           <span>增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
@@ -114,11 +106,19 @@
           <span>增加宝藏属性显示显示。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue-grey">其他</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
+          <span>增加宾果游戏预测功能，可以预测下一个可能出现的数字。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
+          <span>增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
           <span>增加攻略按钮。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue-grey">其他</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
           <span>增加部分地方计时显示。（偷懒了）</span>
         </span>
       </v-card-text>

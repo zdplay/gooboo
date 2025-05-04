@@ -30,7 +30,8 @@ export default {
         bank_investment: 0,
         bank_loan: 0,
         bank_action: false,
-        prize_fleeting: ['relic', 'treasure', 'theme']
+        prize_fleeting: ['relic', 'treasure', 'theme'],
+        casino_bingo_next_draw: null
     },
     getters: {
         currentEvent: (state, getters, rootState) => {
@@ -214,7 +215,7 @@ export default {
             });
 
             let bingos = 0;
-            [
+            const lines = [
                 [0, 1, 2, 3, 4],
                 [5, 6, 7, 8, 9],
                 [10, 11, 12, 13, 14],
@@ -227,8 +228,11 @@ export default {
                 [4, 9, 14, 19, 24],
                 [0, 6, 12, 18, 24],
                 [4, 8, 12, 16, 20]
-            ].forEach(elem => {
-                if (elem.reduce((a, b) => a + (drawn.includes(b) ? 1 : 0), 0) >= 5) {
+            ];
+
+            lines.forEach(elem => {
+                const count = elem.reduce((a, b) => a + (drawn.includes(b) ? 1 : 0), 0);
+                if (count >= 5) {
                     bingos++;
                 }
             });
@@ -298,6 +302,41 @@ export default {
         },
         bingoCellIsRare: () => (index) => {
             return [1, 3, 5, 9, 15, 19, 21, 23].includes(index);
+        },
+        predictNextBingoDraw: (state, getters, rootState, rootGetters) => {
+            if (!state.casino_bingo_card) return null;
+            
+            // 如果已经抽中25个数字，则不再预测
+            if (state.casino_bingo_draws.length >= 25) {
+                return null;
+            }
+            
+            let weights = buildArray(75).map(elem => {
+                const num = elem + 1;
+                if (state.casino_bingo_draws.includes(num)) {
+                    return 0;
+                }
+                const boostIndex = state.casino_bingo_boosts.findIndex(boost => boost === num);
+                return boostIndex === -1 ? 1 : Math.floor(boostIndex / 2 + 3);
+            });
+
+            let rngGen = rootGetters['system/getRng']('bingo_draw');
+            let predictions = [];
+            let remainingWeights = [...weights];
+            
+            // 根据已抽中数字数量决定预测数量
+            const drawnCount = state.casino_bingo_draws.length;
+            const predictionCount = drawnCount >= 22 ? 3 : 5;
+            
+            // 预测指定数量的最可能结果
+            for (let i = 0; i < predictionCount; i++) {
+                if (remainingWeights.some(w => w > 0)) {
+                    const nextDraw = weightSelect(remainingWeights, rngGen());
+                    predictions.push(nextDraw + 1);
+                    remainingWeights[nextDraw] = 0; // 确保不会重复预测同一个数字
+                }
+            }
+            return predictions;
         }
     },
     mutations: {
@@ -341,6 +380,9 @@ export default {
                 price: o.price ?? (() => 1000),
                 effect: o.effect ?? (() => { return {}; })
             });
+        },
+        updateNextBingoDraw(state, value) {
+            state.casino_bingo_next_draw = value;
         }
     },
     actions: {
@@ -744,11 +786,23 @@ export default {
             if (newBingos >= 3 && oldBingos < 3) {
                 dispatch('winPrize', {prize: state.casino_bingo_prize_3, pool: 'bingo4', notify: true});
             }
+
+            // 更新预测结果并显示
+            const predictions = getters.predictNextBingoDraw;
+            commit('updateNextBingoDraw', predictions);
         },
         casinoApplyMultiplier({ state, getters, commit }, num) {
-            if (getters.casinoMultipliersAvailable > 0 && !state.casino_bingo_boosts.includes(num)) {
+            const index = state.casino_bingo_boosts.indexOf(num);
+            if (index !== -1) {
+                // 如果数字已经有倍率，则撤销倍率
+                commit('removeKey', {key: 'casino_bingo_boosts', index});
+            } else if (getters.casinoMultipliersAvailable > 0) {
+                // 如果数字没有倍率且有可用倍率，则设置倍率
                 commit('pushKey', {key: 'casino_bingo_boosts', value: num});
             }
+            // 更新预测结果并显示
+            const predictions = getters.predictNextBingoDraw;
+            commit('updateNextBingoDraw', predictions);
         },
         casinoBingoBuy({ state, rootGetters, commit, dispatch }) {
             if (!state.casino_bingo_bought && rootGetters['currency/value']('gem_topaz') >= CASINO_BINGO_CARD_COST) {
