@@ -63,7 +63,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加2套主题，待调整。</span>
+          <span>增加1套主题【梦幻】。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
@@ -92,6 +92,10 @@
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="green">学校</v-chip>
           <span>修改学校参考考试为直接满分通过。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
+          <span>在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>

@@ -311,75 +311,22 @@
 }
 
 .theme--dark.background-theme-dream {
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(179, 136, 255, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 128, 171, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(128, 216, 255, 0.2) 0%, transparent 50%),
-    linear-gradient(45deg, #1a1a1a, #2a2a2a);
-  backdrop-filter: blur(10px);
+  background: #1e1e2e;
 }
 .theme--light.background-theme-dream {
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(179, 136, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 128, 171, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(128, 216, 255, 0.15) 0%, transparent 50%),
-    linear-gradient(45deg, #f5f5f5, #ffffff);
-  backdrop-filter: blur(10px);
+  background: #f8f4ff;
+  backdrop-filter: blur(8px);
 }
-
-.theme--dark.background-theme-scifi {
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(0, 200, 255, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(100, 0, 255, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.2) 0%, transparent 50%),
-    linear-gradient(45deg, #0a0a1a, #1a1a2a);
-  backdrop-filter: blur(10px);
-}
-.theme--light.background-theme-scifi {
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(0, 200, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(100, 0, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.15) 0%, transparent 50%),
-    linear-gradient(45deg, #e5f5ff, #f0faff);
-  backdrop-filter: blur(10px);
-}
-
 .theme--dark.background-theme-dream >>> .main-app-bar {
-  background: linear-gradient(90deg, 
-    rgba(179, 136, 255, 0.8),
-    rgba(255, 128, 171, 0.8),
-    rgba(128, 216, 255, 0.8),
-    rgba(179, 136, 255, 0.8));
-  backdrop-filter: blur(10px);
+  background: linear-gradient(transparent, #12121280 75%, #121212C0),
+              linear-gradient(90deg, #9575CD, #B197E8, #DA98FF, #E7B0FF, #FFB0E0, #FF9DC2, #9575CD);
   animation: prismatic-navbar 20s linear infinite;
 }
 .theme--light.background-theme-dream >>> .main-app-bar {
-  background: linear-gradient(90deg, 
-    rgba(179, 136, 255, 0.6),
-    rgba(255, 128, 171, 0.6),
-    rgba(128, 216, 255, 0.6),
-    rgba(179, 136, 255, 0.6));
-  backdrop-filter: blur(10px);
+  background: linear-gradient(transparent, #FFFFFF80 75%, #FFFFFFC0),
+              linear-gradient(90deg, #B388FF, #C4A6FF, #E0C1FF, #FFD6F5, #FFB6E3, #FF9BBD, #B388FF);
+  backdrop-filter: blur(8px);
   animation: prismatic-navbar 20s linear infinite;
-}
-
-.theme--dark.background-theme-scifi >>> .main-app-bar {
-  background: linear-gradient(90deg, 
-    rgba(0, 120, 180, 0.8),
-    rgba(0, 150, 200, 0.8),
-    rgba(0, 180, 220, 0.8),
-    rgba(0, 120, 180, 0.8));
-  backdrop-filter: blur(8px);
-  animation: scifi-navbar 15s ease-in-out infinite;
-}
-.theme--light.background-theme-scifi >>> .main-app-bar {
-  background: linear-gradient(90deg, 
-    rgba(0, 150, 200, 0.6),
-    rgba(0, 180, 220, 0.6),
-    rgba(0, 200, 240, 0.6),
-    rgba(0, 150, 200, 0.6));
-  backdrop-filter: blur(8px);
-  animation: scifi-navbar 15s ease-in-out infinite;
 }
 
 .theme--dark.background-theme-rain >>> .main-app-bar {
@@ -450,21 +397,6 @@
   }
   100% {
     background-position: 100% 100%;
-  }
-}
-
-@keyframes scifi-navbar {
-  0% {
-    background-position: 0% 50%;
-    opacity: 0.8;
-  }
-  50% {
-    background-position: 100% 50%;
-    opacity: 1;
-  }
-  100% {
-    background-position: 0% 50%;
-    opacity: 0.8;
   }
 }
 </style>
