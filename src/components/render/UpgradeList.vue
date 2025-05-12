@@ -26,6 +26,10 @@
   border-radius: 4px;
   min-width: 36px;
   height: 36px;
+  transition: transform 0.2s ease;
+}
+.material-button:hover {
+  transform: scale(1.1);
 }
 .material-button-active {
   border: 2px solid white !important;
@@ -40,11 +44,19 @@
   margin: 2px;
   min-width: 64px;
   height: 36px;
+  transition: transform 0.2s ease;
+}
+.satisfy-button:hover {
+  transform: scale(1.1);
 }
 .list-button {
   margin: 2px;
   min-width: 64px;
   height: 36px;
+  transition: transform 0.2s ease;
+}
+.list-button:hover {
+  transform: scale(1.1);
 }
 .filter-section {
   margin-bottom: 8px;
@@ -93,6 +105,16 @@
           v-if="availableMaterials.length > 0"
         >
           {{ satisfyMode ? '清空' : '满足' }}
+        </v-btn>
+        
+        <v-btn 
+          small 
+          class="satisfy-button ml-2" 
+          @click="toggleUnsatisfyMode" 
+          :color="unsatisfyMode ? 'warning' : 'primary'" 
+          v-if="availableMaterials.length > 0"
+        >
+          {{ unsatisfyMode ? '清空' : '未满足' }}
         </v-btn>
         
         <v-btn 
@@ -195,6 +217,7 @@ export default {
     page: 1,
     selectedMaterial: null,
     satisfyMode: false,
+    unsatisfyMode: false,
     originalItems: null,
     showMaterialsRow: false
   }),
@@ -214,6 +237,10 @@ export default {
     items() {
       if (this.satisfyMode) {
         return this.getSatisfyItems();
+      }
+      
+      if (this.unsatisfyMode) {
+        return this.getUnsatisfyItems();
       }
       
       return this.baseItems.filter(elem => {
@@ -356,6 +383,16 @@ export default {
     },
     toggleSatisfyMode() {
       this.satisfyMode = !this.satisfyMode;
+      if (this.satisfyMode) {
+        this.unsatisfyMode = false;
+      }
+      this.page = 1;
+    },
+    toggleUnsatisfyMode() {
+      this.unsatisfyMode = !this.unsatisfyMode;
+      if (this.unsatisfyMode) {
+        this.satisfyMode = false;
+      }
       this.page = 1;
     },
     getSatisfyItems() {
@@ -395,6 +432,48 @@ export default {
           const canAfford = this.$store.getters['upgrade/canAfford'](feature, name);
           
           return canAfford;
+        });
+        
+        return result;
+      }
+    },
+    getUnsatisfyItems() {
+      if (!this.selectedMaterial) {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          
+          const baseRequirement = upgrade.requirement(upgrade.level);
+          if (!baseRequirement) {
+            return false;
+          }
+          
+          const feature = elem.split('_')[0];
+          const name = elem.split('_')[1];
+          const canAfford = this.$store.getters['upgrade/canAfford'](feature, name);
+          
+          return !canAfford;
+        });
+        
+        return result;
+      } else {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          
+          const baseRequirement = upgrade.requirement(upgrade.level);
+          if (!baseRequirement) {
+            return false;
+          }
+          
+          const price = upgrade.price(upgrade.level);
+          if (!price || !Object.keys(price).includes(this.selectedMaterial)) {
+            return false;
+          }
+          
+          const feature = elem.split('_')[0];
+          const name = elem.split('_')[1];
+          const canAfford = this.$store.getters['upgrade/canAfford'](feature, name);
+          
+          return !canAfford;
         });
         
         return result;
