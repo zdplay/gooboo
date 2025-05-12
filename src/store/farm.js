@@ -729,10 +729,18 @@ export default {
                 
                 // 如果是单独收获，并且不是由harvestAll调用，则显示通知
                 if (!o.skipNotify && !o.fromHarvestAll && Object.keys(o.harvestItems).length > 0) {
-                    commit('system/addNotification', {color: 'success', timeout: 5000, message: {
-                        type: 'farmHarvest',
-                        items: o.harvestItems
-                    }}, {root: true});
+                    // 检查通知设置是否开启
+                    const showNotify = rootState.system.settings.experiment && 
+                                      rootState.system.settings.experiment.items && 
+                                      rootState.system.settings.experiment.items.showFarmHarvestNotify && 
+                                      rootState.system.settings.experiment.items.showFarmHarvestNotify.value;
+                    
+                    if (showNotify) {
+                        commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                            type: 'farmHarvest',
+                            items: o.harvestItems
+                        }}, {root: true});
+                    }
                 }
             }
         },
@@ -790,7 +798,7 @@ export default {
             });
             dispatch('updateFieldCaches');
         },
-        harvestAll({ state, dispatch, commit }) {
+        harvestAll({ state, dispatch, commit, rootState }) {
             let harvestItems = {};
             
             state.field.forEach((row, y) => {
@@ -803,15 +811,23 @@ export default {
             
             // 批量收获后，显示合并的通知
             if (Object.keys(harvestItems).length > 0) {
-                commit('system/addNotification', {color: 'success', timeout: 5000, message: {
-                    type: 'farmHarvest',
-                    items: harvestItems
-                }}, {root: true});
+                // 检查通知设置是否开启
+                const showNotify = rootState.system.settings.experiment && 
+                                  rootState.system.settings.experiment.items && 
+                                  rootState.system.settings.experiment.items.showFarmHarvestNotify && 
+                                  rootState.system.settings.experiment.items.showFarmHarvestNotify.value;
+                
+                if (showNotify) {
+                    commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                        type: 'farmHarvest',
+                        items: harvestItems
+                    }}, {root: true});
+                }
             }
             
             dispatch('updateFieldCaches');
         },
-        replantAll({ state, dispatch, commit }) {
+        replantAll({ state, dispatch, commit, rootState }) {
             let harvestItems = {};
             
             state.field.forEach((row, y) => {
@@ -827,10 +843,18 @@ export default {
             
             // 重植后，显示收获物品的汇总通知
             if (Object.keys(harvestItems).length > 0) {
-                commit('system/addNotification', {color: 'success', timeout: 5000, message: {
-                    type: 'farmHarvest',
-                    items: harvestItems
-                }}, {root: true});
+                // 检查通知设置是否开启
+                const showNotify = rootState.system.settings.experiment && 
+                                  rootState.system.settings.experiment.items && 
+                                  rootState.system.settings.experiment.items.showFarmHarvestNotify && 
+                                  rootState.system.settings.experiment.items.showFarmHarvestNotify.value;
+                
+                if (showNotify) {
+                    commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                        type: 'farmHarvest',
+                        items: harvestItems
+                    }}, {root: true});
+                }
             }
             
             dispatch('updateFieldCaches');
