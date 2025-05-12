@@ -554,6 +554,7 @@
         <prize-message v-else-if="message.type === 'prize'" :message="message"></prize-message>
         <school-message v-else-if="message.type === 'school'" :message="message"></school-message>
         <update-message v-else-if="message.type === 'update'" :message="message"></update-message>
+        <farm-harvest-message v-else-if="message.type === 'farmHarvest'" :message="message"></farm-harvest-message>
       </template>
       <template v-slot:action="{ close }">
         <v-btn icon @click="close()"><v-icon>mdi-close</v-icon></v-btn>
@@ -676,6 +677,7 @@ import UpdateMessage from './components/partial/snackbar/UpdateMessage.vue';
 import { APP_ENV } from './js/constants';
 import ImportMessage from './components/partial/snackbar/ImportMessage.vue';
 import Strategy from './components/view/Strategy.vue';
+import FarmHarvestMessage from './components/partial/snackbar/FarmHarvestMessage.vue';
 const semverCompare = require('semver/functions/compare');
 
 export default {
@@ -724,6 +726,7 @@ export default {
     UpdateMessage,
     ImportMessage,
     Strategy,
+    FarmHarvestMessage,
   },
   data: () => ({
     dialogDust: false,

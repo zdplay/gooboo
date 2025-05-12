@@ -146,7 +146,7 @@ export default {
                 rareDrop: [],
                 tag: []
             };
-            ['farmCropGain', 'farmGoldChance', 'farmExperience', 'farmRareDropChance', 'farmGrow', 'farmOvergrow', 'farmCropCost', 'farmFertilizerCost', 'farmLuckyHarvestMult', 'farmHuntChance'].forEach(elem => {
+            ['farmCropGain', 'farmGold', 'farmGoldChance', 'farmExperience', 'farmRareDropChance', 'farmGrow', 'farmOvergrow', 'farmCropCost', 'farmFertilizerCost', 'farmLuckyHarvestMult', 'farmHuntChance'].forEach(elem => {
                 stats.mult[elem] = {baseValue: 0, baseArray: [], multValue: 1, multArray: []};
             });
             const crop = state.crop[name];
@@ -547,37 +547,85 @@ export default {
                     (0.04 * (field.buildingEffect.gnomeBoost ?? 0) / field.time + 1) *
                     ((geneStats.tag.includes('farmLuckyHarvest') && chance(0.01, rngGen())) ? rootGetters['mult/get']('farmLuckyHarvestMult', geneStats.mult.farmLuckyHarvestMult.baseValue) : 1);
 
+                // Gain currency based on crop value and all bonuses
+                if (rootState.unlock && rootState.unlock.farmCurrency && rootState.unlock.farmCurrency.use) {
+                    const currencies = crop.currencyGain || {};
+                    for (const [key, elem] of Object.entries(currencies)) {
+                        const gainAmount = randomRound(elem * rootGetters['mult/get'](
+                            'farmCropGain',
+                            geneStats.mult.farmCropGain.baseValue,
+                            ((field.buildingEffect.scarecrow ?? 0) * 0.1 / field.time + 1) * geneStats.mult.farmCropGain.multValue
+                        ) * allGainBoost * field.grow, rngGen());
+                        dispatch('currency/gain', {feature: 'farm', name: key, amount: gainAmount}, {root: true});
+
+                        // 添加货币收获记录（用于通知）
+                        if (gainAmount > 0) {
+                            if (!o.harvestItems) {
+                                o.harvestItems = {};
+                            }
+                            
+                            if (!o.harvestItems[`farm_${key}`]) {
+                                o.harvestItems[`farm_${key}`] = 0;
+                            }
+                            o.harvestItems[`farm_${key}`] += gainAmount;
+                        }
+                    }
+                }
+
+                // Gold gain
+                const goldAmount = randomRound(rootGetters['mult/get'](
+                    'farmGold',
+                    (crop.goldGain || 0) + geneStats.mult.farmGold.baseValue,
+                    ((field.buildingEffect.gnome ?? 0) * 0.15 / field.time + 1) * geneStats.mult.farmGold.multValue
+                ) * allGainBoost * field.grow, rngGen());
+                if (goldAmount > 0) {
+                    dispatch('currency/gain', {feature: 'farm', name: 'gold', amount: goldAmount}, {root: true});
+
+                    // 添加金币收获记录（用于通知）
+                    if (!o.harvestItems) {
+                        o.harvestItems = {};
+                    }
+                    
+                    if (!o.harvestItems.farm_gold) {
+                        o.harvestItems.farm_gold = 0;
+                    }
+                    o.harvestItems.farm_gold += goldAmount;
+                }
+
                 // Gain currency based on crop type
                 const gainAmount = rootGetters['mult/get'](
                     'currencyFarm' + capitalize(crop.type) + 'Gain',
-                    crop.yield + geneStats.mult.farmCropGain.baseValue,
+                    (crop.yield || 0) + geneStats.mult.farmCropGain.baseValue,
                     (((field.buildingEffect.flag ?? 0) / field.time) * 0.5 + 1) * geneStats.mult.farmCropGain.multValue
                 ) * allGainBoost * field.grow;
                 dispatch('currency/gain', {feature: 'farm', name: crop.type, amount: gainAmount}, {root: true});
+                
+                // 添加收获物品记录（用于通知）
+                if (!o.harvestItems) {
+                    o.harvestItems = {};
+                }
+                if (!o.harvestItems[`farm_${crop.type}`]) {
+                    o.harvestItems[`farm_${crop.type}`] = 0;
+                }
+                o.harvestItems[`farm_${crop.type}`] += gainAmount;
+                
                 if (geneStats.tag.includes('farmYieldConversion')) {
                     ['vegetable', 'berry', 'grain', 'flower'].forEach(croptype => {
                         if (crop.type !== croptype) {
                             const conversionAmount = rootGetters['mult/get'](
                                 'currencyFarm' + capitalize(croptype) + 'Gain',
-                                crop.yield + geneStats.mult.farmCropGain.baseValue,
+                                (crop.yield || 0) + geneStats.mult.farmCropGain.baseValue,
                                 (((field.buildingEffect.flag ?? 0) / field.time) * 0.5 + 1) * geneStats.mult.farmCropGain.multValue
                             ) * allGainBoost * field.grow;
                             dispatch('currency/gain', {feature: 'farm', name: croptype, amount: conversionAmount * 0.05}, {root: true});
+                            
+                            // 添加转化收获物品记录（用于通知）
+                            if (!o.harvestItems[`farm_${croptype}`]) {
+                                o.harvestItems[`farm_${croptype}`] = 0;
+                            }
+                            o.harvestItems[`farm_${croptype}`] += conversionAmount * 0.05;
                         }
                     });
-                }
-
-                // Chance to gain gold
-                const goldAmount = randomRound(
-                    rootGetters['mult/get'](
-                        'farmGoldChance',
-                        getters.baseGoldChance(field.crop) + geneStats.mult.farmGoldChance.baseValue,
-                        ((field.buildingEffect.gardenGnome ?? 0) / field.time) * geneStats.mult.farmGoldChance.multValue
-                    ) * allGainBoost * field.grow,
-                    rngGen()
-                );
-                if (goldAmount) {
-                    dispatch('currency/gain', {feature: 'farm', name: 'gold', amount: goldAmount}, {root: true});
                 }
 
                 // Chance to gain rare drops
@@ -602,11 +650,23 @@ export default {
                         switch (elem.type) {
                             case 'consumable':
                                 dispatch('consumable/gain', {name: elem.name, amount: elem.value * times}, {root: true});
+                                
+                                // 添加消耗品收获记录（用于通知）
+                                if (!o.harvestItems[elem.name]) {
+                                    o.harvestItems[elem.name] = 0;
+                                }
+                                o.harvestItems[elem.name] += elem.value * times;
                                 break;
                             case 'currency': {
                                 const splitName = elem.name.split('_');
                                 dispatch('currency/gain', {feature: splitName[0], name: splitName[1], amount: elem.value * times}, {root: true});
                                 dispatch('performCurrencyUnlocks', elem.name);
+                                
+                                // 添加货币收获记录（用于通知）
+                                if (!o.harvestItems[elem.name]) {
+                                    o.harvestItems[elem.name] = 0;
+                                }
+                                o.harvestItems[elem.name] += elem.value * times;
                                 break;
                             }
                             default:
@@ -635,7 +695,7 @@ export default {
                 }
 
                 // Add exp if unlocked
-                if (rootState.unlock.farmCropExp.use) {
+                if (rootState.unlock && rootState.unlock.farmCropExp && rootState.unlock.farmCropExp.use) {
                     dispatch('getCropExp', {crop: field.crop, value: rootGetters['mult/get'](
                         'farmExperience',
                         geneStats.mult.farmExperience.baseValue,
@@ -665,6 +725,14 @@ export default {
 
                 if (!o.skipCache) {
                     dispatch('updateFieldCaches');
+                }
+                
+                // 如果是单独收获，并且不是由harvestAll调用，则显示通知
+                if (!o.skipNotify && !o.fromHarvestAll && Object.keys(o.harvestItems).length > 0) {
+                    commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                        type: 'farmHarvest',
+                        items: o.harvestItems
+                    }}, {root: true});
                 }
             }
         },
@@ -722,27 +790,49 @@ export default {
             });
             dispatch('updateFieldCaches');
         },
-        harvestAll({ state, dispatch }) {
+        harvestAll({ state, dispatch, commit }) {
+            let harvestItems = {};
+            
             state.field.forEach((row, y) => {
                 row.forEach((cell, x) => {
                     if (cell !== null && cell.type === 'crop' && cell.grow >= 1 && (state.selectedColor === null || cell.color === state.selectedColor)) {
-                        dispatch('harvestCrop', {x, y, skipCache: true});
+                        dispatch('harvestCrop', {x, y, skipCache: true, skipNotify: true, fromHarvestAll: true, harvestItems: harvestItems});
                     }
                 });
             });
+            
+            // 批量收获后，显示合并的通知
+            if (Object.keys(harvestItems).length > 0) {
+                commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                    type: 'farmHarvest',
+                    items: harvestItems
+                }}, {root: true});
+            }
+            
             dispatch('updateFieldCaches');
         },
-        replantAll({ state, dispatch }) {
+        replantAll({ state, dispatch, commit }) {
+            let harvestItems = {};
+            
             state.field.forEach((row, y) => {
                 row.forEach((cell, x) => {
                     if (cell !== null && cell.type === 'crop' && cell.grow >= 1 && (state.selectedColor === null || cell.color === state.selectedColor)) {
                         const crop = cell.crop;
                         const fertilizer = cell.fertilizer ?? null;
-                        dispatch('harvestCrop', {x, y, skipCache: true});
+                        dispatch('harvestCrop', {x, y, skipCache: true, skipNotify: true, fromHarvestAll: true, harvestItems: harvestItems});
                         dispatch('plantCrop', {x, y, crop, fertilizer, skipCache: true});
                     }
                 });
             });
+            
+            // 重植后，显示收获物品的汇总通知
+            if (Object.keys(harvestItems).length > 0) {
+                commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                    type: 'farmHarvest',
+                    items: harvestItems
+                }}, {root: true});
+            }
+            
             dispatch('updateFieldCaches');
         },
         cropPrestige({ state, rootState, getters, commit, dispatch }, name) {
@@ -832,16 +922,20 @@ export default {
             dispatch('meta/globalLevelPart', {key: 'farm_0', amount: totalLevel}, {root: true});
         },
         performCurrencyUnlocks({ rootState, commit }, name) {
-            if (!rootState.unlock.farmAdvancedCardPack.use && name === 'farm_ladybug') {
+            if (rootState.unlock && rootState.unlock.farmAdvancedCardPack && !rootState.unlock.farmAdvancedCardPack.use && name === 'farm_ladybug') {
                 commit('unlock/unlock', 'farmAdvancedCardPack', {root: true});
             }
-            if (!rootState.unlock.farmLuxuryCardPack.use && name === 'farm_goldenPetal') {
+            if (rootState.unlock && rootState.unlock.farmLuxuryCardPack && !rootState.unlock.farmLuxuryCardPack.use && name === 'farm_goldenPetal') {
                 commit('unlock/unlock', 'farmLuxuryCardPack', {root: true});
             }
         },
         updateGrownHint({ state, rootState, commit }) {
             let hasGrown = false;
-            if (rootState.system.settings.notification.items.cropReady.value) {
+            if (rootState.system && rootState.system.settings && 
+                rootState.system.settings.notification && 
+                rootState.system.settings.notification.items && 
+                rootState.system.settings.notification.items.cropReady && 
+                rootState.system.settings.notification.items.cropReady.value) {
                 state.field.forEach(row => {
                     row.forEach(cell => {
                         if (cell !== null && cell.type === 'crop' && cell.grow >= 1) {
@@ -871,7 +965,7 @@ export default {
             }
         },
         applyEarlyGameBuff({ rootState, dispatch }) {
-            if (rootState.unlock.farmDisableEarlyGame.use) {
+            if (rootState.unlock && rootState.unlock.farmDisableEarlyGame && rootState.unlock.farmDisableEarlyGame.use) {
                 dispatch('mult/removeKey', {name: 'farmGrow', key: 'farmEarlyGame', type: 'mult'}, {root: true});
                 dispatch('mult/removeKey', {name: 'farmCropGain', key: 'farmEarlyGame', type: 'mult'}, {root: true});
             } else {

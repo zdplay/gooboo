@@ -362,6 +362,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    farmHarvest: {
+                        unlock: 'farmFeature',
+                        hasDescription: false,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    }
                 }
             },
             confirm: {
@@ -443,6 +450,13 @@ export default {
                         defaultValue: true
                     },
                     showFarmCropName: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    showFarmHarvestNotify: {
                         unlock: 'farmFeature',
                         hasDescription: true,
                         type: 'switch',

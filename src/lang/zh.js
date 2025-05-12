@@ -108,6 +108,9 @@ export default {
       get: '卡包内容',
       new: '新!'
     },
+    farm: {
+      harvest: '收获物品'
+    },
     feature: {
       feature: '新的功能已解锁!',
       subfeature: '新的子功能已解锁!',
@@ -1251,6 +1254,9 @@ export default {
       },
       cropReady: {
         name: '作物成熟'
+      },
+      farmHarvest: {
+        name: '农场收获通知'
       }
     },
     confirm: {
@@ -1295,6 +1301,10 @@ export default {
         showFarmCropName: {
           name: '显示农场植物名称',
           description: '在农场单元格中显示植物的名称，方便识别不同作物'
+        },
+        showFarmHarvestNotify: {
+          name: '启用农场收获通知',
+          description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知'
         }
       }
   },

@@ -154,6 +154,9 @@ export default {
       testingVersion: 'Files from older testing builds cannot be used',
       migration: 'An error occured while migrating from v{0} to v{1}',
       checksum: 'Invalid checksum',
+    },
+    farm: {
+      harvest: 'Harvested items'
     }
   },
   duplicateTab: {
@@ -1251,6 +1254,9 @@ export default {
       },
       cropReady: {
         name: 'Crop ready'
+      },
+      farmHarvest: {
+        name: 'Farm harvest notification'
       }
     },
     confirm: {
@@ -1295,6 +1301,10 @@ export default {
       showFarmCropName: {
         name: 'Show farm crop names',
         description: 'Display crop names in farm cells for easier identification of different plants'
+      },
+      showFarmHarvestNotify: {
+        name: 'Enable farm harvest notification',
+        description: 'Show notifications of items gained when harvesting farm crops, with summary notifications for batch harvests'
       }
     }
   },

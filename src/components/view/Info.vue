@@ -98,6 +98,10 @@
           <span>在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
+          <span>增加农场收获物品通知功能，支持单个和批量收获统计显示。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>
           <span>增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用</span>
         </span>

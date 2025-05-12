@@ -154,6 +154,9 @@ export default {
       testingVersion: 'Dateien von älteren Testversionen können nicht verwendet werden',
       migration: 'Ein Fehler ist beim Migrieren von v{0} nach v{1} aufgetreten',
       checksum: 'Ungültige Prüfsumme',
+    },
+    farm: {
+      harvest: 'Geerntete Gegenstände'
     }
   },
   duplicateTab: {
@@ -1251,6 +1254,9 @@ export default {
       },
       cropReady: {
         name: 'Pflanze reif'
+      },
+      farmHarvest: {
+        name: 'Bauernhof-Ernte Benachrichtigung'
       }
     },
     confirm: {
@@ -1295,6 +1301,10 @@ export default {
       showFarmCropName: {
         name: 'Zeige Pflanzennamen',
         description: 'Zeigt die Namen der Pflanzen in den Bauernhofzellen an, um verschiedene Pflanzen leichter zu erkennen'
+      },
+      showFarmHarvestNotify: {
+        name: 'Bauernhof-Ernte Benachrichtigungen aktivieren',
+        description: 'Zeigt Benachrichtigungen für erhaltene Gegenstände beim Ernten an, mit zusammengefassten Benachrichtigungen für Massenernten'
       }
     }
   },
