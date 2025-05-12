@@ -14,12 +14,21 @@
       </div>
       <template v-else>
         <v-text-field class="ma-2" type="number" step="1" min="0" :label="$vuetify.lang.t('$vuetify.hourglass.timeInMinutes')" outlined hide-details v-model="minutes"></v-text-field>
-        <div class="d-flex justify-end align-center ma-1">
-          <v-btn class="ma-1" color="primary" @click="setToMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-          <v-chip class="justify-center ma-1" style="min-width: 100px;">
-            <v-icon class="mr-1">mdi-timer</v-icon>
-            {{ formattedTime }}
-          </v-chip>
+        <div class="d-flex flex-wrap justify-center align-center ma-1">
+          <div class="d-flex flex-wrap justify-center">
+            <v-btn small dense class="ma-1" color="info" @click="setMinutes(1)">1分</v-btn>
+            <v-btn small dense class="ma-1" color="info" @click="setMinutes(2)">2分</v-btn>
+            <v-btn small dense class="ma-1" color="info" @click="setMinutes(5)">5分</v-btn>
+            <v-btn small dense class="ma-1" color="info" @click="setMinutes(10)">10分</v-btn>
+            <v-btn small dense class="ma-1" color="info" @click="setMinutes(20)">20分</v-btn>
+          </div>
+          <div class="d-flex justify-end align-center flex-grow-1">
+            <v-btn class="ma-1" color="primary" @click="setToMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+            <v-chip class="justify-center ma-1" style="min-width: 100px;">
+              <v-icon class="mr-1">mdi-timer</v-icon>
+              {{ formattedTime }}
+            </v-chip>
+          </div>
         </div>
       </template>
     </v-card-text>
@@ -94,6 +103,9 @@ export default {
     },
     setToMax() {
       this.minutes = Math.floor(Math.pow(this.$store.getters['currency/value']('school_goldenDust') / 100, 1 / 0.9));
+    },
+    setMinutes(value) {
+      this.minutes = value;
     }
   }
 }
