@@ -1287,6 +1287,10 @@ export default {
       },
       card2newLabel: {
         name: 'Reputation card display card pack',
+      },
+      upgradeFilterFeature: {
+        name: 'Upgrade-Menü Filterfunktion',
+        description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'
       }
     }
   },
