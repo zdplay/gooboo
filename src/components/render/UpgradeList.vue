@@ -18,11 +18,35 @@
   display: flex;
   align-items: center;
   margin: 8px;
+  flex-wrap: wrap;
+}
+.material-button {
+  margin: 2px;
+  border-radius: 4px;
+  min-width: 36px;
+  height: 36px;
+}
+.material-button-active {
+  border: 2px solid white !important;
+  box-shadow: 0 0 8px 3px rgb(0, 255, 242) !important;
+}
+.material-tooltip {
+  max-width: none !important;
+  display: inline-block;
+  white-space: nowrap;
+}
+.satisfy-button {
+  margin: 2px;
+  min-width: 64px;
+  height: 36px;
+}
+.filter-section {
+  margin-bottom: 8px;
 }
 </style>
 
 <template>
-  <div v-if="items.length > 0">
+  <div>
     <div class="d-flex upgrade-pagination justify-center align-center bg-tile-default rounded-b elevation-2 mx-2" :class="{'upgrade-pagination-mobile': $vuetify.breakpoint.smAndDown && !noTabs, 'upgrade-pagination-mobile-notabs': $vuetify.breakpoint.smAndDown && noTabs, 'pr-10': showQueueSpeed}" v-if="pages > 1 || requirementStat.length > 0">
       <v-pagination v-if="pages > 1" v-model="page" :length="pages" :total-visible="7"></v-pagination>
       <gb-tooltip v-for="item in requirementFiltered" :key="item.key" :min-width="0">
@@ -45,43 +69,51 @@
       </gb-tooltip>
     </div>
     
-    <div class="filter-container">
-      <v-select
-        outlined
-        dense
-        hide-details
-        clearable
-        class="mx-2"
-        v-model="selectedMaterial"
-        :items="availableMaterials"
-        label="按材料筛选"
-        @change="page = 1"
-      >
-        <template v-slot:selection="{ item }">
-          <v-icon small class="mr-2">{{ getMaterialIcon(item) }}</v-icon>
-          {{ $vuetify.lang.t(`$vuetify.currency.${ item }.name`) }}
-        </template>
-        <template v-slot:item="{ item }">
-          <v-icon small class="mr-2">{{ getMaterialIcon(item) }}</v-icon>
-          {{ $vuetify.lang.t(`$vuetify.currency.${ item }.name`) }}
-        </template>
-      </v-select>
-      <v-btn small class="ml-2" @click="toggleSatisfyMode" :color="satisfyMode ? 'error' : 'primary'">
-        {{ satisfyMode ? '清空' : '满足' }}
-      </v-btn>
+    <div class="filter-section">
+      <div class="filter-container">
+        <!-- 材料筛选按钮 -->
+        <gb-tooltip v-for="material in availableMaterials" :key="material" :min-width="0">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn 
+              small
+              class="material-button"
+              :class="{'material-button-active': selectedMaterial === material}"
+              :color="getMaterialColor(material)"
+              v-bind="attrs"
+              v-on="on"
+              @click="toggleMaterial(material)"
+            >
+              <v-icon small :color="selectedMaterial === material ? 'white' : undefined">{{ getMaterialIcon(material) }}</v-icon>
+            </v-btn>
+          </template>
+          <span class="material-tooltip">{{ $vuetify.lang.t(`$vuetify.currency.${material}.name`) }}</span>
+        </gb-tooltip>
+        
+        <v-btn 
+          small 
+          class="satisfy-button" 
+          @click="toggleSatisfyMode" 
+          :color="satisfyMode ? 'error' : 'primary'" 
+          v-if="availableMaterials.length > 0"
+        >
+          {{ satisfyMode ? '清空' : '满足' }}
+        </v-btn>
+      </div>
     </div>
     
-    <v-row class="pa-1" no-gutters>
-      <v-col class="pa-1" v-for="(item, key) in finalItems" :key="`${feature}-${type}-${key}`" :cols="cols">
-        <upgrade :name="item" :disabled="isFrozen" :upgrade-translation="upgradeTranslation" :translation-set="translationSet">
-          <slot :upgrade-name="item"></slot>
-        </upgrade>
-      </v-col>
-    </v-row>
-  </div>
-  <div v-else>
-    <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.notFound`) }}</div>
-    <alert-text v-if="type === 'book'" class="ma-2" type="info">{{ $vuetify.lang.t(`$vuetify.upgrade.${ feature === 'village' ? 'bookNotFoundVillage' : 'bookNotFound' }`) }}</alert-text>
+    <div v-if="items.length > 0">
+      <v-row class="pa-1" no-gutters>
+        <v-col class="pa-1" v-for="(item, key) in finalItems" :key="`${feature}-${type}-${key}`" :cols="cols">
+          <upgrade :name="item" :disabled="isFrozen" :upgrade-translation="upgradeTranslation" :translation-set="translationSet">
+            <slot :upgrade-name="item"></slot>
+          </upgrade>
+        </v-col>
+      </v-row>
+    </div>
+    <div v-else>
+      <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.notFound`) }}</div>
+      <alert-text v-if="type === 'book'" class="ma-2" type="info">{{ $vuetify.lang.t(`$vuetify.upgrade.${ feature === 'village' ? 'bookNotFoundVillage' : 'bookNotFound' }`) }}</alert-text>
+    </div>
   </div>
 </template>
 
@@ -240,6 +272,17 @@ export default {
   methods: {
     getMaterialIcon(material) {
       return this.$store.state.currency[material]?.icon || 'mdi-help-circle';
+    },
+    getMaterialColor(material) {
+      return this.$store.state.currency[material]?.color || 'grey';
+    },
+    toggleMaterial(material) {
+      if (this.selectedMaterial === material) {
+        this.selectedMaterial = null; // 再次点击相同材料时取消选择
+      } else {
+        this.selectedMaterial = material; // 选择新的材料
+      }
+      this.page = 1; // 重置页码
     },
     printMaterialsToConsole() {
       console.group(`升级材料信息 - ${this.feature} (${this.type})`);
