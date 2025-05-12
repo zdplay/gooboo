@@ -22,6 +22,17 @@
 .mr-05 {
   margin-right: 2px;
 }
+.crop-name {
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.crop-name-small {
+  font-size: 8px;
+}
 </style>
 
 <template>
@@ -34,6 +45,9 @@
       <span>{{ $formatTime(Math.ceil(60 * (1 - item.grow) / item.cache.grow)) }}</span>
     </div>
     <v-icon :size="iconSize" :color="crop.color">{{ crop.icon }}</v-icon>
+    <div class="crop-name" :class="{'crop-name-small': $vuetify.breakpoint.smAndDown}" v-if="showCropName && item.crop">
+      {{ $vuetify.lang.t(`$vuetify.farm.crop.${ item.crop }`) }}
+    </div>
     <v-progress-linear :class="{'rounded-b': $vuetify.breakpoint.smAndDown, 'rounded-b-lg': $vuetify.breakpoint.mdAndUp}" :height="$vuetify.breakpoint.smAndDown ? 4 : 12" :color="isGrown ? 'green' : 'light-green'" :value="grow * 100"></v-progress-linear>
     <div class="crop-symbol-bar" :class="{'crop-symbol-bar-small': $vuetify.breakpoint.smAndDown}">
       <v-icon :size="buildingIconSize" v-if="item.cache.sprinkler" class="mr-05">mdi-sprinkler-variant</v-icon>
@@ -78,6 +92,9 @@ export default {
         return 12;
       }
       return 16;
+    },
+    showCropName() {
+      return this.$store.state.system.settings.experiment.items.showFarmCropName.value;
     }
   }
 }

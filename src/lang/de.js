@@ -1291,6 +1291,10 @@ export default {
       upgradeFilterFeature: {
         name: 'Upgrade-Menü Filterfunktion',
         description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'
+      },
+      showFarmCropName: {
+        name: 'Zeige Pflanzennamen',
+        description: 'Zeigt die Namen der Pflanzen in den Bauernhofzellen an, um verschiedene Pflanzen leichter zu erkennen'
       }
     }
   },

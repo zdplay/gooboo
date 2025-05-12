@@ -1291,6 +1291,10 @@ export default {
       upgradeFilterFeature: {
         name: 'Upgrade menu filter feature',
         description: 'Add material filtering functionality to the upgrade menu for easier browsing of upgrades'
+      },
+      showFarmCropName: {
+        name: 'Show farm crop names',
+        description: 'Display crop names in farm cells for easier identification of different plants'
       }
     }
   },
