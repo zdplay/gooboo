@@ -79,7 +79,7 @@ const saveFileData = async () => {
 
         if (!userId || !tokenId) {
             console.error("clouduser or cloudpwd error");
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: "clouduser or cloudpwd error" } });
+            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: { message: "clouduser or cloudpwd error" } } });
             isSaving = false;
             return; 
         }
@@ -92,7 +92,7 @@ const saveFileData = async () => {
             store.commit('system/addNotification', { color: 'info', timeout: 2000, message: { type: 'save', name: 'auto' } });
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: "cloudsave error" } });
+        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: { message: error } } });
     } finally {
         isSaving = false;
     }
@@ -108,7 +108,7 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
             store.commit('system/addNotification', { 
                 color: 'error', 
                 timeout: 5000, 
-                message: { type: 'load', name: 'cloud', error: 'clouduser or cloudpwd error' } 
+                message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } 
             });
             return;
         }
@@ -122,14 +122,14 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
             store.commit('system/addNotification', { 
                 color: 'warning', 
                 timeout: 5000, 
-                message: { type: 'load', name: 'cloud', error: 'No cloud save found' } 
+                message: { type: 'load', name: 'cloud', error: { message: 'No cloud save found' } } 
             });
         }
     } catch (error) {
         store.commit('system/addNotification', { 
             color: 'error', 
             timeout: 5000, 
-            message: { type: 'load', name: 'cloud', error: error.data?.message || 'Failed to load cloud save' } 
+            message: { type: 'load', name: 'cloud', error: { message: error } } 
         });
     }
 };
@@ -140,14 +140,14 @@ const getCloudSaveFileList = async () => {
         let tokenId = store.state.system.settings.general.items.cloudpwd.value;
 
         if (!userId || !tokenId) {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'clouduser or cloudpwd error' } });
+            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } });
             return null;
         }
         const saveFiles = await getLatestDataList(userId, tokenId);
         console.log('saveFileData res:', saveFiles);
         return saveFiles;
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: error.data.message } });
+        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: error } } });
         return null;
     }
 };
@@ -158,7 +158,7 @@ const loadSelectedFileData = async (selectedSavefile) => {
         let tokenId = store.state.system.settings.general.items.cloudpwd.value;
 
         if (!userId || !tokenId) {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'clouduser or cloudpwd error' } });
+            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } });
             return;
         }
 
@@ -169,10 +169,10 @@ const loadSelectedFileData = async (selectedSavefile) => {
             loadGame(saveData);
             //store.commit('system/addNotification', { color: 'success', timeout: 2000, message: { type: 'load', name: 'cloud' } });
         } else {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: 'Failed to load cloud save' } });
+            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'Failed to load cloud save' } } });
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: error.data?.message || 'Failed to load cloud save' } });
+        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: error } } });
     }
 };
 
