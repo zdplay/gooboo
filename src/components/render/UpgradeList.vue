@@ -14,6 +14,11 @@
   position: absolute;
   right: 8px;
 }
+.filter-container {
+  display: flex;
+  align-items: center;
+  margin: 8px;
+}
 </style>
 
 <template>
@@ -39,6 +44,33 @@
         <stat-breakdown :name="speedMultName"></stat-breakdown>
       </gb-tooltip>
     </div>
+    
+    <div class="filter-container">
+      <v-select
+        outlined
+        dense
+        hide-details
+        clearable
+        class="mx-2"
+        v-model="selectedMaterial"
+        :items="availableMaterials"
+        label="按材料筛选"
+        @change="page = 1"
+      >
+        <template v-slot:selection="{ item }">
+          <v-icon small class="mr-2">{{ getMaterialIcon(item) }}</v-icon>
+          {{ $vuetify.lang.t(`$vuetify.currency.${ item }.name`) }}
+        </template>
+        <template v-slot:item="{ item }">
+          <v-icon small class="mr-2">{{ getMaterialIcon(item) }}</v-icon>
+          {{ $vuetify.lang.t(`$vuetify.currency.${ item }.name`) }}
+        </template>
+      </v-select>
+      <v-btn small class="ml-2" @click="toggleSatisfyMode" :color="satisfyMode ? 'error' : 'primary'">
+        {{ satisfyMode ? '清空' : '满足' }}
+      </v-btn>
+    </div>
+    
     <v-row class="pa-1" no-gutters>
       <v-col class="pa-1" v-for="(item, key) in finalItems" :key="`${feature}-${type}-${key}`" :cols="cols">
         <upgrade :name="item" :disabled="isFrozen" :upgrade-translation="upgradeTranslation" :translation-set="translationSet">
@@ -103,7 +135,10 @@ export default {
     }
   },
   data: () => ({
-    page: 1
+    page: 1,
+    selectedMaterial: null,
+    satisfyMode: false,
+    originalItems: null
   }),
   mounted() {
     const cachePage = this.$store.state.system.cachePage[this.cacheKey];
@@ -116,9 +151,22 @@ export default {
       return [...this.$store.state.upgrade.cache[`${this.feature}_${this.subfeature}_${this.type}`]];
     },
     items() {
+      if (this.satisfyMode) {
+        return this.getSatisfyItems();
+      }
+      
       return this.baseItems.filter(elem => {
         const upgrade = this.$store.state.upgrade.item[elem];
-        return upgrade.requirement(upgrade.level);
+        const baseRequirement = upgrade.requirement(upgrade.level);
+        
+        // 如果没有选择材料筛选，或者没有通过基本要求，直接返回基本要求结果
+        if (!this.selectedMaterial || !baseRequirement) {
+          return baseRequirement;
+        }
+        
+        // 检查升级所需的材料是否包含选中的材料
+        const price = upgrade.price(upgrade.level);
+        return price && Object.keys(price).includes(this.selectedMaterial);
       });
     },
     finalItems() {
@@ -173,6 +221,116 @@ export default {
     },
     cacheKey() {
       return `${ this.feature }_${ this.subfeature }_${ this.type }`;
+    },
+    availableMaterials() {
+      // 收集所有升级所需的材料
+      const materials = new Set();
+      this.baseItems.forEach(elem => {
+        const upgrade = this.$store.state.upgrade.item[elem];
+        if (upgrade.requirement(upgrade.level)) {
+          const price = upgrade.price(upgrade.level);
+          if (price) {
+            Object.keys(price).forEach(material => materials.add(material));
+          }
+        }
+      });
+      return Array.from(materials).sort().reverse();
+    }
+  },
+  methods: {
+    getMaterialIcon(material) {
+      return this.$store.state.currency[material]?.icon || 'mdi-help-circle';
+    },
+    printMaterialsToConsole() {
+      console.group(`升级材料信息 - ${this.feature} (${this.type})`);
+      
+      // 创建材料到升级的映射
+      const materialToUpgrades = {};
+      
+      this.baseItems.forEach(elem => {
+        const upgrade = this.$store.state.upgrade.item[elem];
+        if (upgrade.requirement(upgrade.level)) {
+          const price = upgrade.price(upgrade.level);
+          if (price) {
+            Object.keys(price).forEach(material => {
+              if (!materialToUpgrades[material]) {
+                materialToUpgrades[material] = [];
+              }
+              materialToUpgrades[material].push({
+                name: elem,
+                displayName: this.$vuetify.lang.t(`$vuetify.upgrade.${elem.split('_')[1]}`),
+                amount: price[material]
+              });
+            });
+          }
+        }
+      });
+      
+      // 打印每种材料及其相关升级
+      Object.keys(materialToUpgrades).sort().forEach(material => {
+        const materialName = this.$vuetify.lang.t(`$vuetify.currency.${material}.name`);
+        console.group(`${materialName} (${material})`);
+        
+        materialToUpgrades[material].forEach(upgrade => {
+          console.log(`${upgrade.displayName}: ${upgrade.amount}`);
+        });
+        
+        console.groupEnd();
+      });
+      
+      console.groupEnd();
+    },
+    toggleSatisfyMode() {
+      this.satisfyMode = !this.satisfyMode;
+      this.page = 1;
+    },
+    getSatisfyItems() {
+      // 如果没有选择材料，则只显示"建造"可用的升级
+      if (!this.selectedMaterial) {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          
+          // 检查是否满足基本要求
+          const baseRequirement = upgrade.requirement(upgrade.level);
+          if (!baseRequirement) {
+            return false;
+          }
+          
+          // 使用游戏内部的canAfford方法检查是否可以建造
+          const feature = elem.split('_')[0];
+          const name = elem.split('_')[1];
+          const canAfford = this.$store.getters['upgrade/canAfford'](feature, name);
+          
+          return canAfford;
+        });
+        
+        return result;
+      } else {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          
+          // 检查是否满足基本要求
+          const baseRequirement = upgrade.requirement(upgrade.level);
+          if (!baseRequirement) {
+            return false;
+          }
+          
+          // 检查是否包含选定材料
+          const price = upgrade.price(upgrade.level);
+          if (!price || !Object.keys(price).includes(this.selectedMaterial)) {
+            return false;
+          }
+          
+          // 使用游戏内部的canAfford方法检查是否可以建造
+          const feature = elem.split('_')[0];
+          const name = elem.split('_')[1];
+          const canAfford = this.$store.getters['upgrade/canAfford'](feature, name);
+          
+          return canAfford;
+        });
+        
+        return result;
+      }
     }
   },
   watch: {
