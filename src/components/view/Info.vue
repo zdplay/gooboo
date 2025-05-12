@@ -99,7 +99,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
-          <span>增加农场收获物品通知功能，支持单个和批量收获统计显示。</span>
+          <span>增加农场物品收获和使用通知功能。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>

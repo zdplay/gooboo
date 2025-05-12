@@ -109,7 +109,8 @@ export default {
       new: '新!'
     },
     farm: {
-      harvest: '收获物品'
+      harvest: '收获物品',
+      plant: '使用物品'
     },
     feature: {
       feature: '新的功能已解锁!',
@@ -1256,7 +1257,7 @@ export default {
         name: '作物成熟'
       },
       farmHarvest: {
-        name: '农场收获通知'
+        name: '农场通知'
       }
     },
     confirm: {

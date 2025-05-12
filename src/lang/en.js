@@ -156,7 +156,8 @@ export default {
       checksum: 'Invalid checksum',
     },
     farm: {
-      harvest: 'Harvested items'
+      harvest: 'Harvested items',
+      plant: 'Used items'
     }
   },
   duplicateTab: {
@@ -1303,7 +1304,7 @@ export default {
         description: 'Display crop names in farm cells for easier identification of different plants'
       },
       showFarmHarvestNotify: {
-        name: 'Enable farm harvest notification',
+        name: 'Farm notifications',
         description: 'Show notifications of items gained when harvesting farm crops, with summary notifications for batch harvests'
       }
     }

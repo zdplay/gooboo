@@ -156,7 +156,8 @@ export default {
       checksum: 'Ungültige Prüfsumme',
     },
     farm: {
-      harvest: 'Geerntete Gegenstände'
+      harvest: 'Geerntete Gegenstände',
+      plant: 'Verwendete Gegenstände'
     }
   },
   duplicateTab: {
@@ -1303,7 +1304,7 @@ export default {
         description: 'Zeigt die Namen der Pflanzen in den Bauernhofzellen an, um verschiedene Pflanzen leichter zu erkennen'
       },
       showFarmHarvestNotify: {
-        name: 'Bauernhof-Ernte Benachrichtigungen aktivieren',
+        name: 'Bauernhof-Benachrichtigungen',
         description: 'Zeigt Benachrichtigungen für erhaltene Gegenstände beim Ernten an, mit zusammengefassten Benachrichtigungen für Massenernten'
       }
     }

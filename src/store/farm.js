@@ -827,8 +827,9 @@ export default {
             
             dispatch('updateFieldCaches');
         },
-        replantAll({ state, dispatch, commit, rootState }) {
+        replantAll({ state, dispatch, commit, rootState, rootGetters, getters }) {
             let harvestItems = {};
+            let plantConsumeItems = {};
             
             state.field.forEach((row, y) => {
                 row.forEach((cell, x) => {
@@ -836,25 +837,51 @@ export default {
                         const crop = cell.crop;
                         const fertilizer = cell.fertilizer ?? null;
                         dispatch('harvestCrop', {x, y, skipCache: true, skipNotify: true, fromHarvestAll: true, harvestItems: harvestItems});
+                        
+                        // 记录种植消耗的物品
+                        const costMult = rootGetters['mult/get']('farmCropCost', 1, getters.cropGeneStats(crop).mult.farmCropCost.multValue);
+                        // 记录种子消耗
+                        for (const [key, elem] of Object.entries(state.crop[crop].cost)) {
+                            if (plantConsumeItems[key] === undefined) {
+                                plantConsumeItems[key] = 0;
+                            }
+                            plantConsumeItems[key] += elem * costMult;
+                        }
+                        
+                        // 记录肥料消耗
+                        if (fertilizer !== null) {
+                            const fertilizerName = 'farm_' + fertilizer;
+                            if (plantConsumeItems[fertilizerName] === undefined) {
+                                plantConsumeItems[fertilizerName] = 0;
+                            }
+                            plantConsumeItems[fertilizerName] += getters.cropFertilizerCost(crop);
+                        }
+                        
                         dispatch('plantCrop', {x, y, crop, fertilizer, skipCache: true});
                     }
                 });
             });
             
+            // 检查通知设置是否开启
+            const showNotify = rootState.system.settings.experiment && 
+                              rootState.system.settings.experiment.items && 
+                              rootState.system.settings.experiment.items.showFarmHarvestNotify && 
+                              rootState.system.settings.experiment.items.showFarmHarvestNotify.value;
+            
             // 重植后，显示收获物品的汇总通知
-            if (Object.keys(harvestItems).length > 0) {
-                // 检查通知设置是否开启
-                const showNotify = rootState.system.settings.experiment && 
-                                  rootState.system.settings.experiment.items && 
-                                  rootState.system.settings.experiment.items.showFarmHarvestNotify && 
-                                  rootState.system.settings.experiment.items.showFarmHarvestNotify.value;
-                
-                if (showNotify) {
-                    commit('system/addNotification', {color: 'success', timeout: 5000, message: {
-                        type: 'farmHarvest',
-                        items: harvestItems
-                    }}, {root: true});
-                }
+            if (showNotify && Object.keys(harvestItems).length > 0) {
+                commit('system/addNotification', {color: 'success', timeout: 5000, message: {
+                    type: 'farmHarvest',
+                    items: harvestItems
+                }}, {root: true});
+            }
+            
+            // 显示种植消耗物品的通知
+            if (showNotify && Object.keys(plantConsumeItems).length > 0) {
+                commit('system/addNotification', {color: 'info', timeout: 5000, message: {
+                    type: 'farmPlant',
+                    items: plantConsumeItems
+                }}, {root: true});
             }
             
             dispatch('updateFieldCaches');
