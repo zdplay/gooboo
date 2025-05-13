@@ -27,6 +27,8 @@
           dense
           :disabled="uiRunning || stoppingInProgress"
           hint="达到此区域后将触发声望操作"
+          persistent-hint
+          class="hint-text"
         ></v-text-field>
 
         <v-select
@@ -37,6 +39,8 @@
           outlined
           dense
           hint="将使用此装备配置进行战斗"
+          persistent-hint
+          class="hint-text"
           :rules="[v => !!v || '必须选择装备配置']"
         ></v-select>
 
@@ -214,4 +218,13 @@ export default {
     }
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.hint-text :deep(.v-messages) {
+  min-height: 16px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+</style> 

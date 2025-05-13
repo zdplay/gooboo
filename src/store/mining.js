@@ -30,6 +30,7 @@ export default {
         beacon: {},
         beaconPlaced: {},
         beaconCooldown: 0,
+        niterAutomation: null,
     },
     getters: {
         damage: (state, getters, rootState, rootGetters) => {
@@ -456,6 +457,7 @@ export default {
             commit('updateKey', {key: 'breaks', value: []});
             commit('updateKey', {key: 'enhancementBars', value: 0});
             commit('updateKey', {key: 'enhancementIngredient', value: null});
+            commit('updateKey', {key: 'niterAutomation', value: null});
             for (const [key] of Object.entries(state.smeltery)) {
                 commit('updateSmelteryKey', {name: key, key: 'progress', value: 0});
                 commit('updateSmelteryKey', {name: key, key: 'stored', value: 0});

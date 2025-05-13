@@ -22,6 +22,12 @@
 .no-beacon {
   opacity: 0.1;
 }
+.hint-text :deep(.v-messages) {
+  min-height: 16px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
 </style>
 
 <template>
@@ -34,6 +40,23 @@
       <v-btn icon :disabled="isDeepest || isFrozen" @click="depthNext"><v-icon>mdi-step-forward</v-icon></v-btn>
       <v-btn icon :disabled="isDeepest || isFrozen" @click="depthNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
       <v-btn icon :disabled="isDeepest || isFrozen" @click="depthMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
+      
+      <v-tooltip bottom v-if="canShowNiterAutomation">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn 
+            icon 
+            color="primary" 
+            class="ml-2" 
+            :class="{'amber lighten-1': isNiterAutoRunning}"
+            v-bind="attrs" 
+            v-on="on"
+            @click="showNiterAutomationPanel = !showNiterAutomationPanel"
+          >
+            <v-icon>mdi-robot</v-icon>
+          </v-btn>
+        </template>
+        <span>自动挖烧硝</span>
+      </v-tooltip>
     </div>
     <gb-tooltip :title-text="$vuetify.lang.t('$vuetify.mining.durability')">
       <template v-slot:activator="{ on, attrs }">
@@ -145,6 +168,117 @@
       </template>
     </div>
     <alert-text v-if="showScrapHint" class="ma-1" type="info">{{ $vuetify.lang.t('$vuetify.mining.scrapGainHint') }}</alert-text>
+    
+    <!-- 自动挖烧硝设置面板 -->
+    <v-card v-if="canShowNiterAutomation && showNiterAutomationPanel" class="ma-1 pa-2 position-relative">
+      <div class="d-flex flex-column">
+        <v-card-title class="text-h6 justify-center">
+          <v-icon class="mr-2">mdi-cogs</v-icon>
+          自动挖烧硝
+        </v-card-title>
+        
+        <v-card-subtitle class="text-center">
+          自动挖掘指定次数后切换到下一层，直到目标层。支持离线运行。
+        </v-card-subtitle>
+      </div>
+
+      <v-card-text>
+        <v-alert v-if="!canUseNiter" type="warning" dense>
+          必须达到第 {{ MINING_NITER_DEPTH }} 层才能挖掘烧硝
+        </v-alert>
+        
+        <div v-else>
+          <v-text-field
+            v-model.number="niterAutoStartDepth"
+            type="number"
+            min="130"
+            :max="maxDepth"
+            label="起始深度"
+            outlined
+            dense
+            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
+            :hint="`起始挖掘层，最小 130，最大 ${maxDepth}`"
+            persistent-hint
+            class="hint-text"
+          ></v-text-field>
+
+          <v-text-field
+            v-model.number="niterAutoTargetDepth"
+            type="number"
+            min="130"
+            :max="maxDepth"
+            label="目标深度"
+            outlined
+            dense
+            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
+            :hint="`挖掘到此深度后停止，最小 130，最大 ${maxDepth}`"
+            persistent-hint
+            class="hint-text"
+          ></v-text-field>
+
+          <v-radio-group
+            v-model="niterAutoBreaksPerDepth"
+            row
+            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
+            label="每层目标挖破次数"
+            class="mt-3 py-2 px-3 rounded"
+            :class="$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-4'"
+          >
+            <v-radio label="10次" :value="12"></v-radio>
+            <v-radio label="100次" :value="102"></v-radio>
+            <v-radio label="1000次" :value="1002"></v-radio>
+          </v-radio-group>
+
+          <v-divider class="my-4"></v-divider>
+
+          <div v-if="isNiterAutoRunning" class="text-center mb-4">
+            <div class="subtitle-1">当前状态: 
+              <span v-if="niterAutoStatus.currentState === 'starting'" class="primary--text">正在开始</span>
+              <span v-else-if="niterAutoStatus.currentState === 'mining'" class="success--text">挖掘中</span>
+              <span v-else-if="niterAutoStatus.currentState === 'finished'" class="info--text">已完成</span>
+              <span v-else class="grey--text">空闲</span>
+            </div>
+            
+            <div class="subtitle-1">当前深度: {{ niterAutoStatus.currentDepth }}m</div>
+            <div class="subtitle-1">当前层进度: {{ niterAutoStatus.breaksThisSession }}/{{ niterAutoBreaksPerDepth }} 被挖破次数</div>
+            <div class="subtitle-1">还需: {{ niterAutoStatus.breaksNeeded }} 次挖破</div>
+            
+            <v-progress-linear
+              :value="niterAutoStatus.progress"
+              height="20"
+              color="success"
+              class="my-2"
+            >
+              {{ niterAutoStatus.progress }}%
+            </v-progress-linear>
+            
+            <div class="subtitle-2">已完成层数: {{ niterAutoStatus.completedDepths.length }}</div>
+          </div>
+
+          <div class="d-flex justify-center mt-2">
+            <v-btn
+              color="primary"
+              :disabled="isNiterAutoRunning || !canStartNiterAuto || niterAutoStoppingInProgress"
+              @click="startNiterAutomation"
+            >
+              <v-icon left>mdi-play</v-icon>
+              开始挖掘
+            </v-btn>
+            <v-btn
+              color="error"
+              class="ml-4"
+              :loading="niterAutoStoppingInProgress"
+              :disabled="!isNiterAutoRunning && !niterAutoStoppingInProgress"
+              @click="stopNiterAutomation"
+            >
+              <v-icon left>mdi-stop</v-icon>
+              停止
+            </v-btn>
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
+    
     <div class="d-flex justify-space-around mt-8 mt-lg-12">
       <gb-tooltip v-if="unlock.miningPickaxeCrafting.see" :min-width="0">
         <template v-slot:activator="{ on, attrs }">
@@ -212,7 +346,13 @@ import DisplayRow from '../upgrade/DisplayRow.vue';
 import BeaconSector from './BeaconSector.vue';
 
 export default {
-  components: { StatBreakdown, CurrencyIcon, AlertText, DisplayRow, BeaconSector },
+  components: { 
+    StatBreakdown, 
+    CurrencyIcon, 
+    AlertText, 
+    DisplayRow, 
+    BeaconSector
+  },
   data: () => ({
     rareEarthType: {
       granite: 'both',
@@ -235,6 +375,12 @@ export default {
       glowshard: MINING_GLOWSHARD_DEPTH,
     },
     showBeacons: false,
+    showNiterAutomationPanel: false,
+    niterAutoStatusTimer: null,
+    niterAutoStartDepth: MINING_NITER_DEPTH,
+    niterAutoTargetDepth: MINING_NITER_DEPTH + 20,
+    niterAutoBreaksPerDepth: 11,
+    niterAutoStoppingInProgress: false
   }),
   computed: {
     ...mapState({
@@ -247,6 +393,7 @@ export default {
       subfeature: state => state.system.features.mining.currentSubfeature,
       beacon: state => state.mining.beacon,
       isFrozen: state => state.cryolab.mining.active,
+      niterAutomation: state => state.mining.niterAutomation
     }),
     ...mapGetters({
       damage: 'mining/damage',
@@ -270,6 +417,9 @@ export default {
       enhancementLevel: 'mining/enhancementLevel',
       currentDepthBeacon: 'mining/currentDepthBeacon',
     }),
+    MINING_NITER_DEPTH() {
+      return MINING_NITER_DEPTH;
+    },
     maxDepth() {
       return this.$store.state.stat[`mining_maxDepth${this.subfeature}`].value;
     },
@@ -343,6 +493,63 @@ export default {
       } else {
         return [];
       }
+    },
+    canShowNiterAutomation() {
+      return false; // 暂时隐藏自动挖烧硝功能
+    },
+    isNiterAutoRunning() {
+      return this.niterAutomation && this.niterAutomation.isRunning;
+    },
+    niterAutoStatus() {
+      if (!this.niterAutomation) {
+        return {
+          isRunning: false,
+          currentState: 'idle',
+          currentDepth: this.depth,
+          breaksThisSession: this.currentBreaks,
+          breaksNeeded: 0,
+          completedDepths: [],
+          progress: 0
+        };
+      }
+      
+      // 计算出类似于miningNiterAutomation.getStatus()的返回值
+      const breaksNeeded = Math.max(0, 
+        (this.niterAutomation.config.breaksPerDepth || 11) - this.currentBreaks);
+      
+      const progress = Math.min(100, Math.round((this.currentBreaks / 
+        (this.niterAutomation.config.breaksPerDepth || 11)) * 100));
+        
+      return {
+        isRunning: this.niterAutomation.isRunning,
+        currentState: this.niterAutomation.currentState,
+        config: this.niterAutomation.config,
+        currentDepth: this.depth,
+        maxDepth: this.maxDepth,
+        currentBreaks: this.currentBreaks,
+        breaksThisSession: this.currentBreaks,
+        breaksNeeded: breaksNeeded,
+        completedDepths: this.niterAutomation.completedDepths || [],
+        progress: progress
+      };
+    },
+    canStartNiterAuto() {
+      return this.niterAutoStartDepth <= this.maxDepth && this.niterAutoTargetDepth <= this.maxDepth;
+    },
+    canUseNiter() {
+      return this.maxDepth >= MINING_NITER_DEPTH;
+    },
+  },
+  created() {
+    // 设置定时器以定期更新UI
+    this.niterAutoStatusTimer = setInterval(() => {
+      this.$forceUpdate();
+    }, 500);
+  },
+  beforeDestroy() {
+    if (this.niterAutoStatusTimer) {
+      clearInterval(this.niterAutoStatusTimer);
+      this.niterAutoStatusTimer = null;
     }
   },
   methods: {
@@ -384,6 +591,53 @@ export default {
       this.$store.commit('mining/updateKey', {key: 'depth', value: this.maxDepth});
       this.$store.commit('system/updateTutorialKey', {name: 'miningDepth', key: 'completed', value: true});
       this.resetDurability();
+    },
+    startNiterAutomation() {
+      if (!this.canStartNiterAuto || this.isNiterAutoRunning || this.niterAutoStoppingInProgress) {
+        return;
+      }
+      
+      // 确保深度值是数字
+      const startDepth = parseInt(this.niterAutoStartDepth) || MINING_NITER_DEPTH;
+      const targetDepth = parseInt(this.niterAutoTargetDepth) || (MINING_NITER_DEPTH + 20);
+      const breaksPerDepth = parseInt(this.niterAutoBreaksPerDepth) || 11;
+      
+      const config = {
+        startDepth: startDepth,
+        targetDepth: targetDepth,
+        breaksPerDepth: breaksPerDepth
+      };
+      
+      // 添加调试日志确认配置
+      console.log(`开始自动烧硝 - 配置:`, config);
+      
+      const automationData = {
+        isRunning: true,
+        currentState: 'starting',
+        config: config,
+        completedDepths: []
+      };
+      
+      this.$store.commit('mining/updateKey', {key: 'niterAutomation', value: automationData});
+      
+      // 设置当前深度为起始深度
+      this.$store.commit('mining/updateKey', {key: 'depth', value: config.startDepth});
+      this.resetDurability();
+    },
+    stopNiterAutomation() {
+      if (!this.isNiterAutoRunning) {
+        return;
+      }
+      
+      this.niterAutoStoppingInProgress = true;
+      
+      // 停止自动化
+      this.$store.commit('mining/updateKey', {key: 'niterAutomation', value: null});
+      
+      // 延迟后重置停止状态
+      setTimeout(() => {
+        this.niterAutoStoppingInProgress = false;
+      }, 500);
     }
   }
 }
