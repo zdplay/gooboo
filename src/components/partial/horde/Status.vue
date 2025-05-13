@@ -23,6 +23,9 @@
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext"><v-icon>mdi-step-forward</v-icon></v-btn>
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
+      <v-btn icon color="primary" v-if="canPrestige" @click="toggleAutomation" class="ml-2">
+        <v-icon>mdi-robot</v-icon>
+      </v-btn>
     </div>
     <div v-if="subfeature === 0" class="d-flex flex-wrap justify-center align-center">
       <gb-tooltip :min-width="0">
@@ -173,6 +176,7 @@
       <currency large class="ma-1" name="horde_blood"></currency>
       <currency v-if="selectedClass === 'pirate'" class="ma-1" name="horde_lockpick"></currency>
     </div>
+    <automation-panel v-if="showAutomation" @close="showAutomation = false"></automation-panel>
   </div>
 </template>
 
@@ -190,12 +194,14 @@ import EnemyStatus from './EnemyStatus.vue';
 import PlayerStatus from './PlayerStatus.vue';
 import TowerTile from './TowerTile.vue';
 import TrinketItem from './TrinketItem.vue';
+import AutomationPanel from './AutomationPanel.vue';
 
 export default {
-  components: { Active, PlayerStatus, EnemyStatus, Currency, StatBreakdown, AlertText, EnemyActive, TowerTile, AreaMap, DisplayRow, TrinketItem },
+  components: { Active, PlayerStatus, EnemyStatus, Currency, StatBreakdown, AlertText, EnemyActive, TowerTile, AreaMap, DisplayRow, TrinketItem, AutomationPanel },
   data: () => ({
     showTowers: false,
     showMap: false,
+    showAutomation: false,
     selectedArea: 'warzone',
     bossBonusDifficulty: 0,
     activeShortcutMap: {}
@@ -363,9 +369,15 @@ export default {
     },
     isBossZone() {
       return this.subfeature === 1 && this.areaList[this.currentArea].zones[this.zone].type === 'boss';
+    },
+    canPrestige() {
+      return this.$store.state.unlock.hordePrestige?.use || false;
     }
   },
   methods: {
+    toggleAutomation() {
+      this.showAutomation = !this.showAutomation;
+    },
     updateShortcutMap() {
         this.activeShortcutMap = {};
         let index = 0;

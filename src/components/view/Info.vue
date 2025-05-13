@@ -102,6 +102,10 @@
           <span>增加农场物品收获和使用通知功能。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
+          <span>增加部落声望自动化功能。在楼层切换右边的机器人按钮。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>
           <span>增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用</span>
         </span>
