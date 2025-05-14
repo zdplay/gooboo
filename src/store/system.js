@@ -13,6 +13,7 @@ export default {
         lastPlayedDays: [],
         patchnote: {},
         timestamp: null,
+        dailyCheckIn: null,
         screen: 'newGame',
         notification: [],
         features: {

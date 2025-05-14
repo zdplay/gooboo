@@ -57,7 +57,7 @@
       <v-card-title class="justify-center">改动声明</v-card-title>
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
-        <span class="d-flex ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>增加运存档功能，在【设置】-【通用】设置使用。</span>
         </span>
@@ -120,6 +120,10 @@
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
           <span>增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
+          <span>增加每日签到奖励。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>

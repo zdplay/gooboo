@@ -467,6 +467,7 @@
           <currency name="school_goldenDust"></currency>
         </div>
       </gb-tooltip>
+      <daily-check-in></daily-check-in>
       <gb-tooltip v-if="featureIsFrozen" key="frozen-feature" :title-text="$vuetify.lang.t('$vuetify.cryolab.frozenFeature.title')">
         <template v-slot:activator="{ on, attrs }">
           <v-icon class="mx-2" v-bind="attrs" v-on="on">mdi-snowflake</v-icon>
@@ -680,6 +681,7 @@ import ImportMessage from './components/partial/snackbar/ImportMessage.vue';
 import Strategy from './components/view/Strategy.vue';
 import FarmHarvestMessage from './components/partial/snackbar/FarmHarvestMessage.vue';
 import FarmPlantMessage from './components/partial/snackbar/FarmPlantMessage.vue';
+import DailyCheckIn from './components/partial/menu/DailyCheckIn.vue';
 const semverCompare = require('semver/functions/compare');
 
 export default {
@@ -730,6 +732,7 @@ export default {
     Strategy,
     FarmHarvestMessage,
     FarmPlantMessage,
+    DailyCheckIn,
   },
   data: () => ({
     dialogDust: false,
@@ -837,6 +840,9 @@ export default {
     });
   },
   mounted() {
+    // 初始化每日签到数据
+    this.initDailyCheckIn();
+    
     // Workaround to show notifications
     const notifications = [...this.$store.state.system.notification];
     this.messages = [];
@@ -953,6 +959,36 @@ export default {
     },
     openDustDialog() {
       this.dialogDust = true;
+    },
+    initDailyCheckIn() {
+      const now = Math.floor(Date.now() / 1000);
+      
+      // 如果每日签到数据不存在，初始化它
+      if (!this.$store.state.system.dailyCheckIn) {
+        this.$store.commit('system/updateKey', {
+          key: 'dailyCheckIn',
+          value: {
+            available: 1,
+            timestamp: now,
+            history: []
+          }
+        });
+      } else {
+        // 检查是否需要重置（新的一天）
+        const lastTime = this.$store.state.system.dailyCheckIn.timestamp;
+        const isNewDay = new Date(now * 1000).toDateString() !== new Date(lastTime * 1000).toDateString();
+        
+        if (isNewDay) {
+          this.$store.commit('system/updateKey', {
+            key: 'dailyCheckIn',
+            value: {
+              available: 1,
+              timestamp: now,
+              history: []
+            }
+          });
+        }
+      }
     }
   },
   watch: {
