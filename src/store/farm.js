@@ -146,7 +146,7 @@ export default {
                 rareDrop: [],
                 tag: []
             };
-            ['farmCropGain', 'farmGold', 'farmGoldChance', 'farmExperience', 'farmRareDropChance', 'farmGrow', 'farmOvergrow', 'farmCropCost', 'farmFertilizerCost', 'farmLuckyHarvestMult', 'farmHuntChance'].forEach(elem => {
+            ['farmCropGain', 'farmGoldChance', 'farmExperience', 'farmRareDropChance', 'farmGrow', 'farmOvergrow', 'farmCropCost', 'farmFertilizerCost', 'farmLuckyHarvestMult', 'farmHuntChance'].forEach(elem => {
                 stats.mult[elem] = {baseValue: 0, baseArray: [], multValue: 1, multArray: []};
             });
             const crop = state.crop[name];
@@ -573,12 +573,15 @@ export default {
                 }
 
                 // Gold gain
-                const goldAmount = randomRound(rootGetters['mult/get'](
-                    'farmGold',
-                    (crop.goldGain || 0) + geneStats.mult.farmGold.baseValue,
-                    ((field.buildingEffect.gnome ?? 0) * 0.15 / field.time + 1) * geneStats.mult.farmGold.multValue
-                ) * allGainBoost * field.grow, rngGen());
-                if (goldAmount > 0) {
+                const goldAmount = randomRound(
+                    rootGetters['mult/get'](
+                        'farmGoldChance',
+                        getters.baseGoldChance(field.crop) + geneStats.mult.farmGoldChance.baseValue,
+                        ((field.buildingEffect.gardenGnome ?? 0) / field.time) * geneStats.mult.farmGoldChance.multValue
+                    ) * allGainBoost * field.grow,
+                    rngGen()
+                );
+                if (goldAmount) {
                     dispatch('currency/gain', {feature: 'farm', name: 'gold', amount: goldAmount}, {root: true});
 
                     // 添加金币收获记录（用于通知）

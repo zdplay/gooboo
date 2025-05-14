@@ -21,23 +21,55 @@ export default {
   methods: {
     getItemName(item) {
       if (item.startsWith('farm_')) {
-        return this.$vuetify.lang.t(`$vuetify.currency.${item}.name`);
+        // 首先检查是否存在于currency中
+        if (this.$store.state.currency[item]) {
+          return this.$vuetify.lang.t(`$vuetify.currency.${item}.name`);
+        } 
+        // 然后检查是否存在于consumable中
+        else if (this.$store.state.consumable[item]) {
+          return this.$vuetify.lang.t(`$vuetify.consumable.${item}.name`);
+        }
+        // 如果都不存在，返回原始ID
+        else {
+          return item;
+        }
       } else {
-        return this.$vuetify.lang.t(`$vuetify.consumable.${item}.name`);
+        // 非farm_开头的物品，在consumable中查找
+        if (this.$store.state.consumable[item]) {
+          return this.$vuetify.lang.t(`$vuetify.consumable.${item}.name`);
+        } else {
+          return item;
+        }
       }
     },
     getItemColor(item) {
       if (item.startsWith('farm_')) {
-        return this.$store.state.currency[item].color;
+        const currency = this.$store.state.currency[item];
+        if (currency && currency.color) {
+          return currency.color;
+        } else {
+          // 尝试从消耗品中获取颜色
+          const consumable = this.$store.state.consumable[item];
+          return consumable && consumable.color ? consumable.color : 'grey';
+        }
       } else {
-        return this.$store.state.consumable[item].color;
+        const consumable = this.$store.state.consumable[item];
+        return consumable && consumable.color ? consumable.color : 'grey';
       }
     },
     getItemIcon(item) {
       if (item.startsWith('farm_')) {
-        return this.$store.state.currency[item].icon;
+        const currency = this.$store.state.currency[item];
+        if (currency && currency.icon) {
+          return currency.icon;
+        } else {
+          // 尝试从消耗品中获取图标
+          const consumable = this.$store.state.consumable[item];
+          return consumable && consumable.icon ? consumable.icon : 'mdi-help-circle';
+        }
       } else {
-        return this.$store.state.consumable[item].icon;
+        const consumable = this.$store.state.consumable[item];
+        return consumable && consumable.icon ? consumable.icon : 'mdi-help-circle';
       }
     }
   }
