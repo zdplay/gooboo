@@ -91,7 +91,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
-          <span>增加画廊形状【一键消除】功能。</span>
+          <span>增加画廊形状【清管】功能，一键清空动力值。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="green">学校</v-chip>
