@@ -134,6 +134,13 @@
         >
         {{ isAutoSorting ? "运行中" : "自动" }}
       </v-btn>
+      <v-btn
+        color="error"
+        @click="clearAllSameColors"
+        class="ml-1"
+        >
+        一键消除
+      </v-btn>
     </div>
       <div class="d-flex flex-wrap justify-center align-center ma-1">
       <currency v-for="item in currencies.slice(1)" :key="item" class="ma-1" :name="item" :gainBase="1"></currency>
@@ -155,6 +162,7 @@ export default {
     dragY: null,
     isAutoSorting: false,
     autoSortInterval: null,
+    isClearing: false
   }),
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
@@ -564,7 +572,7 @@ export default {
           }
           const eligibleShapes = Object.entries(this.gridStat)
           .filter(([, count]) => count > 4)
-          .sort((a, b) => a[1] - b[1]);
+          .sort((a, b) => b[1] - a[1]);
           if (eligibleShapes.length > 0) {
             const bestShape = eligibleShapes[0][0];
             await this.triggerSort(bestShape);
@@ -606,6 +614,128 @@ export default {
       }
     }
   },
+  async clearAllSameColors() {
+    if (this.isClearing) return;
+    this.isClearing = true;
+    
+    try {
+      // 停止自动运行
+      if (this.isAutoSorting) {
+        this.stopAutoSort();
+      }
+      
+      console.log("开始一键消除，当前动力值:", this.$store.getters['currency/value']('gallery_motivation'));
+      
+      // 是否继续处理
+      let continueProcessing = true;
+      
+      // 快速模式 - 一次性处理多个形状
+      const batchProcess = async () => {
+        // 每次循环重新计算形状数量
+        const shapeCounts = {...this.gridStat};
+        
+        if (Object.keys(shapeCounts).length === 0) {
+          return false;
+        }
+        
+        // 形状数量从多到少排序
+        const sortedShapes = Object.entries(shapeCounts)
+          .filter(([, count]) => count >= 5) // 只处理数量≥5的形状
+          .sort((a, b) => b[1] - a[1]);       // 数量从多到少排序
+        
+        if (sortedShapes.length === 0) {
+          // 检查是否可以使用重洗功能
+          if (this.canBuyReroll) {
+            this.buyShapeReroll();
+            // 重洗后等待较短时间
+            await new Promise(resolve => setTimeout(resolve, 150));
+            return true;
+          } else {
+            return false;
+          }
+        }
+        
+        // 取数量最多的一个形状处理
+        const [shapeName, amount] = sortedShapes[0];
+        
+        // 检查动力值是否足够
+        if (!this.$store.getters['currency/canAfford']({gallery_motivation: amount})) {
+          return false;
+        }
+        
+        try {
+          // 构建连接网格，标记所有该颜色的位置
+          let connectedGrid = [];
+          for (let y = 0; y < this.shapeGrid.length; y++) {
+            const row = [];
+            for (let x = 0; x < this.shapeGrid[y].length; x++) {
+              row.push(this.shapeGrid[y][x] === shapeName);
+            }
+            connectedGrid.push(row);
+          }
+          
+          // 直接应用效果
+          // 增加资源
+          this.$store.dispatch('currency/gain', {
+            feature: 'gallery', 
+            name: shapeName, 
+            gainMult: true,  // 使用gainMult标志，这样会应用全局增益倍率
+            amount: Math.pow(amount, 2)  // 使用数量的平方作为基础增益
+          });
+          
+          // 记录统计
+          this.$store.commit('stat/increaseTo', {
+            feature: 'gallery', 
+            name: 'shapeComboHighest', 
+            value: amount
+          });
+          
+          this.$store.commit('stat/add', {
+            feature: 'gallery', 
+            name: 'shapeComboTotal', 
+            value: amount
+          });
+          
+          // 消耗动力值
+          this.$store.dispatch('currency/spend', {
+            feature: 'gallery', 
+            name: 'motivation', 
+            amount: amount
+          });
+          
+          // 处理沙漏组合
+          if (this.$store.getters['gallery/shapeHasHourglass']) {
+            this.$store.commit('gallery/updateKey', {
+              key: 'hourglassCombo', 
+              value: this.$store.state.gallery.hourglassCombo + amount
+            });
+          }
+          
+          // 重新生成被移除的形状
+          this.$store.dispatch('gallery/rerollShapes', connectedGrid);
+          
+          // 缩短等待时间
+          await new Promise(resolve => setTimeout(resolve, 100));
+          return true;
+          
+        } catch (error) {
+          console.error(`处理形状 ${shapeName} 时发生错误:`, error);
+          return false;
+        }
+      };
+      
+      // 快速处理多个形状批次
+      while (continueProcessing) {
+        continueProcessing = await batchProcess();
+      }
+      
+      console.log("一键消除完成，剩余动力值:", this.$store.getters['currency/value']('gallery_motivation'));
+    } catch (error) {
+      console.error("一键消除过程中出现错误:", error);
+    } finally {
+      this.isClearing = false;
+    }
+  }
   }
 }
 </script>

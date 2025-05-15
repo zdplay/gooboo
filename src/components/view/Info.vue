@@ -90,6 +90,10 @@
           <span>增加画廊形状重roll快捷键【R】。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
+          <span>增加画廊形状【一键消除】功能。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="green">学校</v-chip>
           <span>修改学校参考考试为直接满分通过。</span>
         </span>
