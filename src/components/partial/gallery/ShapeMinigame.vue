@@ -614,157 +614,6 @@ export default {
       }
     }
   },
-  async clearAllSameColors() {
-    if (this.isClearing) return;
-    this.isClearing = true;
-    
-    try {
-      // 停止自动运行
-      if (this.isAutoSorting) {
-        this.stopAutoSort();
-      }
-      
-      console.log("开始一键消除，当前动力值:", this.$store.getters['currency/value']('gallery_motivation'));
-      
-      // 记录总收益
-      const totalGains = {};
-      let totalMotivationUsed = 0;
-      let rerollCount = 0;
-      let shapeMotivationUsed = 0;
-      
-      // 是否继续处理
-      let continueProcessing = true;
-      
-      // 快速模式 - 一次性处理多个形状
-      const batchProcess = async () => {
-        // 每次循环重新计算形状数量
-        const shapeCounts = {...this.gridStat};
-        
-        if (Object.keys(shapeCounts).length === 0) {
-          return false;
-        }
-        
-        // 形状数量从多到少排序
-        const sortedShapes = Object.entries(shapeCounts)
-          .filter(([, count]) => count >= 5) // 只处理数量≥5的形状
-          .sort((a, b) => b[1] - a[1]);       // 数量从多到少排序
-        
-        if (sortedShapes.length === 0) {
-          // 检查是否可以使用重洗功能
-          if (this.canBuyReroll) {
-            this.buyShapeReroll();
-            // 记录重洗消耗的动力值
-            totalMotivationUsed += GALLERY_REROLL_COST;
-            rerollCount++;
-            // 重洗后等待较短时间
-            await new Promise(resolve => setTimeout(resolve, 150));
-            return true;
-          } else {
-            return false;
-          }
-        }
-        
-        // 取数量最多的一个形状处理
-        const [shapeName, amount] = sortedShapes[0];
-        
-        // 检查动力值是否足够
-        if (!this.$store.getters['currency/canAfford']({gallery_motivation: amount})) {
-          return false;
-        }
-        
-        try {
-          // 构建连接网格，标记所有该颜色的位置
-          let connectedGrid = [];
-          for (let y = 0; y < this.shapeGrid.length; y++) {
-            const row = [];
-            for (let x = 0; x < this.shapeGrid[y].length; x++) {
-              row.push(this.shapeGrid[y][x] === shapeName);
-            }
-            connectedGrid.push(row);
-          }
-          
-          // 计算资源获取量
-          const gainAmount = Math.pow(amount, 2);
-          
-          // 记录收益
-          if (!totalGains[shapeName]) {
-            totalGains[shapeName] = 0;
-          }
-          totalGains[shapeName] += gainAmount;
-          totalMotivationUsed += amount;
-          shapeMotivationUsed += amount;
-          
-          // 直接应用效果
-          // 增加资源
-          this.$store.dispatch('currency/gain', {
-            feature: 'gallery', 
-            name: shapeName, 
-            gainMult: true,  // 使用gainMult标志，这样会应用全局增益倍率
-            amount: gainAmount  // 使用数量的平方作为基础增益
-          });
-          
-          // 记录统计
-          this.$store.commit('stat/increaseTo', {
-            feature: 'gallery', 
-            name: 'shapeComboHighest', 
-            value: amount
-          });
-          
-          this.$store.commit('stat/add', {
-            feature: 'gallery', 
-            name: 'shapeComboTotal', 
-            value: amount
-          });
-          
-          // 消耗动力值
-          this.$store.dispatch('currency/spend', {
-            feature: 'gallery', 
-            name: 'motivation', 
-            amount: amount
-          });
-          
-          // 处理沙漏组合
-          if (this.$store.getters['gallery/shapeHasHourglass']) {
-            this.$store.commit('gallery/updateKey', {
-              key: 'hourglassCombo', 
-              value: this.$store.state.gallery.hourglassCombo + amount
-            });
-          }
-          
-          // 重新生成被移除的形状
-          this.$store.dispatch('gallery/rerollShapes', connectedGrid);
-          
-          // 缩短等待时间
-          await new Promise(resolve => setTimeout(resolve, 100));
-          return true;
-          
-        } catch (error) {
-          console.error(`处理形状 ${shapeName} 时发生错误:`, error);
-          return false;
-        }
-      };
-      
-      // 快速处理多个形状批次
-      while (continueProcessing) {
-        continueProcessing = await batchProcess();
-      }
-      
-      // 输出汇总收益信息
-      console.log("======= 一键消除收益汇总 =======");
-      for (const [shapeName, amount] of Object.entries(totalGains)) {
-        console.log(`${shapeName}: +${amount}`);
-      }
-      console.log(`总消耗动力值: ${totalMotivationUsed}`);
-      console.log(`- 形状消除: ${shapeMotivationUsed}`);
-      console.log(`- 重洗消耗(${rerollCount}次): ${rerollCount * GALLERY_REROLL_COST}`);
-      console.log("===============================");
-      console.log("一键消除完成，剩余动力值:", this.$store.getters['currency/value']('gallery_motivation'));
-    } catch (error) {
-      console.error("一键消除过程中出现错误:", error);
-    } finally {
-      this.isClearing = false;
-    }
-  },
   async clearAllMotivationInstantly() {
     if (this.isClearing) return;
     this.isClearing = true;
@@ -783,9 +632,14 @@ export default {
       let rerollCount = 0;
       let shapeMotivationUsed = 0;
       
+      // 防止无限循环
+      let maxIterations = 200;
+      let iteration = 0;
+      
       // 循环处理直到动力值耗尽
-      let canContinue = true;
-      while (canContinue) {
+      while (iteration < maxIterations) {
+        iteration++;
+        
         // 获取当前动力值
         const currentMotivation = this.$store.getters['currency/value']('gallery_motivation');
         if (currentMotivation < 5) {
@@ -793,7 +647,7 @@ export default {
           break;
         }
         
-        // 获取形状数量信息
+        // 获取形状数量信息 - 每次重新获取最新状态
         const shapeCounts = {...this.gridStat};
         
         // 形状数量从多到少排序
@@ -808,12 +662,15 @@ export default {
             // 记录重洗消耗的动力值
             totalMotivationUsed += GALLERY_REROLL_COST;
             rerollCount++;
+            // 不等待DOM更新
             continue;
           } else {
             console.log("没有可消除的形状且无法重洗，停止处理");
             break;
           }
         }
+        
+        let processedAny = false;
         
         // 处理每种形状一次
         for (const [shapeName, amount] of sortedShapes) {
@@ -832,6 +689,16 @@ export default {
           totalGains[shapeName] += gainAmount;
           totalMotivationUsed += amount;
           shapeMotivationUsed += amount;
+          
+          // 构建网格并记录要重新生成的位置
+          let connectedGrid = [];
+          for (let y = 0; y < this.shapeGrid.length; y++) {
+            const row = [];
+            for (let x = 0; x < this.shapeGrid[y].length; x++) {
+              row.push(this.shapeGrid[y][x] === shapeName);
+            }
+            connectedGrid.push(row);
+          }
           
           // 直接获得资源
           this.$store.dispatch('currency/gain', {
@@ -869,22 +736,26 @@ export default {
             });
           }
           
-          // 构建网格并重新生成形状
-          let connectedGrid = [];
-          for (let y = 0; y < this.shapeGrid.length; y++) {
-            const row = [];
-            for (let x = 0; x < this.shapeGrid[y].length; x++) {
-              row.push(this.shapeGrid[y][x] === shapeName);
-            }
-            connectedGrid.push(row);
-          }
-          
-          // 重新生成被移除的形状（立即处理，不等待动画）
+          // 重新生成被移除的形状
           this.$store.dispatch('gallery/rerollShapes', connectedGrid);
           
+          // 不给DOM时间更新
+          
+          processedAny = true;
           // 处理一个形状后退出内循环
           break;
         }
+        
+        // 如果没有处理任何形状，可能是状态不一致，退出循环
+        if (!processedAny) {
+          console.log("当前循环未处理任何形状，退出以防止卡死");
+          break;
+        }
+      }
+      
+      // 如果达到最大迭代次数，记录警告
+      if (iteration >= maxIterations) {
+        console.warn("清空体力达到最大迭代次数限制，强制停止");
       }
       
       // 输出汇总收益信息
