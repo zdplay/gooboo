@@ -224,9 +224,9 @@
             class="mt-3 py-2 px-3 rounded"
             :class="$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-4'"
           >
-            <v-radio label="10次" :value="12"></v-radio>
-            <v-radio label="100次" :value="102"></v-radio>
-            <v-radio label="1000次" :value="1002"></v-radio>
+            <v-radio label="10次" :value="10"></v-radio>
+            <v-radio label="100次" :value="100"></v-radio>
+            <v-radio label="1000次" :value="1000"></v-radio>
           </v-radio-group>
 
           <v-divider class="my-4"></v-divider>
@@ -379,7 +379,7 @@ export default {
     niterAutoStatusTimer: null,
     niterAutoStartDepth: MINING_NITER_DEPTH,
     niterAutoTargetDepth: MINING_NITER_DEPTH + 20,
-    niterAutoBreaksPerDepth: 11,
+    niterAutoBreaksPerDepth: 10,
     niterAutoStoppingInProgress: false
   }),
   computed: {
@@ -495,7 +495,7 @@ export default {
       }
     },
     canShowNiterAutomation() {
-      return false; // 暂时隐藏自动挖烧硝功能
+      return true;
     },
     isNiterAutoRunning() {
       return this.niterAutomation && this.niterAutomation.isRunning;
@@ -513,22 +513,21 @@ export default {
         };
       }
       
-      // 计算出类似于miningNiterAutomation.getStatus()的返回值
       const breaksNeeded = Math.max(0, 
-        (this.niterAutomation.config.breaksPerDepth || 11) - this.currentBreaks);
+        (this.niterAutomation.config.breaksPerDepth || 10) - this.currentBreaks);
       
       const progress = Math.min(100, Math.round((this.currentBreaks / 
-        (this.niterAutomation.config.breaksPerDepth || 11)) * 100));
+        (this.niterAutomation.config.breaksPerDepth || 10)) * 100));
         
       return {
         isRunning: this.niterAutomation.isRunning,
-        currentState: this.niterAutomation.currentState,
+        currentState: this.niterAutomation.currentState || 'mining',
         config: this.niterAutomation.config,
-        currentDepth: this.depth,
+        currentDepth: this.niterAutomation.currentDepth || this.depth,
         maxDepth: this.maxDepth,
         currentBreaks: this.currentBreaks,
         breaksThisSession: this.currentBreaks,
-        breaksNeeded: breaksNeeded,
+        breaksNeeded: this.niterAutomation.remainingBreaks || breaksNeeded,
         completedDepths: this.niterAutomation.completedDepths || [],
         progress: progress
       };
@@ -541,7 +540,6 @@ export default {
     },
   },
   created() {
-    // 设置定时器以定期更新UI
     this.niterAutoStatusTimer = setInterval(() => {
       this.$forceUpdate();
     }, 500);
@@ -597,10 +595,9 @@ export default {
         return;
       }
       
-      // 确保深度值是数字
       const startDepth = parseInt(this.niterAutoStartDepth) || MINING_NITER_DEPTH;
       const targetDepth = parseInt(this.niterAutoTargetDepth) || (MINING_NITER_DEPTH + 20);
-      const breaksPerDepth = parseInt(this.niterAutoBreaksPerDepth) || 11;
+      const breaksPerDepth = parseInt(this.niterAutoBreaksPerDepth) || 10;
       
       const config = {
         startDepth: startDepth,
@@ -608,21 +605,7 @@ export default {
         breaksPerDepth: breaksPerDepth
       };
       
-      // 添加调试日志确认配置
-      console.log(`开始自动烧硝 - 配置:`, config);
-      
-      const automationData = {
-        isRunning: true,
-        currentState: 'starting',
-        config: config,
-        completedDepths: []
-      };
-      
-      this.$store.commit('mining/updateKey', {key: 'niterAutomation', value: automationData});
-      
-      // 设置当前深度为起始深度
-      this.$store.commit('mining/updateKey', {key: 'depth', value: config.startDepth});
-      this.resetDurability();
+      this.$store.dispatch('mining/startNiterAutomation', config);
     },
     stopNiterAutomation() {
       if (!this.isNiterAutoRunning) {
@@ -631,10 +614,8 @@ export default {
       
       this.niterAutoStoppingInProgress = true;
       
-      // 停止自动化
       this.$store.commit('mining/updateKey', {key: 'niterAutomation', value: null});
       
-      // 延迟后重置停止状态
       setTimeout(() => {
         this.niterAutoStoppingInProgress = false;
       }, 500);

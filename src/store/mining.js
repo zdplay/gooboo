@@ -650,6 +650,66 @@ export default {
                     dispatch('system/applyEffect', {type: effect.type, name: effect.name, multKey: `miningBeacon_${ beacon }`, value: effect.value(state.beacon[beacon].level), trigger: false}, {root: true});
                 });
             }
+        },
+        startNiterAutomation({ state, commit, getters }, config) {
+            console.log('[自动挖硝] 开始初始化，配置:', config);
+            
+            const { startDepth, targetDepth, breaksPerDepth } = config;
+            let currentDepth = startDepth;
+            
+            // 快速跳过已完成的层
+            while (currentDepth <= targetDepth) {
+                // 获取当前层的挖掘次数
+                const breakIndex = currentDepth - 1;
+                const currentBreaks = state.breaks.length > breakIndex ? state.breaks[breakIndex] : 0;
+                
+                if (currentBreaks < breaksPerDepth) {
+                    // 找到第一个未完成的层，设置为当前深度
+                    break;
+                }
+                
+                // 这一层已完成，继续检查下一层
+                currentDepth++;
+            }
+            
+            // 如果所有层都已完成，或者超出目标范围，则停止任务
+            if (currentDepth > targetDepth) {
+                console.log('[自动挖硝] 所有目标层已完成，任务结束');
+                return false;
+            }
+            
+            // 设置当前深度为找到的第一个未完成层
+            if (currentDepth !== state.depth) {
+                console.log(`[自动挖硝] 跳过已完成层，从 ${currentDepth} 层开始`);
+                commit('updateKey', {key: 'depth', value: currentDepth});
+                // 重置耐久
+                commit('updateKey', {key: 'durability', value: getters.currentDurability});
+            }
+            
+            // 获取当前层的挖掘次数
+            const breakIndex = currentDepth - 1;
+            const curBreaks = state.breaks.length > breakIndex ? state.breaks[breakIndex] : 0;
+            
+            // 创建自动挖硝状态
+            const niterAutomation = {
+                isRunning: true,
+                currentState: 'mining',
+                config: config,
+                startTime: Date.now(),
+                completedDepths: [],
+                // 整合状态指示器信息
+                active: true,
+                currentDepth: currentDepth,
+                targetDepth: targetDepth,
+                progress: `${curBreaks}/${breaksPerDepth}`,
+                remainingBreaks: breaksPerDepth - curBreaks
+            };
+            
+            // 更新状态
+            commit('updateKey', {key: 'niterAutomation', value: niterAutomation});
+            
+            console.log('[自动挖硝] 启动成功');
+            return true;
         }
     }
 }
