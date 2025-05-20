@@ -59,7 +59,7 @@
       <v-card-text>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加云存档功能，在【设置】-【通用】设置使用。</span>
+          <span>增加云存档功能，在【设置】-【通用】设置。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
@@ -67,7 +67,11 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加新UI的布局，在【设置】-【实验性】设置使用，需要跟货币标签一起开启。</span>
+          <span>增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
+          <span>增加【显示科学计数法】选项，在【设置】-【实验性】设置。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="pink">挖矿</v-chip>

@@ -44,6 +44,48 @@ function formatNum(amount, showDecimals = false) {
         return negativePrefix + '∞';
     }
 
+    // 使用科学计数法显示大数字
+    const useScientificNotation = store.state.system.settings.experiment.items.showScientificNotation.value;
+    
+    // 如果启用了科学计数法，对大数和小数应用统一格式
+    if (useScientificNotation && amount > 0) {
+        // 只对1000及以上的数字或0.001及以下的数字应用科学计数法
+        if (numBase >= 3 || numBase <= -3) {
+            // 处理数字的尾数和指数
+            const exponent = numBase;
+            let mantissa = amount / Math.pow(10, exponent);
+            
+            // 确保尾数始终是1位数字
+            let adjustedExponent = exponent;
+            
+            // 如果尾数不在1-10范围内，调整尾数和指数
+            if (mantissa < 1) {
+                mantissa *= 10;
+                adjustedExponent -= 1;
+            } else if (mantissa >= 10) {
+                mantissa /= 10;
+                adjustedExponent += 1;
+            }
+            
+            // 使用Unicode上标字符
+            const superscripts = {
+                '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', 
+                '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+                '-': '⁻'
+            };
+            let expStr = '';
+            // 处理负指数（小数）
+            const expDigits = adjustedExponent.toString();
+            for (let i = 0; i < expDigits.length; i++) {
+                expStr += superscripts[expDigits[i]] || expDigits[i];
+            }
+            
+            // 返回科学计数法格式的字符串（例如：9.46×10¹⁰）
+            return negativePrefix + mantissa.toPrecision(3) + '×10' + expStr;
+        }
+    }
+    
+    // 以下是原始代码，当不使用科学计数法时执行
     if (showDecimals) {
         if (numBase === -Infinity) {
             return '0';

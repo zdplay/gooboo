@@ -1306,6 +1306,10 @@ export default {
       showFarmHarvestNotify: {
         name: 'Farm notifications',
         description: 'Show notifications of items gained when harvesting farm crops, with summary notifications for batch harvests'
+      },
+      showScientificNotation: {
+        name: 'Show scientific notation',
+        description: 'Use scientific notation (e.g., 9.73×10^9) instead of abbreviated representation (e.g., 9.738B)'
       }
     }
   },

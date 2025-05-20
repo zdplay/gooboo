@@ -1304,8 +1304,12 @@ export default {
           description: '在农场单元格中显示植物的名称，方便识别不同作物'
         },
         showFarmHarvestNotify: {
-          name: '启用农场收获通知',
+          name: '农场收获通知',
           description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知'
+        },
+        showScientificNotation: {
+          name: '显示科学计数法',
+          description: '使用科学计数法(如9.73×10^9)代替缩略表示(如9.738B)'
         }
       }
   },

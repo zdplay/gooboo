@@ -1306,6 +1306,10 @@ export default {
       showFarmHarvestNotify: {
         name: 'Bauernhof-Benachrichtigungen',
         description: 'Zeigt Benachrichtigungen für erhaltene Gegenstände beim Ernten an, mit zusammengefassten Benachrichtigungen für Massenernten'
+      },
+      showScientificNotation: {
+        name: 'Wissenschaftliche Notation anzeigen',
+        description: 'Verwende wissenschaftliche Notation (z.B. 9,73×10^9) anstelle von abgekürzter Darstellung (z.B. 9,738B)'
       }
     }
   },
