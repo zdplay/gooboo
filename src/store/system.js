@@ -450,6 +450,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    upgradeBuyProgress: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                     showFarmCropName: {
                         unlock: 'farmFeature',
                         hasDescription: true,

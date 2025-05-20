@@ -157,6 +157,10 @@
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
           <span>在升级菜单中添加材料筛选功能。</span>
         </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
+          <span>增加购买按钮进度条功能，在【设置】-【实验性】中开启。</span>
+        </span>
       </v-card-text>
       <v-card-text class="text-center">
         部分功能借鉴了

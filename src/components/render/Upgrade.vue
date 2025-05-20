@@ -12,6 +12,21 @@
 .reduced-height {
   height: 28px;
 }
+.progress-button-wrap {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  background-color: rgba(33, 150, 243, 0.5);
+  pointer-events: none;
+  z-index: 0;
+}
 </style>
 
 <template>
@@ -42,8 +57,9 @@
     <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
     <gb-tooltip key="upgrade-buy-collapse">
       <template v-slot:activator="{ on, attrs }">
-        <div class="ma-1 rounded" v-bind="attrs" v-on="on">
-          <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+        <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
+          <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :style="{ width: `${affordabilityRatio}%` }"></div>
+          <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
       <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
@@ -144,7 +160,10 @@
       </div>
       <v-spacer></v-spacer>
       <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-      <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+      <div class="progress-button-wrap ml-2">
+        <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :style="{ width: `${affordabilityRatio}%` }"></div>
+        <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+      </div>
     </v-card-actions>
     <v-btn class="upgrade-collapse" icon @click="toggleCollapse"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
     <gb-tooltip key="upgrade-persistent" v-if="upgrade.persistent" :min-width="0">
@@ -188,6 +207,9 @@ export default {
   computed: {
     upgrade() {
       return this.$store.state.upgrade.item[this.name];
+    },
+    showProgressBar() {
+      return this.$store.state.system.settings.experiment.items.upgradeBuyProgress.value;
     },
     otherUpgrade() {
       if (!this.upgrade.raiseOtherCap) {
@@ -316,6 +338,35 @@ export default {
         });
       }
       return arr;
+    },
+    affordabilityRatio() {
+      if (this.canAfford || this.isMax || this.disabled) {
+        return 0;
+      }
+      
+      const price = this.price;
+      if (!price) return 0;
+      let minRatio = 1;
+      let hasRequirement = false;
+      
+      for (const currency in price) {
+        const required = price[currency];
+        if (required <= 0) continue;
+        
+        hasRequirement = true;
+
+        const currencyState = this.$store.state.currency[currency];
+        const available = currencyState?.value || 0;
+        
+        const ratio = Math.min(available / required, 1);
+
+        if (ratio < minRatio) {
+          minRatio = ratio;
+        }
+      }
+
+      if (!hasRequirement) return 0;
+      return minRatio * 100;
     }
   },
   methods: {

@@ -1299,6 +1299,10 @@ export default {
           name: '升级菜单筛选功能',
           description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目'
         },
+        upgradeBuyProgress: {
+          name: '升级购买按钮进度条',
+          description: '在购买按钮上显示进度条，指示您根据所需材料有多接近能够购买该升级'
+        },
         showFarmCropName: {
           name: '显示农场植物名称',
           description: '在农场单元格中显示植物的名称，方便识别不同作物'

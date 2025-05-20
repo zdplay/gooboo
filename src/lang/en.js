@@ -1299,6 +1299,10 @@ export default {
         name: 'Upgrade menu filter feature',
         description: 'Add material filtering functionality to the upgrade menu for easier browsing of upgrades'
       },
+      upgradeBuyProgress: {
+        name: 'Upgrade buy button progress bar',
+        description: 'Show a progress bar on buy buttons indicating how close you are to affording the upgrade based on required materials'
+      },
       showFarmCropName: {
         name: 'Show farm crop names',
         description: 'Display crop names in farm cells for easier identification of different plants'

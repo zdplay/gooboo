@@ -1299,6 +1299,10 @@ export default {
         name: 'Upgrade-Menü Filterfunktion',
         description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'
       },
+      upgradeBuyProgress: {
+        name: 'Fortschrittsbalken für Kauf-Buttons',
+        description: 'Zeigt einen Fortschrittsbalken auf Kauf-Buttons an, der anzeigt, wie nah du daran bist, das Upgrade basierend auf benötigten Materialien kaufen zu können'
+      },
       showFarmCropName: {
         name: 'Zeige Pflanzennamen',
         description: 'Zeigt die Namen der Pflanzen in den Bauernhofzellen an, um verschiedene Pflanzen leichter zu erkennen'

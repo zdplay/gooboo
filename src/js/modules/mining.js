@@ -100,7 +100,8 @@ function awardLoot(breaks, loots, hits) {
                 if (currentBreaks === nextStep) {
                     breaksMult++;
                 }
-            }console.log(`获得硝: ${store.getters['mining/rareDropFinal']('niter') * breaksMult}`);
+            }
+            //console.log(`获得硝: ${store.getters['mining/rareDropFinal']('niter') * breaksMult}`);
             store.dispatch('currency/gain', {feature: 'mining', name: 'niter', amount: store.getters['mining/rareDropFinal']('niter') * breaksMult});
         }
         if (gotLoot && depth >= MINING_OBSIDIAN_DEPTH && store.getters['mining/enhancementLevel'] <= 0) {
@@ -205,18 +206,18 @@ export default {
                     const neededBreaks = breaksPerDepth - curBreaks;
 
                     // 调试 - 挖破次数判断
-                    console.log(`[自动挖硝判断] 当前层 ${curDepth}, 已挖次数 ${curBreaks}, 目标次数 ${breaksPerDepth}, 还需 ${neededBreaks}`);
+                   //console.log(`[自动挖硝判断] 当前层 ${curDepth}, 已挖次数 ${curBreaks}, 目标次数 ${breaksPerDepth}, 还需 ${neededBreaks}`);
 
                     // 如果当前层已经达到目标挖掘次数
                     if (neededBreaks <= 0) {
                         // 已完成当前层，进入下一层
                         const newDepth = curDepth + 1;
 
-                        console.log(`[自动挖硝] 当前层 ${curDepth} 已达到目标挖掘次数 ${breaksPerDepth}, 准备进入下一层 ${newDepth}`);
+                       //console.log(`[自动挖硝] 当前层 ${curDepth} 已达到目标挖掘次数 ${breaksPerDepth}, 准备进入下一层 ${newDepth}`);
 
                         // 检查是否超出目标深度
                         if (newDepth > targetDepth) {
-                            console.log('[自动挖硝] 已达到目标深度，任务完成');
+                           //console.log('[自动挖硝] 已达到目标深度，任务完成');
                             store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
                             // 继续正常的挖矿循环
                             continue;
@@ -225,7 +226,7 @@ export default {
                         // 记录完成的层
                         const completedDepths = [...store.state.mining.niterAutomation.completedDepths, curDepth];
 
-                        console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
+                       //console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
 
                         // 进入下一层
                         store.commit('mining/updateKey', { key: 'depth', value: newDepth });
@@ -254,8 +255,8 @@ export default {
 
                     // 计算需要多少秒才能完成当前层的目标
                     const secondsNeeded = hitsPerBreak * neededBreaks;
-                    console.log(`[自动挖硝] 当前层 ${curDepth} 需要 ${secondsNeeded} 秒完成目标`);
-                    console.log(`[自动挖硝] 当前秒数 ${secondsLeft} 秒`);
+                   //console.log(`[自动挖硝] 当前层 ${curDepth} 需要 ${secondsNeeded} 秒完成目标`);
+                   //console.log(`[自动挖硝] 当前秒数 ${secondsLeft} 秒`);
                     if (secondsLeft >= secondsNeeded) {
                         // 足够完成当前层目标
                         awardLoot(neededBreaks, 0, secondsNeeded);
@@ -270,13 +271,13 @@ export default {
 
                         // 检查是否超出目标深度
                         if (newDepth > targetDepth) {
-                            console.log('[自动挖硝] 已达到目标深度，任务完成');
+                           //console.log('[自动挖硝] 已达到目标深度，任务完成');
                             store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
                             // 继续正常的挖矿循环
                             continue;
                         }
 
-                        console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
+                       //console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
 
                         store.commit('mining/updateKey', { key: 'depth', value: newDepth });
 
@@ -299,7 +300,7 @@ export default {
                         continue;
                     } else {
                         // 秒数不足以完成当前层目标，消耗所有剩余秒数
-                        console.log(`[自动挖硝] 秒数不足以完成当前层目标，消耗所有剩余秒数`);
+                       //console.log(`[自动挖硝] 秒数不足以完成当前层目标，消耗所有剩余秒数`);
                         const possibleBreaks = Math.floor(secondsLeft / hitsPerBreak);
                         const remainingHits = secondsLeft % hitsPerBreak;
 
@@ -331,7 +332,7 @@ export default {
                     }
                 } else {
                     // 不在任务范围内，停止自动挖硝
-                    console.log('[自动挖硝] 不在任务范围内，停止自动挖硝');
+                   //console.log('[自动挖硝] 不在任务范围内，停止自动挖硝');
                     store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
                 }
             }
