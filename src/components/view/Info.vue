@@ -59,7 +59,7 @@
       <v-card-text>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加运存档功能，在【设置】-【通用】设置使用。</span>
+          <span>增加云存档功能，在【设置】-【通用】设置使用。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
@@ -70,11 +70,15 @@
           <span>增加新UI的布局，在【设置】-【实验性】设置使用，需要跟货币标签一起开启。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="indigo">设置</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="pink">挖矿</v-chip>
           <span>修改冶炼最大按钮为指定数量按钮。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="indigo">设置</v-chip>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="pink">挖矿</v-chip>
+          <span>增加自动挖硝功能，在深度切换右侧机器人按钮，支持离线。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
           <span>调整自动施法槽默认为5，普通技能也能自动施法。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
@@ -107,7 +111,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
-          <span>增加部落声望自动化功能。在楼层切换右边的机器人按钮。</span>
+          <span>增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>
@@ -127,7 +131,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
-          <span>增加每日签到奖励。</span>
+          <span>增加每日签到奖励。（别服存档过来要过一天才能签到）</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
@@ -143,7 +147,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>增加部分地方计时显示。（偷懒了）</span>
+          <span>增加部分地方计时显示。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>

@@ -543,11 +543,30 @@ export default {
     this.niterAutoStatusTimer = setInterval(() => {
       this.$forceUpdate();
     }, 500);
+    
+    // 初始化自动挖硝设置，如果有现有任务则使用任务配置的值
+    if (this.niterAutomation && this.niterAutomation.config) {
+      this.niterAutoStartDepth = this.niterAutomation.config.startDepth;
+      this.niterAutoTargetDepth = this.niterAutomation.config.targetDepth;
+      this.niterAutoBreaksPerDepth = this.niterAutomation.config.breaksPerDepth;
+    }
   },
   beforeDestroy() {
     if (this.niterAutoStatusTimer) {
       clearInterval(this.niterAutoStatusTimer);
       this.niterAutoStatusTimer = null;
+    }
+  },
+  watch: {
+    niterAutomation: {
+      handler(newVal) {
+        if (newVal && newVal.config) {
+          this.niterAutoStartDepth = newVal.config.startDepth;
+          this.niterAutoTargetDepth = newVal.config.targetDepth;
+          this.niterAutoBreaksPerDepth = newVal.config.breaksPerDepth;
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -598,6 +617,11 @@ export default {
       const startDepth = parseInt(this.niterAutoStartDepth) || MINING_NITER_DEPTH;
       const targetDepth = parseInt(this.niterAutoTargetDepth) || (MINING_NITER_DEPTH + 20);
       const breaksPerDepth = parseInt(this.niterAutoBreaksPerDepth) || 10;
+      
+      // 保存当前设置值
+      this.niterAutoStartDepth = startDepth;
+      this.niterAutoTargetDepth = targetDepth;
+      this.niterAutoBreaksPerDepth = breaksPerDepth;
       
       const config = {
         startDepth: startDepth,
