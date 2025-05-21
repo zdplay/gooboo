@@ -26,6 +26,17 @@
   height: 16px;
 }
 
+/* Dream theme title breathing effect */
+@keyframes dream-title-breathing {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.dream-title {
+  animation: dream-title-breathing 3s ease-in-out infinite;
+}
+
 /* All theme-specific backgrounds */
 .theme--dark.background-theme-factory {
   background: repeating-linear-gradient(135deg, #121212 0.001px 46px, #383812 48px 94px, #121212 96px);
@@ -113,11 +124,19 @@
               radial-gradient(circle at 100% 0%, #B0D8FF, #B0D8FF 30%, transparent 30%),
               linear-gradient(#80C0FF, #80C0FF);
 }
+.theme--dark.background-theme-dream {
+  background: linear-gradient(transparent, #12121280 75%, #121212C0),
+  linear-gradient(90deg, #9575CD, #B197E8, #DA98FF, #E7B0FF, #FFB0E0, #FF9DC2, #9575CD);
+}
+.theme--light.background-theme-dream {
+  background: linear-gradient(transparent, #FFFFFF80 75%, #FFFFFFC0),
+  linear-gradient(90deg, #B388FF, #C4A6FF, #E0C1FF, #FFD6F5, #FFB6E3, #FF9BBD, #B388FF);
+}
 </style>
 
 <template>
   <v-card class="d-flex flex-column default-card pa-2 elevation-4" :style="`border: 4px solid ${this.$vuetify.theme.dark ? '#121212' : '#FFFFFF'};`" :class="[`background-theme-${name}`, {'theme-item': !small, 'theme-item-small': small}]">
-    <v-card-title class="pa-0 justify-center" :class="{'mb-2': !small}">{{ $vuetify.lang.t(`$vuetify.theme.${name}`) }}</v-card-title>
+    <v-card-title class="pa-0 justify-center" :class="[{'mb-2': !small}, name.toLowerCase() === 'dream' ? 'dream-title' : '']">{{ $vuetify.lang.t(`$vuetify.theme.${name}`) }}</v-card-title>
     <div class="d-flex flex-wrap justify-center">
       <div class="theme-box theme-box-wide rounded elevation-1" :style="`background-color: ${themeCurrent.primary}`">1</div>
       <div class="theme-box theme-box-wide rounded elevation-1" :style="`background-color: ${themeCurrent.secondary}`">2</div>
