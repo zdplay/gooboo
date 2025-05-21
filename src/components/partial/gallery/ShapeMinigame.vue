@@ -165,10 +165,10 @@ export default {
     isClearing: false
   }),
   mounted() {
-    window.addEventListener('keydown', this.handleKeydown);
+    // 移除R键快捷键监听
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleKeydown);
+    // 移除R键快捷键监听
     this.stopAutoSort();
   },
   computed: {
@@ -283,16 +283,6 @@ export default {
         }});
       } else {
         this.$store.dispatch('gallery/buyMotivation');
-      }
-    },
-    handleKeydown(event) {
-      if (event.key === 'r' && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
-        if (this.canBuyReroll) {
-          this.buyShapeReroll();
-          if (this.$refs.rerollButton) {
-            this.$refs.rerollButton.$el.focus();
-          }
-        }
       }
     },
     async triggerSort(shapeName) {

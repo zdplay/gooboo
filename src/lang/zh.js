@@ -1131,7 +1131,44 @@ export default {
       },
       debugSkip1d: {
         name: '跳过 1 天'
-      }
+      },
+      achievement: {
+        name: '成就'
+      },
+      gem: {
+        name: '宝石'
+      },
+      treasure: {
+        name: '宝藏'
+      },
+      card: {
+        name: '卡片'
+      },
+      cryolab: {
+        name: '冷冻实验室'
+      },
+      mining: {
+        name: '采矿'
+      },
+      village: {
+        name: '村庄'
+      },
+      horde: {
+        name: '部落'
+      },
+      farm: {
+        name: '农场'
+      },
+      gallery: {
+        name: '画廊'
+      },
+      general: {
+        name: '将军'
+      },
+      farmGalleryRefresh: {
+        name: '农场重新种植/画廊重洗'
+      },
+      fixedKeys: '注意：快捷键1-0固定用在部落技能释放。'
     },
     theme: {
       name: '主题'
@@ -1312,8 +1349,8 @@ export default {
           description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知'
         },
         showScientificNotation: {
-          name: '显示科学计数法',
-          description: '使用科学计数法(如9.73×10^9)代替缩略表示(如9.738B)'
+          name: '显示科学记数法',
+          description: '使用科学记数法(如9.73×10^9)代替缩略表示(如9.738B)'
         }
       }
   },

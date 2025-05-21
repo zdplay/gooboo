@@ -44,12 +44,12 @@ function formatNum(amount, showDecimals = false) {
         return negativePrefix + '∞';
     }
 
-    // 使用科学计数法显示大数字
+    // 使用科学记数法显示大数字
     const useScientificNotation = store.state.system.settings.experiment.items.showScientificNotation.value;
     
-    // 如果启用了科学计数法，对大数和小数应用统一格式
+    // 如果启用了科学记数法，对大数和小数应用统一格式
     if (useScientificNotation && amount > 0) {
-        // 只对1000及以上的数字或0.001及以下的数字应用科学计数法
+        // 只对1000及以上的数字或0.001及以下的数字应用科学记数法
         if (numBase >= 3 || numBase <= -3) {
             // 处理数字的尾数和指数
             const exponent = numBase;
@@ -80,12 +80,12 @@ function formatNum(amount, showDecimals = false) {
                 expStr += superscripts[expDigits[i]] || expDigits[i];
             }
             
-            // 返回科学计数法格式的字符串（例如：9.46×10¹⁰）
+            // 返回科学记数法格式的字符串（例如：9.46×10¹⁰）
             return negativePrefix + mantissa.toPrecision(3) + '×10' + expStr;
         }
     }
     
-    // 以下是原始代码，当不使用科学计数法时执行
+    // 以下是原始代码，当不使用科学记数法时执行
     if (showDecimals) {
         if (numBase === -Infinity) {
             return '0';

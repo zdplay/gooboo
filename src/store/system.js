@@ -488,6 +488,18 @@ export default {
             debugSkip10m: null,
             debugSkip1h: null,
             debugSkip1d: null,
+            achievement: null,
+            gem: null,
+            treasure: null,
+            card: null,
+            cryolab: null,
+            mining: null,
+            village: null,
+            horde: null,
+            farm: null,
+            gallery: null,
+            general: null,
+            farmGalleryRefresh: null,
         },
         keybindCurrent: null,
         autosaveTimer: null,
@@ -940,6 +952,59 @@ export default {
                         }
                         case 'debugSkip1d': {
                             tick(86400, 0);
+                            break;
+                        }
+                        case 'achievement': {
+                            commit('updateKey', {key: 'screen', value: 'achievement'});
+                            break;
+                        }
+                        case 'gem': {
+                            commit('updateKey', {key: 'screen', value: 'gem'});
+                            break;
+                        }
+                        case 'treasure': {
+                            commit('updateKey', {key: 'screen', value: 'treasure'});
+                            break;
+                        }
+                        case 'card': {
+                            commit('updateKey', {key: 'screen', value: 'card'});
+                            break;
+                        }
+                        case 'cryolab': {
+                            commit('updateKey', {key: 'screen', value: 'cryolab'});
+                            break;
+                        }
+                        case 'mining': {
+                            commit('updateKey', {key: 'screen', value: 'mining'});
+                            break;
+                        }
+                        case 'village': {
+                            commit('updateKey', {key: 'screen', value: 'village'});
+                            break;
+                        }
+                        case 'horde': {
+                            commit('updateKey', {key: 'screen', value: 'horde'});
+                            break;
+                        }
+                        case 'farm': {
+                            commit('updateKey', {key: 'screen', value: 'farm'});
+                            break;
+                        }
+                        case 'gallery': {
+                            commit('updateKey', {key: 'screen', value: 'gallery'});
+                            break;
+                        }
+                        case 'general': {
+                            commit('updateKey', {key: 'screen', value: 'general'});
+                            break;
+                        }
+                        case 'farmGalleryRefresh': {
+                            // 根据当前屏幕执行不同的操作
+                            if (state.screen === 'farm') {
+                                dispatch('farm/replantAll', null, {root: true});
+                            } else if (state.screen === 'gallery') {
+                                dispatch('gallery/buyShapeReroll', null, {root: true});
+                            }
                             break;
                         }
                         default:

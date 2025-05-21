@@ -1131,7 +1131,44 @@ export default {
       },
       debugSkip1d: {
         name: 'Überspringe 1 Tag'
-      }
+      },
+      achievement: {
+        name: 'Erfolge'
+      },
+      gem: {
+        name: 'Edelsteine'
+      },
+      treasure: {
+        name: 'Schätze'
+      },
+      card: {
+        name: 'Karten'
+      },
+      cryolab: {
+        name: 'Kryolabor'
+      },
+      mining: {
+        name: 'Bergbau'
+      },
+      village: {
+        name: 'Dorf'
+      },
+      horde: {
+        name: 'Horde'
+      },
+      farm: {
+        name: 'Bauernhof'
+      },
+      gallery: {
+        name: 'Galerie'
+      },
+      general: {
+        name: 'Generäle'
+      },
+      farmGalleryRefresh: {
+        name: 'Bauernhof neu bepflanzen / Galerie neu würfeln'
+      },
+      fixedKeys: 'Hinweis: Tasten 1-0 sind fest für Horde-Kampffähigkeiten vergeben.'
     },
     theme: {
       name: 'Farbschema'

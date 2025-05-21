@@ -1131,7 +1131,44 @@ export default {
       },
       debugSkip1d: {
         name: 'Skip 1 day'
-      }
+      },
+      achievement: {
+        name: 'Achievement'
+      },
+      gem: {
+        name: 'Gem'
+      },
+      treasure: {
+        name: 'Treasure'
+      },
+      card: {
+        name: 'Card'
+      },
+      cryolab: {
+        name: 'Freezing Laboratory'
+      },
+      mining: {
+        name: 'Mining'
+      },
+      village: {
+        name: 'Village'
+      },
+      horde: {
+        name: 'Horde'
+      },
+      farm: {
+        name: 'Farm'
+      },
+      gallery: {
+        name: 'Gallery'
+      },
+      general: {
+        name: 'Generals'
+      },
+      farmGalleryRefresh: {
+        name: 'Farm replant / Gallery reroll'
+      },
+      fixedKeys: 'Note: Keys 1-0 are fixed for horde battle skills.'
     },
     theme: {
       name: 'Theme'

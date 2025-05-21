@@ -20,6 +20,43 @@
         <keybind class="ma-2" name="debugSkip1h"></keybind>
         <keybind class="ma-2" name="debugSkip1d"></keybind>
       </template>
+      <template v-if="(unlock.farmFeature && unlock.farmFeature.see) || (unlock.galleryFeature && unlock.galleryFeature.see)">
+        <keybind class="ma-2" name="farmGalleryRefresh"></keybind>
+      </template>
+      <keybind class="ma-2" name="mining"></keybind>
+      <template v-if="unlock.villageFeature && unlock.villageFeature.see">
+        <keybind class="ma-2" name="village"></keybind>
+      </template>
+      <template v-if="unlock.hordeFeature && unlock.hordeFeature.see">
+        <keybind class="ma-2" name="horde"></keybind>
+      </template>
+      <template v-if="unlock.farmFeature && unlock.farmFeature.see">
+        <keybind class="ma-2" name="farm"></keybind>
+      </template>
+      <template v-if="unlock.galleryFeature && unlock.galleryFeature.see">
+        <keybind class="ma-2" name="gallery"></keybind>
+      </template>
+      <template v-if="unlock.generalFeature && unlock.generalFeature.see">
+        <keybind class="ma-2" name="general"></keybind>
+      </template>
+      <template v-if="unlock.achievementFeature && unlock.achievementFeature.see">
+        <keybind class="ma-2" name="achievement"></keybind>
+      </template>
+      <template v-if="unlock.gemFeature && unlock.gemFeature.see">
+        <keybind class="ma-2" name="gem"></keybind>
+      </template>
+      <template v-if="unlock.treasureFeature && unlock.treasureFeature.see">
+        <keybind class="ma-2" name="treasure"></keybind>
+      </template>
+      <template v-if="unlock.cardFeature && unlock.cardFeature.see">
+        <keybind class="ma-2" name="card"></keybind>
+      </template>
+      <template v-if="unlock.cryolabFeature && unlock.cryolabFeature.see">
+        <keybind class="ma-2" name="cryolab"></keybind>
+      </template>
+      <v-card class="ma-2 pa-3">
+        <div class="text-caption">{{ $vuetify.lang.t(`$vuetify.settings.keybinds.fixedKeys`) }}</div>
+      </v-card>
     </div>
     <div v-else-if="tab === 'themes'" class="d-flex justify-center flex-wrap pa-1" :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container-tab' : ''">
       <theme-item class="ma-1" v-for="(theme, name) in themes" :key="'theme-' + name" :name="name"></theme-item>
@@ -57,11 +94,11 @@ export default {
     settings() {
       let obj = {};
       for (const [key, elem] of Object.entries(this.$store.state.system.settings)) {
-        if (elem.unlock === null || this.unlock[elem.unlock].see) {
+        if (elem.unlock === null || (this.unlock[elem.unlock] && this.unlock[elem.unlock].see)) {
           let items = {};
           for (const [subkey, subelem] of Object.entries(elem.items)) {
             if (
-              (subelem.unlock === null || this.unlock[subelem.unlock].see) &&
+              (subelem.unlock === null || (this.unlock[subelem.unlock] && this.unlock[subelem.unlock].see)) &&
               (subelem.mobile === undefined || (subelem.mobile === this.$vuetify.breakpoint.smAndDown)) &&
               (this.canSeeUpdates || key !== 'notification' || subkey !== 'updateCheck')
             ) {
@@ -74,10 +111,10 @@ export default {
       return obj;
     },
     canSeeThemes() {
-      return this.unlock.gemFeature.see;
+      return this.unlock.gemFeature && this.unlock.gemFeature.see;
     },
     canSeeDebug() {
-      return this.unlock.debugFeature.see;
+      return this.unlock.debugFeature && this.unlock.debugFeature.see;
     },
     canSeeUpdates() {
       return APP_ENV === 'WEB';
