@@ -55,6 +55,13 @@ iframe {
   .spacer-container{
     display: block;
   }
+  /* Hide spacer when menu is at bottom */
+  .bottom-positioned ~ .v-main .strategy-container .spacer {
+    display: none;
+  }
+  .bottom-positioned ~ .v-main .strategy-container .spacer-container {
+    display: none;
+  }
 }
   </style>
   

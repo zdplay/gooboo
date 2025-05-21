@@ -443,6 +443,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    mobileMenuAtBottom: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                     upgradeFilterFeature: {
                         unlock: null,
                         hasDescription: true,

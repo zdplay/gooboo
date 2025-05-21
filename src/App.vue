@@ -8,15 +8,26 @@
   overflow-y: auto;
   max-height: calc(100vh - 64px);
 }
+.bottom-positioned ~ .v-main .scroll-container {
+  max-height: calc(100vh - 64px);
+  padding-bottom: 56px;
+}
 .scroll-container-tab {
   overflow-y: auto;
   max-height: calc(100vh - 112px);
+}
+.bottom-positioned ~ .v-main .scroll-container-tab {
+  max-height: calc(100vh - 112px);
+  padding-bottom: 56px;
 }
 .mobile-tabs {
   position: sticky;
   top: 56px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   z-index: 3;
+}
+.bottom-positioned ~ .v-main .mobile-tabs {
+  top: 0;
 }
 .w-100 {
   width: 100%;
@@ -171,6 +182,16 @@
 }
 .snackbars-close-all-bottom >>> .v-snack {
   bottom: 54px;
+}
+.bottom-positioned ~ .v-main .snackbars-close-all-bottom >>> .v-snack {
+  bottom: 110px;
+}
+.main-app-bar.bottom-positioned {
+  bottom: 0 !important;
+  top: auto !important;
+}
+.bottom-menu-spacing {
+  padding-bottom: 56px;
 }
 .hourglass-container {
   position: relative;
@@ -399,11 +420,40 @@
     background-position: 100% 100%;
   }
 }
+
+/* Remove top padding when menu is at bottom */
+.v-application--wrap {
+  min-height: 100vh;
+}
+/* When menu is at bottom, adjust the content area */
+.bottom-positioned ~ .v-main {
+  padding-top: 0 !important;
+}
+.bottom-positioned ~ .v-main .v-content__wrap {
+  padding-top: 0;
+}
+/* Fix for strategy view */
+.bottom-positioned ~ .v-main .scroll-container {
+  max-height: calc(100vh - 0px);
+  padding-bottom: 56px;
+}
+.bottom-positioned ~ .v-main .scroll-container-tab {
+  max-height: calc(100vh - 48px);
+  padding-bottom: 56px;
+}
+/* Additional fixes for mobile view content */
+.bottom-positioned ~ .v-main {
+  min-height: 100vh;
+}
+/* Force components to use full available height */
+.bottom-positioned ~ .v-main > div {
+  min-height: calc(100vh - 56px);
+}
 </style>
 
 <template>
   <v-app class="game-app" :class="`background-theme-${ currentTheme } css-shadow-${ cssShadows }`">
-    <v-app-bar v-if="screen !== 'newGame' && screen !== 'tab-duplicate'" class="px-lg-2 main-app-bar" app :color="$vuetify.theme.dark ? 'primary' : 'primary lighten-1'">
+    <v-app-bar v-if="screen !== 'newGame' && screen !== 'tab-duplicate'" class="px-lg-2 main-app-bar" app :color="$vuetify.theme.dark ? 'primary' : 'primary lighten-1'" :class="{'bottom-positioned': bottomPositioned}">
       <v-menu min-width="296" :max-width="$vuetify.breakpoint.xsOnly ? 296 : ($vuetify.breakpoint.smOnly ? 488 : 896)" open-on-hover offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn class="px-2 ml-n2" text :icon="$vuetify.breakpoint.xsOnly" v-bind="attrs" v-on="on">
@@ -532,7 +582,7 @@
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-main>
+    <v-main :class="{'bottom-menu-spacing': bottomPositioned}">
       <component :is="screen"></component>
     </v-main>
     <v-snackbars
@@ -831,6 +881,9 @@ export default {
         badges++;
       }
       return badges;
+    },
+    bottomPositioned() {
+      return this.$vuetify.breakpoint.smAndDown && this.$store.state.system.settings.experiment.items.mobileMenuAtBottom.value;
     }
   },
   created() {

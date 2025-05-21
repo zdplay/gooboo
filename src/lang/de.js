@@ -1335,6 +1335,10 @@ export default {
       card2newLabel: {
         name: 'Reputation card display card pack',
       },
+      mobileMenuAtBottom: {
+        name: 'Mobilmenü am unteren Rand',
+        description: 'Platziert die Hauptmenüleiste auf mobilen Geräten am unteren Rand des Bildschirms anstatt am oberen'
+      },
       upgradeFilterFeature: {
         name: 'Upgrade-Menü Filterfunktion',
         description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'

@@ -1335,6 +1335,10 @@ export default {
         card2newLabel: {
           name: '声望卡片显示卡包',
         },
+        mobileMenuAtBottom: {
+          name: '手机菜单移动底部',
+          description: '将手机界面的主菜单栏从顶部移动到底部'
+        },
         upgradeFilterFeature: {
           name: '升级菜单筛选功能',
           description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目'
