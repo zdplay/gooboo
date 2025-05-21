@@ -50,7 +50,7 @@ export default {
     saveManual: '保存',
     saveExport: '导出到文件',
     saveImport: '从文件加载',
-    cloudsave: '【云储存】',
+    cloudsave: '【云存档】',
     cloudloadlatest: '【云加载最新】',
     cloudloadlist: '【云存档列表】',
     resetProgress: '重置进度',
@@ -96,7 +96,7 @@ export default {
   },
   endOfContent: {
     name: '内容结束',
-    description: '您已到达此功能的内容末尾，使得经过此点的进度比预期慢。 等待未来的更新或专注于其他功能以继续进步'
+    description: '您已到达此功能的内容末尾，这会使进度比预期慢。等待未来更新或专注于其他功能以继续前进'
   },
   message: {
     achievement: {
@@ -122,7 +122,7 @@ export default {
       get: '发现了传家宝'
     },
     note: {
-      get: '笔记 #{0} 已发现',
+      get: '发现笔记 #{0}',
       read: '阅读'
     },
     save: {

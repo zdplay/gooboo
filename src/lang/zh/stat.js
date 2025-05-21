@@ -1,95 +1,95 @@
 export default {
   // Mining stats
   mining_maxDepth0: {
-    achievement: '这很深',
+    achievement: '深不见底',
     description: '最大深度'
   },
   mining_maxDepth1: {
-    achievement: '深入挖掘',
+    achievement: '更深一层',
     description: '气态巨行星最大深度'
   },
   mining_maxDepthSpeedrun: {
-    achievement: '深渊',
-    description: '15 分钟内达到最大深度'
+    achievement: '速探深渊',
+    description: '15分钟内达到最大深度'
   },
   mining_depthDwellerCap0: {
-    achievement: '垂直向下钻',
+    achievement: '垂直钻探',
     description: '最大居民深度'
   },
   mining_depthDwellerCap1: {
-    achievement: '无火花',
+    achievement: '无火花区',
     description: '最大气体居民深度'
   },
   mining_totalDamage: {
-    achievement: '毁灭',
+    achievement: '破坏之力',
     description: '造成的总伤害'
   },
   mining_maxDamage: {
-    achievement: '力量',
-    description: '一击造成最大伤害'
+    achievement: '强力一击',
+    description: '单次最大伤害'
   },
   mining_craftingCount: {
-    description: '精心制作的镐'
+    description: '制作的镐子数量'
   },
   mining_scrap: {
-    achievement: '垃圾堆',
+    achievement: '废料堆',
     description: '获得的废料'
   },
   mining_oreTotal: {
-    achievement: '更多矿石',
+    achievement: '矿石丰富',
     description: '获得的矿石'
   },
   mining_oreVariety: {
-    achievement: '多样性',
-    description: '发现的矿石类型'
+    achievement: '多样矿藏',
+    description: '发现的矿石种类'
   },
   mining_coal: {
-    achievement: '黑暗',
-    description: '获得的煤'
+    achievement: '漆黑一片',
+    description: '获得的煤炭'
   },
   mining_coalMax: {
-    description: '最高煤量'
+    description: '最高煤炭数量'
   },
   mining_resin: {
-    achievement: '陷入困境',
-    description: '得到的树脂'
+    achievement: '黏滞困境',
+    description: '获得的树脂'
   },
   mining_craftingWasted: {
-    achievement: '浪费了',
-    description: '制作一把比你现在的镐更好的镐'
+    achievement: '徒劳无功',
+    description: '制作一把不如当前镐子好的镐子'
   },
   mining_dwellerCapHit: {
-    achievement: '谷底',
+    achievement: '触底反弹',
     description: '达到最大居民深度'
   },
   mining_craftingLuck: {
     achievement: '百万分之一',
-    description: '获得属性排名前 0.0001% 的镐'
+    description: '获得属性排名前0.0001%的镐子'
   },
   mining_timeSpent: {
     description: '花费的时间'
   },
   mining_bestPrestige0: {
-    description: '最佳声望 (矿山)'
+    description: '最佳声望（矿山）'
   },
   mining_bestPrestige1: {
-    description: '最佳声望 (气体巨人)'
+    description: '最佳声望（气态巨行星）'
   },
   mining_prestigeCount: {
-    description: '声望'
+    description: '声望次数'
   },
 
   // Village stats
   village_maxBuilding: {
     achievement: '摩天大楼',
-    description: '已建成的建筑物'
+    description: '已建成的建筑数量'
   },
   village_basicResources: {
-    achievement: '敲木头',
-    description: '最高的木材数量、植物纤维数量或石材数量'
+    achievement: '敲敲木头',
+    description: '最高的木材、植物纤维或石料数量'
   },
   village_metal: {
-    achievement: '铁锈和金属',
+    achievement: '金属与锈蚀',
     description: '最高金属数量'
   },
   village_coin: {
@@ -97,16 +97,16 @@ export default {
     description: '获得的硬币'
   },
   village_water: {
-    achievement: '渡槽',
-    description: '最高的水数量'
+    achievement: '水道系统',
+    description: '最高水量'
   },
   village_knowledge: {
-    achievement: '策划者',
+    achievement: '智多星',
     description: '最高知识数量'
   },
   village_advancedResources: {
-    achievement: '闪亮',
-    description: '最高的硬木或宝石含量'
+    achievement: '闪闪发光',
+    description: '最高的硬木或宝石数量'
   },
   village_blessing: {
     achievement: '命中注定',
@@ -121,83 +121,83 @@ export default {
     description: '做出的牺牲'
   },
   village_oil: {
-    achievement: '拿走他们的油!',
-    description: '最高油数量'
+    achievement: '夺取石油！',
+    description: '最高石油数量'
   },
   village_highestPower: {
-    achievement: '开灯',
+    achievement: '灯火通明',
     description: '最高电力'
   },
   village_minHappiness: {
-    achievement: '生活在地狱里',
+    achievement: '地狱生活',
     description: '达到最低幸福感'
   },
   village_timeSpent: {
     description: '花费的时间'
   },
   village_bestPrestige0: {
-    description: '最佳声望 (工人)'
+    description: '最佳声望（工人）'
   },
   village_bestPrestige1: {
-    description: '最佳声望 (工匠公会)'
+    description: '最佳声望（工匠公会）'
   },
   village_prestigeCount: {
-    description: '声望'
+    description: '声望次数'
   },
   village_offeringMax: {
-    description: '供品最高数量'
+    description: '最高供品数量'
   },
 
   // Horde stats
   horde_maxZone: {
     achievement: '探险家',
-    description: '最大区域'
+    description: '最高区域'
   },
   horde_maxDifficulty: {
-    description: '最大难度'
+    description: '最高难度'
   },
   horde_maxZoneSpeedrun: {
-    achievement: '迅捷出击',
-    description: '30分钟内达到最大区域'
+    achievement: '迅捷突袭',
+    description: '30分钟内达到最高区域'
   },
   horde_totalDamage: {
-    achievement: '杀手',
-    description: '造成的基本攻击总伤害'
+    achievement: '屠魔者',
+    description: '造成的基础攻击总伤害'
   },
   horde_maxDamage: {
-    achievement: '威猛',
-    description: '一次基本攻击造成最大伤害'
+    achievement: '所向披靡',
+    description: '单次基础攻击最大伤害'
   },
   horde_bone: {
-    achievement: '狗的最爱',
+    achievement: '狗狗最爱',
     description: '获得的骨头'
   },
   horde_monsterPart: {
-    achievement: '没有任何东西被浪费',
-    description: '获得的怪物零件'
+    achievement: '物尽其用',
+    description: '获得的怪物部件'
   },
   horde_soulCorrupted: {
-    achievement: '灵魂的牧者',
+    achievement: '灵魂牧者',
     description: '获得的腐化灵魂'
   },
   horde_maxCorruptionKill: {
     achievement: '挑战邪恶',
-    description: '击败最高腐化敌人'
+    description: '击败最高腐化等级的敌人'
   },
   horde_maxMastery: {
-    achievement: '一招',
+    achievement: '一招制胜',
     description: '最高精通等级'
   },
   horde_totalMastery: {
-    achievement: '多样性',
-    description: '总计精通等级'
+    achievement: '多样化',
+    description: '总精通等级'
   },
   horde_unlucky: {
-    achievement: '不幸',
-    description: '失败有 99% 的传家宝几率'
+    achievement: '倒霉透顶',
+    description: '在99%几率下失败获取传家宝'
   },
   horde_maxItems: {
-    description: '最多装备使用'
+    description: '最多装备使用数量'
   },
   horde_timeSpent: {
     description: '花费的时间'

@@ -1,31 +1,31 @@
 export default {
-  overcapGain: '由于达到上限，收入减少至 {0}%',
-  overcapNoGain: '由于超果上限没有收入',
-  benefitLoss: '购买这个会导致利益损失',
-  gainTimerNeeded: '距离可以负担得起还有 {0}',
-  capTimerNeeded: '距离达到容量上限还有 {0}',
-  overcapTimerNeeded: '距离达到下一个容量等级还有 {0}',
+  overcapGain: '由于超出上限，收入减少至{0}%',
+  overcapNoGain: '由于超出上限，无法获得收入',
+  benefitLoss: '购买此项会导致收益损失',
+  gainTimerNeeded: '{0}后可以购买',
+  capTimerNeeded: '{0}后达到容量上限',
+  overcapTimerNeeded: '{0}后达到下一个容量等级',
 
   // Premium currencies
   gem_ruby: {
     name: '红宝石',
-    description: '闪亮的红色宝石，可以兑换强大的永久升级'
+    description: '闪亮的红色宝石，可兑换强大的永久升级'
   },
   gem_emerald: {
     name: '翡翠',
-    description: '一种暗绿色的宝石，可用于购买各种改进品。 你的村民似乎喜欢它'
+    description: '一种暗绿色的宝石，可用于购买各种改进品。 您的村民似乎喜欢它'
   },
   gem_sapphire: {
     name: '蓝宝石',
-    description: '深蓝色宝石，可用于购买消耗品，帮助你更快进步'
+    description: '深蓝色宝石，可用于购买消耗品，帮助您更快地进步'
   },
   gem_amethyst: {
     name: '紫水晶',
-    description: '这种美丽的紫色宝石可用于购买主题或其他化妆品'
+    description: '这种美丽的紫色宝石可用于购买主题或其他装饰品'
   },
   gem_topaz: {
     name: '黄玉',
-    description: '黄色宝石，可用于提高你的表现或参加活动。 在大型活动期间，黄玉无法从宝石生成器中获得。 您将收到一种特定于活动的货币'
+    description: '黄色宝石，可用于提高您的表现或参加活动。在大型活动期间，无法从宝石生成器中获得黄玉，您将获得特定于活动的货币'
   },
   gem_diamond: {
     name: '钻石',
@@ -43,31 +43,31 @@ export default {
   },
   event_humus: {
     name: '腐殖质',
-    description: '你的花喜欢这新鲜肥沃的土壤'
+    description: '您的花朵喜欢这种新鲜肥沃的土壤'
   },
   event_cloud: {
     name: '云',
-    description: '瓶子里捕捉到的一朵小云'
+    description: '瓶中捕获的一朵小云'
   },
   event_cocktail: {
-    name: '混合物',
-    description: '您很想自己喝这些，但它们对您的建造者来说是一个极好的动力源泉'
+    name: '鸡尾酒',
+    description: '您很想自己喝掉它们，但它们是您的建造者的绝佳动力来源'
   },
   event_magic: {
     name: '魔法',
-    description: '魔法会慢慢消耗，将你的其他货币转换成魔法货币。 你拥有的魔法越多，转换过程就越快。 神奇货币可以通过其不寻常的图标来识别。 要将它们恢复到常规版本，只需将鼠标悬停在它们上方，您就会获得成分作为回报'
+    description: '魔法会慢慢消耗，将您的其他货币转换为魔法货币。您拥有的魔法越多，转换过程就越快。魔法货币可通过其独特图标识别。将鼠标悬停在它们上方，即可将其还原为普通版本，并获得成分作为回报'
   },
   event_snowball: {
     name: '雪球',
-    description: '抓住!'
+    description: '接住！'
   },
   event_cindersToken: {
-    name: '煤渣代币',
-    description: '获得一定数量的光的奖励'
+    name: '余烬代币',
+    description: '获得一定数量光芒的奖励'
   },
   event_bloomToken: {
     name: '绽放代币',
-    description: '达到花卉类型新等级记录的奖励'
+    description: '达到花卉新等级记录的奖励'
   },
   event_weatherChaosToken: {
     name: '天气混乱代币',
@@ -83,39 +83,39 @@ export default {
   },
   event_snowdownToken: {
     name: '降雪代币',
-    description: '打雪仗获胜的奖励'
+    description: '赢得雪球战的奖励'
   },
   event_light: {
-    name: '光',
-    description: '燃烧得更亮'
+    name: '光芒',
+    description: '更加明亮'
   },
   event_soot: {
-    name: '煤烟',
-    description: '燃烧的蜡烛留下的'
+    name: '烟灰',
+    description: '燃烧的蜡烛留下的残余物'
   },
   event_blossom: {
-    name: '开花',
-    description: '她们很漂亮，但看起来都一样'
+    name: '花朵',
+    description: '它们很美丽，但看起来都一样'
   },
   event_algae: {
-    name: '海藻',
-    description: '绿色且粘稠'
+    name: '藻类',
+    description: '绿色且黏滑'
   },
   event_driftwood: {
     name: '浮木',
-    description: '你不知道它从哪里来，但它看起来仍然有用'
+    description: '不知道它从哪里来，但看起来仍然有用'
   },
   event_plastic: {
     name: '塑料',
     description: '为什么海里有这么多垃圾？'
   },
   event_slime: {
-    name: '粘液',
-    description: '你以为藻类是粘糊糊的'
+    name: '黏液',
+    description: '比藻类更加黏滑'
   },
   event_log: {
-    name: '木头',
-    description: '一种基本建筑材料'
+    name: '原木',
+    description: '基本建筑材料'
   },
   event_stoneBlock: {
     name: '石块',
@@ -123,31 +123,31 @@ export default {
   },
   event_coconut: {
     name: '椰子',
-    description: '很难破开'
+    description: '很难打开'
   },
   event_shell: {
     name: '贝壳',
-    description: '你在海滩上发现的贝壳'
+    description: '在海滩上发现的贝壳'
   },
   event_music: {
     name: '音乐',
-    description: '你管这叫音乐?'
+    description: '你管这叫音乐？'
   },
   event_sand: {
     name: '沙子',
-    description: '沙子，一望无际'
+    description: '放眼望去，尽是沙子'
   },
   event_freshWater: {
     name: '淡水',
-    description: '新鲜并经过过滤'
+    description: '新鲜且经过过滤'
   },
   event_coal: {
-    name: '煤',
-    description: '经常用来生火烹饪食物的资源'
+    name: '煤炭',
+    description: '常用于生火烹饪食物的资源'
   },
   event_metalPart: {
     name: '金属零件',
-    description: '有人说是垃圾，有人说是宝藏'
+    description: '有人称之为垃圾，有人称之为宝藏'
   },
   event_pearl: {
     name: '珍珠',
@@ -155,15 +155,15 @@ export default {
   },
   event_salt: {
     name: '盐',
-    description: '咸的?'
+    description: '咸的？'
   },
   event_pepper: {
     name: '胡椒',
-    description: '当你需要一些香料时完美'
+    description: '需要一些香料时的完美选择'
   },
   event_honey: {
     name: '蜂蜜',
-    description: '多么甜啊'
+    description: '多么甜美啊'
   },
   event_vegetable: {
     name: '蔬菜',
@@ -175,7 +175,7 @@ export default {
   },
   event_rawFish: {
     name: '生鱼',
-    description: '刚从海洋里捕捞上来'
+    description: '刚从海洋中捕捞上来'
   },
   event_cookedFish: {
     name: '熟鱼',
@@ -183,19 +183,19 @@ export default {
   },
   event_rawMeat: {
     name: '生肉',
-    description: '刚从森林里出来的'
+    description: '刚从森林中获取'
   },
   event_cookedMeat: {
     name: '熟肉',
-    description: '只需要一些盐和胡椒粉'
+    description: '只需要一些盐和胡椒'
   },
   event_solidPlate: {
     name: '实心板',
-    description: '常见的建筑材料由木材和石头制成'
+    description: '由木材和石头制成的常见建筑材料'
   },
   event_sandstone: {
     name: '砂岩',
-    description: '看起来像沙子，但行为却像石头'
+    description: '看起来像沙子，但表现得像石头'
   },
   event_hardSteel: {
     name: '硬钢',
