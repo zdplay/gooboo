@@ -1165,8 +1165,11 @@ export default {
       general: {
         name: '将军'
       },
+      school: {
+        name: '学校'
+      },
       farmGalleryRefresh: {
-        name: '农场重新种植/画廊重洗'
+        name: '农场重新种植/画廊形状重洗'
       },
       fixedKeys: '注意：快捷键1-0固定用在部落技能释放。'
     },

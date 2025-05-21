@@ -500,6 +500,7 @@ export default {
             gallery: null,
             general: null,
             farmGalleryRefresh: null,
+            school: null,
         },
         keybindCurrent: null,
         autosaveTimer: null,
@@ -1005,6 +1006,10 @@ export default {
                             } else if (state.screen === 'gallery') {
                                 dispatch('gallery/buyShapeReroll', null, {root: true});
                             }
+                            break;
+                        }
+                        case 'school': {
+                            commit('updateKey', {key: 'screen', value: 'school'});
                             break;
                         }
                         default:

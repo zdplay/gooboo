@@ -1165,8 +1165,11 @@ export default {
       general: {
         name: 'Generäle'
       },
+      school: {
+        name: 'Schule'
+      },
       farmGalleryRefresh: {
-        name: 'Bauernhof neu bepflanzen / Galerie neu würfeln'
+        name: 'Bauernhof neu bepflanzen / Galerie Form neu würfeln'
       },
       fixedKeys: 'Hinweis: Tasten 1-0 sind fest für Horde-Kampffähigkeiten vergeben.'
     },

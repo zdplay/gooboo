@@ -39,6 +39,9 @@
       <template v-if="unlock.generalFeature && unlock.generalFeature.see">
         <keybind class="ma-2" name="general"></keybind>
       </template>
+      <template v-if="unlock.schoolFeature && unlock.schoolFeature.see">
+        <keybind class="ma-2" name="school"></keybind>
+      </template>
       <template v-if="unlock.achievementFeature && unlock.achievementFeature.see">
         <keybind class="ma-2" name="achievement"></keybind>
       </template>

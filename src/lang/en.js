@@ -1165,8 +1165,11 @@ export default {
       general: {
         name: 'Generals'
       },
+      school: {
+        name: 'School'
+      },
       farmGalleryRefresh: {
-        name: 'Farm replant / Gallery reroll'
+        name: 'Farm replant / Gallery shape reroll'
       },
       fixedKeys: 'Note: Keys 1-0 are fixed for horde battle skills.'
     },
