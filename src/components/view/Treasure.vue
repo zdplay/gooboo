@@ -10,6 +10,7 @@
       <chance-list></chance-list>
       <div class="d-flex flex-wrap justify-center align-center ma-1">
         <div class="d-flex flex-wrap justify-center align-center">
+          <currency class="ma-1" name="gem_emerald"></currency>
           <currency class="ma-1" name="treasure_fragment"></currency>
           <gb-tooltip :min-width="0">
             <template v-slot:activator="{ on, attrs }">

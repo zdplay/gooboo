@@ -123,7 +123,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="yellow">宝藏</v-chip>
-          <span>增加宝藏属性显示显示。</span>
+          <span>增加宝藏属性显示和翡翠显示。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
