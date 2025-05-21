@@ -32,6 +32,9 @@
       <div class="d-flex flex-wrap ma-1">
         <price-tag class="ma-1" v-for="(amount, currency) in currencies" :key="`currency-${currency}`" add :highlight="amount.isNew" :currency="currency" :amount="amount.after - amount.before"></price-tag>
       </div>
+      
+      <!-- Add HarvestEstimation component for farm feature -->
+      <harvest-estimation v-if="name === 'farm' && $store.state.system.settings.experiment.items.showFarmOfflineSummary.value" class="mt-3"></harvest-estimation>
     </v-card-text>
     <v-spacer></v-spacer>
     <v-card-actions>
@@ -44,9 +47,10 @@
 <script>
 import { mapState } from 'vuex';
 import PriceTag from './PriceTag.vue';
+import HarvestEstimation from '../partial/farm/HarvestEstimation.vue';
 
 export default {
-  components: { PriceTag },
+  components: { PriceTag, HarvestEstimation },
   props: {
     name: {
       type: String,

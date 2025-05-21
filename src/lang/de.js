@@ -1354,6 +1354,10 @@ export default {
       showScientificNotation: {
         name: 'Wissenschaftliche Notation anzeigen',
         description: 'Verwende wissenschaftliche Notation (z.B. 9,73×10^9) anstelle von abgekürzter Darstellung (z.B. 9,738B)'
+      },
+      showFarmOfflineSummary: {
+        name: 'Bauernhof-Offline-Zusammenfassung',
+        description: 'Zeigt die Bauernhof-Ernteprognose in der Offline-Zusammenfassung an'
       }
     }
   },

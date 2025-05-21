@@ -90,6 +90,10 @@
           <span>调整自动施法槽默认为5，普通技能也能自动施法。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
+          <span>增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
           <span>增加画廊的形状游戏显示各个形状的个数。</span>
         </span>
@@ -114,8 +118,8 @@
           <span>增加农场物品收获和使用通知功能。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
-          <span>增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。</span>
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
+          <span>增加农场离线汇总功能，可在【设置】-【实验性】中开关。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>

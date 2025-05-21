@@ -1354,6 +1354,10 @@ export default {
       showScientificNotation: {
         name: 'Show scientific notation',
         description: 'Use scientific notation (e.g., 9.73×10^9) instead of abbreviated representation (e.g., 9.738B)'
+      },
+      showFarmOfflineSummary: {
+        name: 'Farm offline summary',
+        description: 'Display farm harvest estimation in the offline summary page'
       }
     }
   },

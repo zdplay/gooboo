@@ -477,6 +477,13 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
+                    },
+                    showFarmOfflineSummary: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     }
                 }
             }

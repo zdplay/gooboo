@@ -53,7 +53,7 @@ export default {
     }),
     featureList() {
       return [
-        ...this.mainFeatures.filter(elem => elem.name !== 'farm'),
+        ...this.mainFeatures.filter(elem => !(elem.name === 'farm' && !this.$store.state.system.settings.experiment.items.showFarmOfflineSummary.value)),
         ...this.sideFeatures.filter(elem => ['gem', 'school', 'event'].includes(elem.name) && (elem.name !== 'event' || this.$store.getters['event/eventIsBig'](this.$store.getters['event/currentEvent'])))
       ];
     },

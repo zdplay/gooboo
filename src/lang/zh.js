@@ -935,7 +935,7 @@ export default {
         },
         gravestone: {
           name: '墓碑',
-          description: '宠物冻结可以治愈玩家和其他宠物 15'
+          description: '宠物冻结可以治疗玩家和其他宠物 15'
         },
         spikedCollar: {
           name: '尖刺项圈',
@@ -1354,6 +1354,10 @@ export default {
         showScientificNotation: {
           name: '显示科学记数法',
           description: '使用科学记数法(如9.73×10^9)代替缩略表示(如9.738B)'
+        },
+        showFarmOfflineSummary: {
+          name: '农场离线汇总',
+          description: '在离线汇总页面中显示农场收获预估'
         }
       }
   },
