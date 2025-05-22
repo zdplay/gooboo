@@ -1344,6 +1344,14 @@ export default {
       card2newLabel: {
         name: 'Reputation card display card pack',
       },
+      wallpaperPath: {
+        name: 'Benutzerdefinierter Hintergrundbild-Pfad',
+        description: 'Gib eine URL für ein Online-Bild ein, das als Hintergrundbild verwendet werden soll. Wenn leer, wird der Themenhintergrund verwendet. Wenn das Bild nicht geladen werden kann, wird ein einfarbiger Hintergrund verwendet'
+      },
+      wallpaperBlur: {
+        name: 'Milchglas-Effekt für Hintergrundbild',
+        description: 'Stellt die Unschärfe des Hintergrundbildes ein, 0 für keine Unschärfe, 100 für maximale Unschärfe'
+      },
       mobileMenuAtBottom: {
         name: 'Mobilmenü am unteren Rand',
         description: 'Platziert die Hauptmenüleiste auf mobilen Geräten am unteren Rand des Bildschirms anstatt am oberen'

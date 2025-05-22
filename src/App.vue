@@ -452,7 +452,7 @@
 </style>
 
 <template>
-  <v-app class="game-app" :class="`background-theme-${ currentTheme } css-shadow-${ cssShadows }`">
+  <v-app class="game-app" :class="`background-theme-${ currentTheme } css-shadow-${ cssShadows }`" :style="wallpaperBackgroundStyle">
     <v-app-bar v-if="screen !== 'newGame' && screen !== 'tab-duplicate'" class="px-lg-2 main-app-bar" app :color="$vuetify.theme.dark ? 'primary' : 'primary lighten-1'" :class="{'bottom-positioned': bottomPositioned}">
       <v-menu min-width="296" :max-width="$vuetify.breakpoint.xsOnly ? 296 : ($vuetify.breakpoint.smOnly ? 488 : 896)" open-on-hover offset-y>
         <template v-slot:activator="{ on, attrs }">
@@ -582,7 +582,7 @@
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-main :class="{'bottom-menu-spacing': bottomPositioned}">
+    <v-main :style="frostedGlassStyle" :class="{'bottom-menu-spacing': bottomPositioned}">
       <component :is="screen"></component>
     </v-main>
     <v-snackbars
@@ -677,7 +677,7 @@
     </v-dialog>
     <input @change="importSave" type="file" accept="text/plain, application/json" id="gooboo-savefile-input" style="display: none;"/>
     <v-icon v-if="activeTutorialCss !== null" class="tutorial-arrow" :style="activeTutorialCss">mdi-arrow-up-bold</v-icon>
-</v-app>
+  </v-app>
 </template>
 
 <script>
@@ -884,7 +884,39 @@ export default {
     },
     bottomPositioned() {
       return this.$vuetify.breakpoint.smAndDown && this.$store.state.system.settings.experiment.items.mobileMenuAtBottom.value;
-    }
+    },
+    wallpaperBackgroundStyle() {
+      const wallpaperPath = this.$store.state.system.settings.experiment?.items?.wallpaperPath?.value || '';
+      if (!wallpaperPath) {
+        // 如果壁纸路径为空，返回空对象，使用主题自带背景
+        return {};
+      }
+      // 返回壁纸样式，不包含 backdropFilter
+      return {
+        backgroundImage: `url(${wallpaperPath})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
+        // 背景颜色作为图片加载失败或透明时的后备
+        backgroundColor: this.$vuetify.theme.dark ? '#000000' : '#FFFFFF',
+      };
+    },
+    frostedGlassStyle() {
+      const wallpaperPath = this.$store.state.system.settings.experiment?.items?.wallpaperPath?.value || '';
+      const blurAmount = this.$store.state.system.settings.experiment?.items?.wallpaperBlur?.value || 0;
+      // 只有当设置了壁纸并且模糊量大于0时才应用毛玻璃效果
+      if (!wallpaperPath || blurAmount === 0) {
+        return {};
+      }
+      // 根据主题选择一个半透明的背景颜色
+      const overlayColor = this.$vuetify.theme.dark ? 'rgba(18, 18, 18, 0)' : 'rgba(255, 255, 255, 0)'; // 0.7 是透明度，您可以根据需要调整
+      return {
+        backgroundColor: overlayColor, // 半透明背景色
+        backdropFilter: `blur(${blurAmount / 5}px)`, // 毛玻璃效果
+        // 确保 v-main 的内容位于这个模糊层之上，通常 v-main 默认层级足够
+      };
+    },
   },
   created() {
     let that = this;

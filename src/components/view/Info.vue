@@ -63,6 +63,10 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
+          <span>增加自定义壁纸功能，在【设置】-【实验性】设置。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
           <span>完善【设置】-【键盘绑定】里面的快捷键功能。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
@@ -71,7 +75,7 @@
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加手机菜单栏移动到底部，在【设置】-【通用】设置。</span>
+          <span>增加手机菜单栏移动到底部，在【设置】-【实验性】设置。</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>

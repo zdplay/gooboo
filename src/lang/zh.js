@@ -1344,6 +1344,14 @@ export default {
         card2newLabel: {
           name: '声望卡片显示卡包',
         },
+        wallpaperPath: {
+          name: '壁纸路径',
+          description: '设置壁纸路径，支持网络图片'
+        },
+        wallpaperBlur: {
+          name: '壁纸毛玻璃效果',
+          description: '调整壁纸的模糊程度，0为无模糊效果，100为最大模糊效果'
+        },
         mobileMenuAtBottom: {
           name: '手机菜单移动底部',
           description: '将手机界面的主菜单栏从顶部移动到底部'

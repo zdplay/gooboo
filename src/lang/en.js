@@ -1344,6 +1344,14 @@ export default {
       card2newLabel: {
         name: 'Reputation card display card pack',
       },
+      wallpaperPath: {
+        name: 'Custom wallpaper path',
+        description: 'Enter a URL for an online image to use as background wallpaper. If empty, the theme background will be used. If the image fails to load, a solid color background will be used'
+      },
+      wallpaperBlur: {
+        name: 'Wallpaper frosted glass effect',
+        description: 'Adjust the blur level of the wallpaper, 0 for no blur, 100 for maximum blur effect'
+      },
       mobileMenuAtBottom: {
         name: 'Mobile menu at bottom',
         description: 'Places the main menu bar at the bottom of the screen on mobile devices instead of at the top'

@@ -415,6 +415,23 @@ export default {
             experiment: {
                 unlock: null,
                 items: {
+                    wallpaperPath: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'text',
+                        value: '',
+                        defaultValue: ''
+                    },
+                    wallpaperBlur: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        step: 1,
+                        value: 0,
+                        defaultValue: 0
+                    },
                     currencyLabel: {
                         unlock: null,
                         hasDescription: true,
