@@ -516,6 +516,8 @@ export default {
             farmGalleryRefresh: null,
             school: null,
             event: null,
+            nextTab: null,
+            prevTab: null,
         },
         keybindCurrent: null,
         autosaveTimer: null,
@@ -1029,6 +1031,24 @@ export default {
                         }
                         case 'event': {
                             commit('updateKey', {key: 'screen', value: 'event'});
+                            break;
+                        }
+                        case 'nextTab': {
+                            const tabList = document.querySelectorAll('.v-tab');
+                            if (tabList.length > 0) {
+                                const currentIndex = Array.from(tabList).findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+                                const nextIndex = (currentIndex + 1) >= tabList.length ? 0 : (currentIndex + 1);
+                                tabList[nextIndex].click();
+                            }
+                            break;
+                        }
+                        case 'prevTab': {
+                            const tabList = document.querySelectorAll('.v-tab');
+                            if (tabList.length > 0) {
+                                const currentIndex = Array.from(tabList).findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+                                const prevIndex = (currentIndex - 1) < 0 ? (tabList.length - 1) : (currentIndex - 1);
+                                tabList[prevIndex].click();
+                            }
                             break;
                         }
                         default:

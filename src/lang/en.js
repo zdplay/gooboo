@@ -1174,6 +1174,12 @@ export default {
       event: {
         name: 'Event'
       },
+      nextTab: {
+        name: 'Next tab'
+      },
+      prevTab: {
+        name: 'Previous tab'
+      },
       fixedKeys: 'Note: Keys 1-0 are fixed for horde battle skills.'
     },
     theme: {

@@ -1174,6 +1174,12 @@ export default {
       event: {
         name: '事件'
       },
+      nextTab: {
+        name: '下一个标签页'
+      },
+      prevTab: {
+        name: '上一个标签页'
+      },
       fixedKeys: '注意：快捷键1-0固定用在部落技能释放。'
     },
     theme: {

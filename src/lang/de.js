@@ -1174,6 +1174,12 @@ export default {
       event: {
         name: 'Event'
       },
+      nextTab: {
+        name: 'Nächste Registerkarte'
+      },
+      prevTab: {
+        name: 'Vorherige Registerkarte'
+      },
       fixedKeys: 'Hinweis: Tasten 1-0 sind fest für Horde-Kampffähigkeiten vergeben.'
     },
     theme: {
