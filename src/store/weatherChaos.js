@@ -25,6 +25,7 @@ export default {
         fishingProgress: 0,
         treasureRods: 0,
         boughtRods: 0,
+        fishingHistory: []
     },
     getters: {
         eventMult: (state, getters, rootState, rootGetters) => {
@@ -161,6 +162,13 @@ export default {
         },
         updateSubkey(state, o) {
             Vue.set(state[o.name][o.key], o.subkey, o.value);
+        },
+        addFishingRecord(state, record) {
+            state.fishingHistory.unshift(record);
+            
+            if (state.fishingHistory.length > 30) {
+                state.fishingHistory.pop();
+            }
         }
     },
     actions: {
@@ -184,6 +192,7 @@ export default {
             commit('updateKey', {key: 'fishingProgress', value: 0});
             commit('updateKey', {key: 'treasureRods', value: 0});
             commit('updateKey', {key: 'boughtRods', value: 0});
+            commit('updateKey', {key: 'fishingHistory', value: []});
         },
         catchFish({ state, rootGetters, commit, dispatch }, name) {
             const fish = state.fish[name];
@@ -198,6 +207,14 @@ export default {
             }
 
             dispatch('currency/gain', {feature: 'event', name: 'slime', gainMult: true, amount: size}, {root: true});
+
+            commit('addFishingRecord', {
+                type: 'fish',
+                fishName: name,
+                size: size,
+                location: state.currentLocation,
+                time: Date.now()
+            });
 
             if (state.fish[name].catchRecord === null || state.fish[name].catchRecord < size) {
                 dispatch('event/giveTokens', {event: 'weatherChaos', amount: size - (state.fish[name].catchRecord ?? 0)}, {root: true});
@@ -225,7 +242,6 @@ export default {
                 let rngGen = rootGetters['system/getRng']('weatherChaos_catch');
                 commit('system/nextRng', {name: 'weatherChaos_catch', amount: 1}, {root: true});
                 if (chance(treasureChance, rngGen())) {
-                    // Catch treasure
                     let treasureNames = [];
                     let treasureWeights = [];
                     for (const [key, elem] of Object.entries(getters.treasureWeights)) {
@@ -235,14 +251,20 @@ export default {
                     const treasureCaught = treasureNames[weightSelect(treasureWeights, rngGen())];
 
                     if (treasureCaught === 'next') {
-                        // Unlock next location
                         const next = state.location[state.currentLocation].next;
                         if (next) {
                             commit('updateSubkey', {name: 'location', key: next.name, subkey: 'owned', value: true});
+                            
+                            commit('addFishingRecord', {
+                                type: 'treasure',
+                                treasureType: 'location',
+                                location: next.name,
+                                time: Date.now()
+                            });
+                            
                             dispatch('note/find', 'event_17', {root: true});
                         }
                     } else if (treasureCaught === 'fishingRod') {
-                        // Unlock random fishing rod
                         let eligible = [];
                         for (const [key, elem] of Object.entries(state.fishingRod)) {
                             if (!elem.owned) {
@@ -252,24 +274,48 @@ export default {
                         if (eligible.length > 0) {
                             let rngGenRod = rootGetters['system/getRng']('weatherChaos_fishingRod');
                             commit('system/nextRng', {name: 'weatherChaos_fishingRod', amount: 1}, {root: true});
-                            commit('updateSubkey', {name: 'fishingRod', key: randomElem(eligible, rngGenRod()), subkey: 'owned', value: true});
+                            const rodName = randomElem(eligible, rngGenRod());
+                            commit('updateSubkey', {name: 'fishingRod', key: rodName, subkey: 'owned', value: true});
                             commit('updateKey', {key: 'treasureRods', value: state.treasureRods + 1});
+                            
+                            commit('addFishingRecord', {
+                                type: 'treasure',
+                                treasureType: 'fishingRod',
+                                fishingRod: rodName,
+                                time: Date.now()
+                            });
                         }
                     } else if (treasureCaught === 'bait') {
-                        // Gain random bait
                         const baitName = randomElem(Object.keys(state.bait), rngGen());
                         const bait = state.bait[baitName];
-                        commit('updateSubkey', {name: 'bait', key: baitName, subkey: 'owned', value: bait.owned + bait.stackSize});
+                        const amount = bait.stackSize;
+                        commit('updateSubkey', {name: 'bait', key: baitName, subkey: 'owned', value: bait.owned + amount});
+                        
+                        commit('addFishingRecord', {
+                            type: 'treasure',
+                            treasureType: 'bait',
+                            bait: baitName,
+                            amount: amount,
+                            time: Date.now()
+                        });
                     }
                 } else if (chance(fishChance, rngGen())) {
-                    // Catch fish
                     for (let i = 0, n = chance(fishDoubleChance) ? 2 : 1; i < n; i++) {
                         dispatch('catchFish', fishNames[weightSelect(fishWeights, rngGen())]);
                     }
                     dispatch('note/find', 'event_16', {root: true});
                 } else {
-                    // Catch trash
-                    dispatch('currency/gain', {feature: 'event', name: trashNames[weightSelect(trashWeights, rngGen())], gainMult: true, amount: 100 * getters.eventMult}, {root: true});
+                    const trashName = trashNames[weightSelect(trashWeights, rngGen())];
+                    const trashAmount = 100 * getters.eventMult;
+                    
+                    commit('addFishingRecord', {
+                        type: 'trash',
+                        trashName: trashName,
+                        amount: trashAmount,
+                        time: Date.now()
+                    });
+                    
+                    dispatch('currency/gain', {feature: 'event', name: trashName, gainMult: true, amount: trashAmount}, {root: true});
                 }
             }
         },

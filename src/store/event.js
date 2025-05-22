@@ -512,6 +512,7 @@ export default {
                     commit('weatherChaos/updateKey', {key: 'fishingProgress', value: 0}, {root: true});
                     commit('weatherChaos/updateKey', {key: 'treasureRods', value: 0}, {root: true});
                     commit('weatherChaos/updateKey', {key: 'boughtRods', value: 0}, {root: true});
+                    commit('weatherChaos/updateKey', {key: 'fishingHistory', value: []}, {root: true});
                     break;
                 }
                 case 'summerFestival': {

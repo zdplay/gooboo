@@ -426,6 +426,9 @@ export default {
         if (store.state.weatherChaos.boughtRods > 0) {
             obj.weatherChaos_boughtRods = store.state.weatherChaos.boughtRods;
         }
+        if (store.state.weatherChaos.fishingHistory && store.state.weatherChaos.fishingHistory.length > 0) {
+            obj.weatherChaos_fishingHistory = store.state.weatherChaos.fishingHistory;
+        }
 
         let weatherChaosFishingRod = [];
         for (const [key, elem] of Object.entries(store.state.weatherChaos.fishingRod)) {
@@ -661,6 +664,9 @@ export default {
         }
         if (data.weatherChaos_boughtRods !== undefined) {
             store.commit('weatherChaos/updateKey', {key: 'boughtRods', value: data.weatherChaos_boughtRods});
+        }
+        if (data.weatherChaos_fishingHistory !== undefined) {
+            store.commit('weatherChaos/updateKey', {key: 'fishingHistory', value: data.weatherChaos_fishingHistory});
         }
         if (data.weatherChaos_fishingRod !== undefined) {
             data.weatherChaos_fishingRod.forEach(key => {
