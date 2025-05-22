@@ -1171,6 +1171,9 @@ export default {
       farmGalleryRefresh: {
         name: 'Bauernhof neu bepflanzen / Galerie Form neu würfeln'
       },
+      event: {
+        name: 'Event'
+      },
       fixedKeys: 'Hinweis: Tasten 1-0 sind fest für Horde-Kampffähigkeiten vergeben.'
     },
     theme: {

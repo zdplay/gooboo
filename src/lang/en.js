@@ -1171,6 +1171,9 @@ export default {
       farmGalleryRefresh: {
         name: 'Farm replant / Gallery shape reroll'
       },
+      event: {
+        name: 'Event'
+      },
       fixedKeys: 'Note: Keys 1-0 are fixed for horde battle skills.'
     },
     theme: {

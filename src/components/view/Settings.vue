@@ -57,6 +57,9 @@
       <template v-if="unlock.cryolabFeature && unlock.cryolabFeature.see">
         <keybind class="ma-2" name="cryolab"></keybind>
       </template>
+      <template v-if="unlock.eventFeature && unlock.eventFeature.see">
+        <keybind class="ma-2" name="event"></keybind>
+      </template>
       <v-card class="ma-2 pa-3">
         <div class="text-caption">{{ $vuetify.lang.t(`$vuetify.settings.keybinds.fixedKeys`) }}</div>
       </v-card>

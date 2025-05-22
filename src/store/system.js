@@ -515,6 +515,7 @@ export default {
             general: null,
             farmGalleryRefresh: null,
             school: null,
+            event: null,
         },
         keybindCurrent: null,
         autosaveTimer: null,
@@ -1024,6 +1025,10 @@ export default {
                         }
                         case 'school': {
                             commit('updateKey', {key: 'screen', value: 'school'});
+                            break;
+                        }
+                        case 'event': {
+                            commit('updateKey', {key: 'screen', value: 'event'});
                             break;
                         }
                         default:

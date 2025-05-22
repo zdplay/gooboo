@@ -1171,6 +1171,9 @@ export default {
       farmGalleryRefresh: {
         name: '农场重新种植/画廊形状重洗'
       },
+      event: {
+        name: '事件'
+      },
       fixedKeys: '注意：快捷键1-0固定用在部落技能释放。'
     },
     theme: {
