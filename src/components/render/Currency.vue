@@ -215,7 +215,7 @@
                 </v-progress-linear>
               </div>
             </div>
-            <div class="currency-labels d-flex justify-center">
+            <div class="currency-labels d-flex justify-space-between">
               <div
                 v-if="!currency.hideGainTag && gainTimerAmount > 0"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
@@ -224,6 +224,10 @@
                 v-if="capTimerNeeded !== null"
                 class="currency-label balloon-text-dynamic mx-1 px-1"
               >{{ $formatTime(capTimerNeeded) }}</div>
+              <div
+                v-if="isOvercap && currency.overcapMult > 0"
+                class="currency-label balloon-text-dynamic mx-1 px-1"
+              >{{ $formatNum(overcapMult * 100, true) }}%</div>
             </div>
           </div>
         </template>
