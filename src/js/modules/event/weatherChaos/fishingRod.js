@@ -2,6 +2,40 @@ export default {
     basic: {
         owned: true,
     },
+    novice: {
+        owned: true,
+        icon: 'mdi-baby-bottle',
+        effect: [
+            {name: 'weatherChaosFishingPower', type: 'base', value: 8},
+            {name: 'weatherChaosFishingTime', type: 'mult', value: 1.05},
+        ],
+    },
+    net: {
+        owned: true,
+        icon: 'mdi-search-web',
+        effect: [
+            {name: 'weatherChaosTrashGain', type: 'mult', value: 1.08},
+            {name: 'weatherChaosFishChance', type: 'base', value: -0.07},
+        ],
+    },
+
+    bamboo: {
+        owned: true,
+        icon: 'mdi-tree-outline',
+        effect: [
+            {name: 'weatherChaosFishSizeMax', type: 'base', value: 0.7},
+            {name: 'weatherChaosFishSizeAverage', type: 'mult', value: 1 / 1.07},
+        ],
+    },
+
+    lucky: {
+        owned: true,
+        icon: 'mdi-clover',
+        effect: [
+            {name: 'weatherChaosFishChance', type: 'base', value: 0.025},
+            {name: 'weatherChaosTreasureChance', type: 'base', value: 0.012},
+        ],
+    },
     fast: {
         icon: 'mdi-run-fast',
         effect: [

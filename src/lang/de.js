@@ -647,6 +647,10 @@ export default {
         dull: 'Stumpf',
         mystical: 'Mystisch',
         twins: 'Zwillinge',
+        novice: 'Kind',
+        bamboo: 'Bambus',
+        net: 'Fischernetz',
+        lucky: 'Glück',
       },
       bait: {
         juicyBait: 'Saftiger Köder',

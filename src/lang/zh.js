@@ -647,6 +647,10 @@ export default {
         dull: '迟钝',
         mystical: '神秘',
         twins: '双胞胎',
+        novice: '儿童版',
+        bamboo: '竹制',
+        net: '捞网',
+        lucky: '幸运',
       },
       bait: {
         juicyBait: '多汁的诱饵',
