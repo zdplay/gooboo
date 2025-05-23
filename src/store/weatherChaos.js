@@ -25,7 +25,9 @@ export default {
         fishingProgress: 0,
         treasureRods: 0,
         boughtRods: 0,
-        fishingHistory: []
+        fishingHistory: [],
+        piratesTreasureDebug: false,
+        piratesTreasureSeed: 0,
     },
     getters: {
         eventMult: (state, getters, rootState, rootGetters) => {
@@ -166,7 +168,7 @@ export default {
         addFishingRecord(state, record) {
             state.fishingHistory.unshift(record);
             
-            if (state.fishingHistory.length > 30) {
+            if (state.fishingHistory.length > 50) {
                 state.fishingHistory.pop();
             }
         }
@@ -193,6 +195,7 @@ export default {
             commit('updateKey', {key: 'treasureRods', value: 0});
             commit('updateKey', {key: 'boughtRods', value: 0});
             commit('updateKey', {key: 'fishingHistory', value: []});
+            commit('updateKey', {key: 'piratesTreasureSeed', value: 0});
         },
         catchFish({ state, rootGetters, commit, dispatch }, name) {
             const fish = state.fish[name];
@@ -226,6 +229,7 @@ export default {
             const fishChance = rootGetters['mult/get']('weatherChaosFishChance');
             const fishDoubleChance = rootGetters['mult/get']('weatherChaosFishDoubleChance');
             const treasureChance = rootGetters['mult/get']('weatherChaosTreasureChance');
+            const piratesTreasureChance = 0.005;
             let fishNames = [];
             let fishWeights = [];
             let trashNames = [];
@@ -241,6 +245,7 @@ export default {
             for (let i = 0; i < amount; i++) {
                 let rngGen = rootGetters['system/getRng']('weatherChaos_catch');
                 commit('system/nextRng', {name: 'weatherChaos_catch', amount: 1}, {root: true});
+                
                 if (chance(treasureChance, rngGen())) {
                     let treasureNames = [];
                     let treasureWeights = [];
@@ -318,6 +323,48 @@ export default {
                     
                     dispatch('currency/gain', {feature: 'event', name: trashName, gainMult: true, amount: trashAmount}, {root: true});
                 }
+                
+                // 使用基于日期的固定种子判断宝藏掉落
+                // 获取当天日期作为基础种子
+                const today = new Date();
+                const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+                
+                // 将种子与玩家特有状态结合（如当前钓鱼地点、装备、历史记录数量等）
+                // 这确保同一天内相同玩家状态下结果一致，但不同状态下结果不同
+                const playerState = state.currentLocation + state.currentFishingRod + (state.currentBait || "") + state.fishingHistory.length;
+                let hash = 0;
+                for (let j = 0; j < playerState.length; j++) {
+                    hash = ((hash << 5) - hash) + playerState.charCodeAt(j);
+                    hash = hash & hash; // 转换为32位整数
+                }
+                
+                // 合并日期种子和玩家状态种子
+                const combinedSeed = dateSeed ^ hash;
+                
+                // 使用伪随机数生成器，每次掉落判断都使用不同的"随机"位置
+                const pseudoRandom = (seed, position) => {
+                    const x = Math.sin(seed + position) * 10000;
+                    return x - Math.floor(x);
+                };
+                
+                // 计算今天的掉落结果，使用固定种子
+                if (pseudoRandom(combinedSeed, state.piratesTreasureSeed) < piratesTreasureChance) {
+                    // 使用固定种子确定黄玉数量，确保刷新页面时数量也一致
+                    const topazSeed = combinedSeed * 31 + state.piratesTreasureSeed;
+                    const topazAmount = Math.floor(1 + pseudoRandom(topazSeed, 0) * 100);
+                    
+                    dispatch('currency/gain', {feature: 'gem', name: 'topaz', amount: topazAmount}, {root: true});
+                    
+                    commit('addFishingRecord', {
+                        type: 'treasure',
+                        treasureType: 'piratesTreasure',
+                        amount: topazAmount,
+                        time: Date.now()
+                    });
+                }
+                
+                // 增加种子值，确保下次判断使用不同的"随机"位置
+                commit('updateKey', {key: 'piratesTreasureSeed', value: state.piratesTreasureSeed + 1});
             }
         },
         applyLocationEffects({ state, dispatch }, name) {
@@ -433,6 +480,22 @@ export default {
             if (rootGetters['currency/value']('event_cloud') >= WEATHER_CHAOS_RESET_COST) {
                 dispatch('currency/spend', {feature: 'event', name: 'cloud', amount: WEATHER_CHAOS_RESET_COST}, {root: true});
                 dispatch('initWeatherCycle');
+            }
+        },
+        togglePiratesTreasureDebug({ state, commit }) {
+            commit('updateKey', {key: 'piratesTreasureDebug', value: !state.piratesTreasureDebug});
+        },
+        debugGetPiratesTreasure({ state, commit, dispatch }) {
+            if (state.piratesTreasureDebug) {
+                const topazAmount = Math.floor(1 + Math.random() * 100);
+                dispatch('currency/gain', {feature: 'gem', name: 'topaz', amount: topazAmount}, {root: true});
+                
+                commit('addFishingRecord', {
+                    type: 'treasure',
+                    treasureType: 'piratesTreasure',
+                    amount: topazAmount,
+                    time: Date.now()
+                });
             }
         }
     }

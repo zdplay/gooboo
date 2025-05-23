@@ -4,6 +4,9 @@
   height: 64px;
   cursor: pointer;
 }
+.debug-active {
+  border: 2px solid red;
+}
 </style>
 
 <template>
@@ -117,6 +120,18 @@
           <div v-else>{{ $vuetify.lang.t(`$vuetify.event.weatherChaos.treasureDescriptionFinal`) }}</div>
           <stat-breakdown name="weatherChaosTreasureChance"></stat-breakdown>
         </gb-tooltip>
+        <gb-tooltip title-text="海贼王的宝藏">
+          <template v-slot:activator="{ on, attrs }">
+            <div class="bg-tile-default rounded ma-1 pa-1" v-bind="attrs" v-on="on" @click="getPiratesTreasure" :class="{ 'debug-active': piratesTreasureDebug }">
+              <v-icon>mdi-treasure-chest</v-icon>
+              <span class="ma-1">0.5%</span>
+              <v-icon v-if="piratesTreasureDebug" small color="red">mdi-bug</v-icon>
+            </div>
+          </template>
+          <div>海贼王的宝藏 - 获得1-100的黄玉</div>
+          <div>每次钓鱼都有可能伴生掉落</div>
+          <div v-if="piratesTreasureDebug" class="red--text">调试模式已开启，点击获得宝藏</div>
+        </gb-tooltip>
       </div>
     </div>
     <div class="ma-2">
@@ -148,6 +163,7 @@ export default {
       weather: state => state.weatherChaos.weather,
       nextWeather: state => state.weatherChaos.nextWeather,
       cloud: state => state.currency.event_cloud.value,
+      piratesTreasureDebug: state => state.weatherChaos.piratesTreasureDebug,
     }),
     ...mapGetters({
       fishList: 'weatherChaos/fishList',
@@ -243,6 +259,11 @@ export default {
     },
     resetWeather() {
       this.$store.dispatch('weatherChaos/resetWeatherCycle');
+    },
+    getPiratesTreasure() {
+      if (this.piratesTreasureDebug) { // 只在调试模式下响应点击
+        this.$store.dispatch('weatherChaos/debugGetPiratesTreasure');
+      }
     }
   }
 }

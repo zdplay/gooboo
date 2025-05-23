@@ -238,7 +238,7 @@ export default {
       { category: '事件', color: 'blue', content: '增加每日签到奖励。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加宾果游戏预测功能，可以预测下一个可能出现的数字。', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '增加天气混乱事件萌新钓竿。', isCurrentUpdate: true },
+      { category: '事件', color: 'blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志。', isCurrentUpdate: true },
       { category: '事件', color: 'blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择。', isCurrentUpdate: false },
