@@ -2,7 +2,7 @@ import Vue from "vue";
 import { tick } from "../js/tick";
 import { randomHex } from "../js/utils/random";
 import seedrandom from "seedrandom";
-import { LOCAL_STORAGE_NAME } from "../js/constants";
+import { LOCAL_STORAGE_NAME, UPDATE_VERSION } from "../js/constants";
 
 export default {
     namespaced: true,
@@ -14,6 +14,7 @@ export default {
         patchnote: {},
         timestamp: null,
         dailyCheckIn: null,
+        updateNoticeVersion: null,
         screen: 'newGame',
         notification: [],
         features: {
@@ -678,7 +679,13 @@ export default {
                 }
             }
             return obj;
-        }
+        },
+        hasUpdateNotice: (state) => {
+            // 检查是否需要更新提醒
+            // 通过检查updateNoticeVersion是否与constants.js中定义的UPDATE_VERSION匹配
+            // 发布新更新时只需修改constants.js中的UPDATE_VERSION常量
+            return state.updateNoticeVersion !== UPDATE_VERSION;
+        },
     },
     mutations: {
         nextRng(state, o) {
@@ -822,6 +829,7 @@ export default {
             commit('updateKey', {key: 'cachePage', value: {}});
             commit('updateKey', {key: 'playerId', value: null});
             commit('updateKey', {key: 'playerName', value: null});
+            commit('updateKey', {key: 'updateNoticeVersion', value: null});
 
             for (const [key, elem] of Object.entries(state.features)) {
                 if (elem.currentSubfeature !== undefined) {

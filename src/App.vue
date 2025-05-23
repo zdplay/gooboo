@@ -547,7 +547,9 @@
       </gb-tooltip>
       <v-spacer></v-spacer>
       <v-btn icon @click="changeScreen('info')">
-        <v-icon>mdi-information</v-icon>
+        <v-badge :value="hasUpdateNotice" color="red" overlap dot>
+          <v-icon>mdi-information</v-icon>
+        </v-badge>
       </v-btn>
       <v-menu bottom open-on-hover offset-y>
         <template v-slot:activator="{ on, attrs }">
@@ -836,7 +838,8 @@ export default {
       backupHint: 'system/backupHint',
       isEndOfFeature: 'system/isEndOfFeature',
       isOnMainFeature: 'system/isOnMainFeature',
-      featureIsFrozen: 'cryolab/featureIsFrozen'
+      featureIsFrozen: 'cryolab/featureIsFrozen',
+      hasUpdateNotice: 'system/hasUpdateNotice'
     }),
     marginSize() {
       return this.$vuetify.breakpoint.mdAndUp ? 2 : 1;

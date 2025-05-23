@@ -53,130 +53,40 @@
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/Tendsty/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.viewCode') }}</v-btn>
       </v-card-actions>
     </v-card>
+
+    <!-- 本次更新醒目展示区域 -->
+    <v-card v-if="currentUpdates.length > 0" class="ma-2" color="primary" dark>
+      <v-card-title class="justify-center">
+        <v-icon left>mdi-star</v-icon>
+        本次更新
+        <v-icon right>mdi-star</v-icon>
+      </v-card-title>
+      <v-card-text>
+        <div 
+          v-for="(update, index) in currentUpdates" 
+          :key="`current-update-${index}`"
+          class="d-flex mt-2 ml-4"
+          :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}"
+        >
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" :color="update.color">{{ update.category }}</v-chip>
+          <span class="font-weight-medium">{{ update.content }}</span>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <v-card class="ma-2">
       <v-card-title class="justify-center">改动声明</v-card-title>
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加云存档功能，在【设置】-【通用】设置。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加自定义壁纸功能，在【设置】-【实验性】设置。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>完善【设置】-【键盘绑定】里面的快捷键功能。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加1套主题【梦幻】。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加手机菜单栏移动到底部，在【设置】-【实验性】设置。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="teal">设置</v-chip>
-          <span>增加【显示科学记数法】选项，在【设置】-【实验性】设置。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="pink">挖矿</v-chip>
-          <span>修改冶炼最大按钮为指定数量按钮。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="pink">挖矿</v-chip>
-          <span>增加自动挖硝功能，在深度切换右侧机器人按钮，支持离线。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
-          <span>调整自动施法槽默认为5，普通技能也能自动施法。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="red">部落</v-chip>
-          <span>增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
-          <span>增加画廊的形状游戏显示各个形状的个数。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
-          <span>增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="orange">画廊</v-chip>
-          <span>增加画廊形状【清管】功能，一键清空动力值。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="green">学校</v-chip>
-          <span>修改学校参考考试为直接满分通过。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
-          <span>在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
-          <span>增加农场物品收获和使用通知功能。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="brown">农场</v-chip>
-          <span>增加农场离线汇总功能，可在【设置】-【实验性】中开关。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="deep-purple">卡片</v-chip>
-          <span>增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="yellow">宝藏</v-chip>
-          <span>增加宝藏属性显示和翡翠显示。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
-          <span>增加宾果游戏预测功能，可以预测下一个可能出现的数字。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
-          <span>增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
-          <span>增加每日签到奖励。（别服存档过来要过一天才能签到）</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
-          <span>增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>增加攻略按钮。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>增加沙漏快捷时间选择。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>调整低分辨率的画面布局。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>增加部分地方计时显示。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>在升级菜单中添加材料筛选功能。</span>
-        </span>
-        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
-          <span>增加购买按钮进度条功能，在【设置】-【实验性】中开启。</span>
-        </span>
+        <div 
+          v-for="(update, index) in allUpdates" 
+          :key="`update-${index}`"
+          class="d-flex mt-2 ml-4"
+          :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}"
+        >
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" :color="update.color">{{ update.category }}</v-chip>
+          <span>{{ update.content }}</span>
+        </div>
       </v-card-text>
       <v-card-text class="text-center">
         部分功能借鉴了
@@ -289,7 +199,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { APP_ENV, APP_TESTING } from '../../js/constants';
+import { APP_ENV, APP_TESTING, UPDATE_VERSION } from '../../js/constants';
 import { numFormatters, numNegativeFormatters } from '../../js/utils/format';
 import AlertText from '../partial/render/AlertText.vue';
 
@@ -297,6 +207,45 @@ export default {
   components: { AlertText },
   data: () => ({
     timeUnits: ['s', 'm', 'h', 'd'],
+    // 当前更新版本号从constants.js导入，只需在那里修改一处
+    // 发布新更新时请同步修改：
+    // 1. constants.js中的UPDATE_VERSION常量
+    // 2. updateItems中相应项的isCurrentUpdate标记
+    // 更新内容数据结构
+    updateItems: [
+      // 本次更新项（isCurrentUpdate: true 表示属于本次更新）
+      // 历史更新项（isCurrentUpdate: false 或不设置表示历史更新）
+      { category: '设置', color: 'teal', content: '增加云存档功能，在【设置】-【通用】设置。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '增加自定义壁纸功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '完善【设置】-【键盘绑定】里面的快捷键功能。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '增加1套主题【梦幻】。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '增加手机菜单栏移动到底部，在【设置】-【实验性】设置。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。', isCurrentUpdate: false },
+      { category: '设置', color: 'teal', content: '增加【显示科学记数法】选项，在【设置】-【实验性】设置。', isCurrentUpdate: false },
+      { category: '挖矿', color: 'pink', content: '修改冶炼最大按钮为指定数量按钮。', isCurrentUpdate: false },
+      { category: '挖矿', color: 'pink', content: '增加自动挖硝功能，在深度切换右侧机器人按钮，支持离线。', isCurrentUpdate: false },
+      { category: '部落', color: 'red', content: '调整自动施法槽默认为5，普通技能也能自动施法。', isCurrentUpdate: false },
+      { category: '部落', color: 'red', content: '增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。', isCurrentUpdate: false },
+      { category: '画廊', color: 'orange', content: '增加画廊的形状游戏显示各个形状的个数。', isCurrentUpdate: false },
+      { category: '画廊', color: 'orange', content: '增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。', isCurrentUpdate: false },
+      { category: '画廊', color: 'orange', content: '增加画廊形状【清管】功能，一键清空动力值。', isCurrentUpdate: false },
+      { category: '学校', color: 'green', content: '修改学校参考考试为直接满分通过。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '增加农场物品收获和使用通知功能。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '增加农场离线汇总功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
+      { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
+      { category: '事件', color: 'blue', content: '增加每日签到奖励。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
+      { category: '事件', color: 'blue', content: '增加宾果游戏预测功能，可以预测下一个可能出现的数字。', isCurrentUpdate: false },
+      { category: '事件', color: 'blue', content: '增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。', isCurrentUpdate: false },
+      { category: '事件', color: 'blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: true },
+      { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '调整低分辨率的画面布局。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '在升级菜单中添加材料筛选功能。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false }
+    ],
     tech: {
       web: {
         vue: {github: 'https://github.com/vuejs/vue', website: 'https://vuejs.org'},
@@ -323,6 +272,14 @@ export default {
     ...mapState({
       version: state => state.system.version
     }),
+    // 本次更新内容（只显示标记为当前更新的项目）
+    currentUpdates() {
+      return this.updateItems.filter(item => item.isCurrentUpdate === true);
+    },
+    // 所有更新内容（用于改动声明区域显示）
+    allUpdates() {
+      return this.updateItems;
+    },
     bigNumbers() {
       return numFormatters.slice(1);
     },
@@ -345,7 +302,15 @@ export default {
     },
     toStatOverview() {
       this.$store.commit('system/updateKey', {key: 'screen', value: 'statOverview'});
+    },
+    markUpdateAsRead() {
+      // 使用data中定义的当前更新版本标识
+      this.$store.commit('system/updateKey', {key: 'updateNoticeVersion', value: UPDATE_VERSION});
     }
+  },
+  mounted() {
+    // 进入Info页面时自动标记更新已读
+    this.markUpdateAsRead();
   }
 }
 </script>
