@@ -307,11 +307,12 @@ export default {
                 } else {
                     const trashName = trashNames[weightSelect(trashWeights, rngGen())];
                     const trashAmount = 100 * getters.eventMult;
+                    const actualAmount = rootGetters['mult/get'](rootGetters['currency/gainMultName']('event', trashName), trashAmount);
                     
                     commit('addFishingRecord', {
                         type: 'trash',
                         trashName: trashName,
-                        amount: trashAmount,
+                        amount: actualAmount,
                         time: Date.now()
                     });
                     
