@@ -7,6 +7,64 @@
 .debug-active {
   border: 2px solid red;
 }
+.fishing-game-container {
+  margin: 16px;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.fishing-game-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.fishing-game-progress {
+  height: 30px;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+.fishing-game-target {
+  position: absolute;
+  height: 100%;
+  background-color: #4CAF50;
+  opacity: 0.5;
+}
+.fishing-game-cursor {
+  position: absolute;
+  height: 100%;
+  width: 4px;
+  background-color: red;
+  top: 0;
+  z-index: 2;
+}
+.fishing-game-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+.fishing-game-success {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(76, 175, 80, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.fishing-game-success.active {
+  opacity: 1;
+}
 </style>
 
 <template>
@@ -137,6 +195,41 @@
     <div class="ma-2">
       <v-progress-linear height="24" class="rounded" :value="fishingPercent">{{ $formatTime(fishingTimeLeft) }}</v-progress-linear>
     </div>
+    
+    <div class="fishing-game-container">
+      <div class="fishing-game-header" @click="toggleFishingGame">
+        <v-icon class="mr-2">mdi-fish</v-icon>
+        <span class="title">互动钓鱼</span>
+        <v-icon class="ml-2">{{ fishingGameExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+      </div>
+      
+      <v-expand-transition>
+        <div v-if="fishingGameExpanded">
+          <div class="fishing-game-progress">
+            <div 
+              class="fishing-game-target" 
+              :style="{left: `${targetPosition}%`, width: `${targetWidth}%`}">
+            </div>
+            <div 
+              class="fishing-game-cursor" 
+              :style="{left: `${cursorPosition}%`}">
+            </div>
+          </div>
+          
+          <div class="fishing-game-button">
+            <v-btn color="primary" @click="catchFish" :disabled="fishingGameCooldown > 0">
+              <v-icon left>mdi-hook</v-icon>
+              钓起 {{ fishingGameCooldown > 0 ? `(${fishingGameCooldown}s)` : '' }}
+            </v-btn>
+          </div>
+          
+          <div class="fishing-game-success" :class="{'active': showSuccessAnimation}">
+            <v-icon x-large color="success">mdi-check-circle</v-icon>
+          </div>
+        </div>
+      </v-expand-transition>
+    </div>
+
     <div class="d-flex flex-wrap ma-1">
       <weather-chaos-fish class="ma-1" v-for="(item, key) in fishList" :key="`fish-${key}`" :name="key" :chance="fishChances[key]"></weather-chaos-fish>
     </div>
@@ -153,6 +246,17 @@ import WeatherChaosFish from './WeatherChaosFish.vue';
 
 export default {
   components: { WeatherChaosFish, PriceTag, DisplayRow, StatBreakdown },
+  data: () => ({
+    targetPosition: 0,
+    targetWidth: 5,
+    cursorPosition: 0,
+    cursorDirection: 1,
+    fishingGameInterval: null,
+    fishingGameCooldown: 0,
+    fishingGameCooldownInterval: null,
+    showSuccessAnimation: false,
+    fishingGameExpanded: false
+  }),
   computed: {
     ...mapState({
       fishingRod: state => state.weatherChaos.fishingRod,
@@ -260,10 +364,92 @@ export default {
     resetWeather() {
       this.$store.dispatch('weatherChaos/resetWeatherCycle');
     },
+    toggleFishingGame() {
+      this.fishingGameExpanded = !this.fishingGameExpanded;
+      
+      // 如果展开，则初始化钓鱼游戏
+      if (this.fishingGameExpanded) {
+        this.initFishingGame();
+      } else {
+        // 折叠时清除计时器
+        if (this.fishingGameInterval) {
+          clearInterval(this.fishingGameInterval);
+          this.fishingGameInterval = null;
+        }
+      }
+    },
+    initFishingGame() {
+      // 随机生成目标位置
+      this.targetPosition = Math.floor(Math.random() * (100 - this.targetWidth));
+      
+      // 清除现有的计时器
+      if (this.fishingGameInterval) {
+        clearInterval(this.fishingGameInterval);
+      }
+      
+      // 设置光标移动
+      this.cursorPosition = 0;
+      this.cursorDirection = 1;
+      
+      this.fishingGameInterval = setInterval(() => {
+        this.cursorPosition += this.cursorDirection;
+        
+        // 到达边界时改变方向
+        if (this.cursorPosition >= 100 || this.cursorPosition <= 0) {
+          this.cursorDirection *= -1;
+        }
+      }, 30);
+    },
+    catchFish() {
+      if (this.fishingGameCooldown > 0) return;
+      
+      // 检查光标是否在目标区域内
+      const isInTarget = this.cursorPosition >= this.targetPosition && 
+                         this.cursorPosition <= (this.targetPosition + this.targetWidth);
+      
+      if (isInTarget) {
+        // 成功，给予一次钓鱼奖励
+        this.$store.dispatch('weatherChaos/getCatch', 1);
+        
+        // 显示成功动画
+        this.showSuccessAnimation = true;
+        setTimeout(() => {
+          this.showSuccessAnimation = false;
+        }, 1000);
+      }
+      
+      // 重新生成目标区域
+      this.targetPosition = Math.floor(Math.random() * (100 - this.targetWidth));
+      
+      // 设置冷却时间
+      this.fishingGameCooldown = 2;
+      
+      if (this.fishingGameCooldownInterval) {
+        clearInterval(this.fishingGameCooldownInterval);
+      }
+      
+      this.fishingGameCooldownInterval = setInterval(() => {
+        this.fishingGameCooldown--;
+        if (this.fishingGameCooldown <= 0) {
+          clearInterval(this.fishingGameCooldownInterval);
+        }
+      }, 1000);
+    },
     getPiratesTreasure() {
       if (this.piratesTreasureDebug) { // 只在调试模式下响应点击
         this.$store.dispatch('weatherChaos/debugGetPiratesTreasure');
       }
+    }
+  },
+  mounted() {
+    // 不在mounted时初始化，等待点击展开后初始化
+  },
+  beforeDestroy() {
+    if (this.fishingGameInterval) {
+      clearInterval(this.fishingGameInterval);
+    }
+    if (this.fishingGameCooldownInterval) {
+      clearInterval(this.fishingGameCooldownInterval);
     }
   }
 }
