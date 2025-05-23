@@ -150,6 +150,10 @@
           <span>增加每日签到奖励。（别服存档过来要过一天才能签到）</span>
         </span>
         <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
+          <v-chip label small class="flex-shrink-0 mr-2 px-2" color="blue">事件</v-chip>
+          <span>增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。</span>
+        </span>
+        <span class="d-flex mt-2 ml-4" :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}">
           <v-chip label small class="flex-shrink-0 mr-2 px-2" color="cyan">其他</v-chip>
           <span>增加攻略按钮。</span>
         </span>

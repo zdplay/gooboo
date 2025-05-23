@@ -466,6 +466,12 @@ export default {
     subtitleSchool: 'Convert exam passes to golden dust',
     timeInMinutes: 'Time (in minutes)'
   },
+  eventHourglass: {
+    title: 'Event time hourglass',
+    subtitle: 'Use amethyst to accelerate current event',
+    timeInMinutes: 'Time (in minutes)',
+    description: 'Each amethyst consumed accelerates the current event by 1.5 minutes'
+  },
   cryolab: {
     frozen: '{0} / {1} features frozen',
     active: 'Active: {0}%',

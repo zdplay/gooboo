@@ -466,6 +466,12 @@ export default {
     subtitleSchool: '将考试合格证转化为金粉',
     timeInMinutes: '时间 (分钟)'
   },
+  eventHourglass: {
+    title: '事件时间沙漏',
+    subtitle: '使用紫水晶加速当前事件',
+    timeInMinutes: '时间（分钟）',
+    description: '每消耗1个紫水晶可以加速当前事件1.5分钟'
+  },
   cryolab: {
     frozen: '{0} / {1} 功能冻结',
     active: '主动: {0}%',

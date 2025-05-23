@@ -517,6 +517,21 @@
           <currency name="school_goldenDust"></currency>
         </div>
       </gb-tooltip>
+      <gb-tooltip v-if="canSeeAmethystHourglass" key="event-hourglass" title-text="事件时间沙漏">
+        <template v-slot:activator="{ on, attrs }">
+          <div class="hourglass-container mx-2" @click="openEventHourglassDialog" v-bind="attrs" v-on="on">
+            <v-icon color="secondary" class="hourglass-outline">mdi-timer-sand-full</v-icon>
+            <div class="hourglass-bg" :style="`top: ${ hourglassShift }px;`">
+              <v-icon color="purple" class="hourglass-bg-inner">mdi-timer-sand-full</v-icon>
+            </div>
+            <v-icon class="hourglass-outline">mdi-timer-sand-empty</v-icon>
+          </div>
+        </template>
+        <div class="text-center">使用紫水晶加速当前事件</div>
+        <div class="d-flex justify-center">
+          <currency name="gem_amethyst"></currency>
+        </div>
+      </gb-tooltip>
       <daily-check-in></daily-check-in>
       <gb-tooltip v-if="featureIsFrozen" key="frozen-feature" :title-text="$vuetify.lang.t('$vuetify.cryolab.frozenFeature.title')">
         <template v-slot:activator="{ on, attrs }">
@@ -660,6 +675,9 @@
     <v-dialog v-model="dialogDust" max-width="400">
       <golden-dust-menu @cancel="dialogDust = false"></golden-dust-menu>
     </v-dialog>
+    <v-dialog v-model="dialogEventHourglass" max-width="400">
+      <event-hourglass @cancel="dialogEventHourglass = false"></event-hourglass>
+    </v-dialog>
     <v-dialog v-model="showCloudLoadConfirm" max-width="500">
       <v-card class="default-card" elevation="5" shaped>
         <v-card-title primary-title class="title">请确认是否下载最新云存档</v-card-title>
@@ -732,6 +750,7 @@ import Strategy from './components/view/Strategy.vue';
 import FarmHarvestMessage from './components/partial/snackbar/FarmHarvestMessage.vue';
 import FarmPlantMessage from './components/partial/snackbar/FarmPlantMessage.vue';
 import DailyCheckIn from './components/partial/menu/DailyCheckIn.vue';
+import EventHourglass from './components/render/EventHourglass.vue';
 const semverCompare = require('semver/functions/compare');
 
 export default {
@@ -783,9 +802,11 @@ export default {
     FarmHarvestMessage,
     FarmPlantMessage,
     DailyCheckIn,
+    EventHourglass
   },
   data: () => ({
     dialogDust: false,
+    dialogEventHourglass: false,
     dialogSaveList: false,
     saveFiles: [],
     selectedSavefile: null,
@@ -848,6 +869,13 @@ export default {
     },
     canSeeHourglass() {
       return this.screen === 'school' || (this.$store.state.stat.school_goldenDust.total > 0 && this.isOnMainFeature && !this.featureIsFrozen);
+    },
+    canSeeAmethystHourglass() {
+      return this.screen === 'event' && 
+             this.$store.state.unlock.eventFeature && 
+             this.$store.state.unlock.eventFeature.see && 
+             this.$store.getters['event/currentEvent'] !== null &&
+             this.$store.getters['event/eventIsBig'](this.$store.getters['event/currentEvent']);
     },
     canSeeUpdates() {
       return APP_ENV === 'WEB';
@@ -1045,6 +1073,9 @@ export default {
     openDustDialog() {
       this.dialogDust = true;
     },
+    openEventHourglassDialog() {
+      this.dialogEventHourglass = true;
+    },
     initDailyCheckIn() {
       const now = Math.floor(Date.now() / 1000);
       
@@ -1074,7 +1105,7 @@ export default {
           });
         }
       }
-    }
+    },
   },
   watch: {
     dark: {
