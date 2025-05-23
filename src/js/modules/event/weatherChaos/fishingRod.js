@@ -14,8 +14,8 @@ export default {
         owned: true,
         icon: 'mdi-search-web',
         effect: [
-            {name: 'weatherChaosTrashGain', type: 'mult', value: 1.08},
-            {name: 'weatherChaosFishChance', type: 'base', value: -0.07},
+            {name: 'weatherChaosTrashGain', type: 'mult', value: 1.1},
+            {name: 'weatherChaosFishChance', type: 'base', value: -0.1},
         ],
     },
 
