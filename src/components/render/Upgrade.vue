@@ -23,9 +23,14 @@
   left: 0;
   bottom: 0;
   height: 100%;
-  background-color: rgba(33, 150, 243, 0.5);
   pointer-events: none;
   z-index: 0;
+}
+.primary-overlay {
+  background-color: rgba(33, 150, 243, 0.5);
+}
+.error-overlay {
+  background-color: rgba(244, 67, 54, 0.5);
 }
 </style>
 
@@ -58,7 +63,7 @@
     <gb-tooltip key="upgrade-buy-collapse">
       <template v-slot:activator="{ on, attrs }">
         <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
-          <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :style="{ width: `${affordabilityRatio}%` }"></div>
+          <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
           <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
@@ -161,7 +166,7 @@
       <v-spacer></v-spacer>
       <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
       <div class="progress-button-wrap ml-2">
-        <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :style="{ width: `${affordabilityRatio}%` }"></div>
+        <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
         <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
       </div>
     </v-card-actions>
@@ -228,6 +233,63 @@ export default {
     },
     canAfford() {
       return this.$store.getters['upgrade/canAfford'](this.upgrade.feature, this.splitName);
+    },
+    ableAfford() {
+      // 检查是否能够负担升级费用（不考虑上限）
+      const price = this.price;
+      if (!price) return true;
+      
+      for (const currency in price) {
+        const required = price[currency];
+        if (required <= 0) continue;
+        
+        const currencyState = this.$store.state.currency[currency];
+        if (!currencyState) return false;
+        
+        // 如果需求超过了上限，则不能负担
+        if (currencyState.cap < required) {
+          return false;
+        }
+      }
+      
+      return true;
+    },
+    affordProgress() {
+      // 计算支付进度比例
+      if (this.canAfford || this.isMax || this.disabled) return 0;
+      
+      const price = this.price;
+      if (!price) return 0;
+      
+      let percents = [];
+      if (this.ableAfford) {
+        // 如果理论上可以支付（上限足够），则计算当前值相对于价格的比例
+        for (const currency in price) {
+          const required = price[currency];
+          if (required <= 0) continue;
+          
+          const currencyState = this.$store.state.currency[currency];
+          if (!currencyState) continue;
+          
+          const ratio = currencyState.value < required ? currencyState.value / required : 1;
+          percents.push(ratio);
+        }
+      } else {
+        // 如果理论上不能支付（上限不足），则计算上限相对于价格的比例
+        for (const currency in price) {
+          const required = price[currency];
+          if (required <= 0) continue;
+          
+          const currencyState = this.$store.state.currency[currency];
+          if (!currencyState) continue;
+          
+          const ratio = currencyState.cap < required ? currencyState.cap / required : 1;
+          percents.push(ratio);
+        }
+      }
+      
+      if (percents.length === 0) return 0;
+      return percents.reduce((a, b) => a + b, 0) / percents.length * 100;
     },
     isMax() {
       return this.upgrade.cap !== null && this.upgrade.bought >= this.upgrade.cap;
@@ -338,35 +400,6 @@ export default {
         });
       }
       return arr;
-    },
-    affordabilityRatio() {
-      if (this.canAfford || this.isMax || this.disabled) {
-        return 0;
-      }
-      
-      const price = this.price;
-      if (!price) return 0;
-      let minRatio = 1;
-      let hasRequirement = false;
-      
-      for (const currency in price) {
-        const required = price[currency];
-        if (required <= 0) continue;
-        
-        hasRequirement = true;
-
-        const currencyState = this.$store.state.currency[currency];
-        const available = currencyState?.value || 0;
-        
-        const ratio = Math.min(available / required, 1);
-
-        if (ratio < minRatio) {
-          minRatio = ratio;
-        }
-      }
-
-      if (!hasRequirement) return 0;
-      return minRatio * 100;
     }
   },
   methods: {
