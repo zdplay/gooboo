@@ -744,7 +744,7 @@ export default {
     }, effect: [
         {name: 'villageWorker', type: 'base', value: lvl => lvl * 4}
     ]},
-    mechanicalMine: {cap: 20, capMult: true, note: 'village_mechanicalMine', subtype: 'workstation', icon: 'mdi-robot-industrial', requirement() {
+    mechanicalMine: {cap: 10, capMult: true, note: 'village_mechanicalMine', subtype: 'workstation', icon: 'mdi-robot-industrial', requirement() {
         return store.state.unlock.villageBuildings6.use && store.state.upgrade.item.village_steamEngine.level >= 1;
     }, price(lvl) {
         return {
