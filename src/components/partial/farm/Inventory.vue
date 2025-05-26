@@ -1,7 +1,15 @@
 <template>
   <div>
     <div class="d-flex flex-wrap justify-center ma-1">
-      <currency v-for="(item, key) in currencies" class="ma-1" :key="'currency-' + key" :name="'farm_' + item"></currency>
+      <currency v-for="(item, key) in currencies" class="ma-1" :key="'currency-' + key" :name="'farm_' + item">
+        <div v-if="rareDropSource[`farm_${item}`]">
+          掉落作物：
+          <v-chip v-for="crop in rareDropSource[`farm_${item}`]" :key="crop" class="ma-1 balloon-text-dynamic" :color="crops[crop].color" small label>
+            <v-icon class="mr-1">{{ crops[crop].icon }}</v-icon>
+            {{ $vuetify.lang.t(`$vuetify.farm.crop.${ crop }`) }}
+          </v-chip>
+        </div>
+      </currency>
     </div>
     <template v-if="useLegacySelect">
       <div class="d-flex flex-wrap justify-center ma-1">
@@ -91,6 +99,18 @@ export default {
     useLegacySelect() {
       return this.$store.state.system.settings.general.items.useLegacyFarmSelect.value;
     },
+    rareDropSource() {
+      const drops = {};
+      for(const crop in this.crops) {
+        this.crops[crop].rareDrop.forEach((drop) => {
+          if (drops[drop.name] === undefined) {
+            drops[drop.name] = [];
+          }
+          drops[drop.name].push(crop);
+        });
+      }
+      return drops;
+    }
   },
   mounted() {
     if (this.selectedCropName !== null) {

@@ -231,6 +231,7 @@ export default {
       { category: '画廊', color: 'orange', content: '增加画廊形状【清管】功能，一键清空动力值。', isCurrentUpdate: false },
       { category: '学校', color: 'green', content: '修改学校参考考试为直接满分通过。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '在农场货币中显示掉落来源。', isCurrentUpdate: true },
       { category: '农场', color: 'brown', content: '增加农场物品收获和使用通知功能。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场离线汇总功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },

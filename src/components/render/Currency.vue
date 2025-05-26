@@ -101,14 +101,34 @@
   display: flex;
   justify-content: space-between !important;
   padding: 0 2px;
+  width: 100%;
 }
 .currency-container-new .currency-label {
   border: none;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  margin: 0 1px;
 }
 .render-currency-mobile.currency-container-new .currency-labels {
   font-size: 10px;
   bottom: 0px;
   padding: 0 2px;
+}
+@media (max-width: 400px) {
+  .render-currency-mobile.currency-container-new .currency-labels {
+    font-size: 8px;
+  }
+  .currency-container-new .currency-label {
+    padding: 0 2px !important;
+  }
+}
+.currency-label-adaptive {
+  font-size: inherit;
+}
+@media (max-width: 400px) {
+  .currency-label-adaptive {
+    font-size: 9px;
+  }
 }
 .custom-progress-wrapper {
   position: relative;
@@ -218,15 +238,15 @@
             <div class="currency-labels d-flex justify-space-between">
               <div
                 v-if="!currency.hideGainTag && gainTimerAmount > 0"
-                class="currency-label balloon-text-dynamic mx-1 px-1"
+                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
               >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
               <div
                 v-if="capTimerNeeded !== null"
-                class="currency-label balloon-text-dynamic mx-1 px-1"
+                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
               >{{ $formatTime(capTimerNeeded) }}</div>
               <div
                 v-if="isOvercap && currency.overcapMult > 0"
-                class="currency-label balloon-text-dynamic mx-1 px-1"
+                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
               >{{ $formatNum(overcapMult * 100, true) }}%</div>
             </div>
           </div>
