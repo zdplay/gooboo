@@ -1040,6 +1040,12 @@ export default {
       if (finishTutorial) {
         this.$store.commit('system/updateTutorialKey', {name: 'viewFeature', key: 'completed', value: true});
       }
+      const scrollContainers = document.querySelectorAll('.scroll-container, .scroll-container-tab');
+      scrollContainers.forEach(container => {
+        if (container) {
+          container.scrollTop = 0;
+        }
+      });
     },
     closeAllMessages() {
       while (this.messages.length > 0) {
