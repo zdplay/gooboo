@@ -224,6 +224,7 @@ export default {
       { category: '设置', color: 'teal', content: '增加【显示科学记数法】选项，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '修改冶炼最大按钮为指定数量按钮。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加自动挖硝功能，在深度切换右侧机器人按钮，支持离线。', isCurrentUpdate: false },
+      { category: '村庄', color: 'indigo', content: '在蒸汽机阶段增加机械矿场升级项目，解锁遥控矿车工作种类，大幅提高金属产量。', isCurrentUpdate: true },
       { category: '部落', color: 'red', content: '调整自动施法槽默认为5，普通技能也能自动施法。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，不支持后台。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊的形状游戏显示各个形状的个数。', isCurrentUpdate: false },

@@ -744,6 +744,21 @@ export default {
     }, effect: [
         {name: 'villageWorker', type: 'base', value: lvl => lvl * 4}
     ]},
+    mechanicalMine: {cap: 20, capMult: true, note: 'village_mechanicalMine', subtype: 'workstation', icon: 'mdi-robot-industrial', requirement() {
+        return store.state.unlock.villageBuildings6.use && store.state.upgrade.item.village_steamEngine.level >= 1;
+    }, price(lvl) {
+        return {
+            village_metal: Math.pow(1.75, lvl) * buildNum(50, 'B'),
+            village_gem: Math.pow(1.65, lvl) * buildNum(2, 'M'),
+            village_glass: Math.pow(1.7, lvl) * buildNum(10, 'M'),
+            village_coin: Math.pow(1.8, lvl) * buildNum(5, 'T')
+        };
+    }, timeNeeded(lvl) {
+        return Math.ceil(Math.pow(1.35, lvl) * buildNum(20, 'M'));
+    }, effect: [
+        {name: 'remoteMiner', type: 'villageJob', value: lvl => lvl},
+        {name: 'currencyVillageMetalCap', type: 'base', value: lvl => lvl > 1 ? (500 * (lvl - 1)) : null}
+    ]},
     oilRig: {cap: 10, capMult: true, subtype: 'workstation', icon: 'mdi-tower-fire', requirement() {
         return store.state.unlock.villageBuildings6.use;
     }, price(lvl) {

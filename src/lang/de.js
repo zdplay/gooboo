@@ -1562,6 +1562,7 @@ export default {
       oilWorker: 'Ölarbeiter',
       sculptor: 'Bildhauer',
       explorer: 'Entdecker',
+      remoteMiner: 'Ferngesteuerter Bergbauwagen',
     },
     policy: {
       name: 'Verordnungen',

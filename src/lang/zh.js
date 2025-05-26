@@ -1562,6 +1562,7 @@ export default {
       oilWorker: '石油工人',
       sculptor: '雕塑家',
       explorer: '探险家',
+      remoteMiner: '遥控矿车',
     },
     policy: {
       name: '政策',

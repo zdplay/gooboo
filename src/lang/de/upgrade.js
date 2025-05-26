@@ -44,6 +44,7 @@ export default {
     village_darkCult: 'Die Religionsverordnung erlaubt es dir, Rohstoffe oder Glaube zu priorisieren, auf Kosten des Anderen',
     village_pyramid: 'Entdecker finden einen neuen Rohstoff mit der Zeit. Die Einstellung benötigt 600 Dorfbewohner, vielleich brauchst du hierfür die Einwanderungsverordnung!',
     village_radar: 'Die Scanverordnung erlaubt es dir, Beuteeinkommen oder Beutequalität zu priorisieren, auf Kosten des Anderen',
+    village_mechanicalMine: 'Die mechanische Mine erlaubt es dir, Auto-Miner zu beauftragen, die das Metallproduktion erheblich erhöhen, aber mehr Arbeiter benötigen',
 
     horde_purifier: 'Erhalte langsam korruptes Fleisch und nutze es, um die Korruption zu senken',
 
@@ -244,6 +245,7 @@ export default {
   village_well: 'Brunnen',
   village_garden: 'Garten',
   village_townHall: 'Rathaus',
+  village_mechanicalMine: 'Mechanische Mine',
   village_house: 'Haus',
   village_shed: 'Schuppen',
   village_tunnel: 'Tunnel',

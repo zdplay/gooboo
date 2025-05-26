@@ -44,6 +44,7 @@ export default {
     village_darkCult: 'The religion policy allows you to prioritize resource or faith gain, at the expense of the other',
     village_pyramid: 'Explorers find a new resource over time. Hiring one requires 600 villagers, you may need the immigration policy to reach this!',
     village_radar: 'The scanning policy allows you to prioritize loot gain or quality, at the expense of the other',
+    village_mechanicalMine: 'The mechanical mine allows you to hire auto miners, greatly increasing metal production but requiring more workers to operate',
 
     horde_purifier: 'Corrupted flesh is gained slowly over time and allows you to reduce corruption',
 
@@ -270,6 +271,7 @@ export default {
   village_miniatureGlassblowery: 'Miniature glassblowery',
   village_lostPages: 'Lost pages',
   village_playground: 'Playground',
+  village_mechanicalMine: 'Mechanical mine',
   village_government: 'Government',
   village_modernHouse: 'Modern house',
   village_fountain: 'Fountain',

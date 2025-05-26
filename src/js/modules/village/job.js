@@ -118,5 +118,12 @@ export default {
         rewards: [
             {type: 'base', name: 'villageLootGain', amount: 0.5}
         ]
+    },
+    remoteMiner: {
+        max: 0,
+        needed: 8,
+        rewards: [
+            {type: 'base', name: 'currencyVillageMetalGain', amount: 12}
+        ]
     }
 }

@@ -1530,6 +1530,7 @@ export default {
       oilWorker: 'Oil worker',
       sculptor: 'Sculptor',
       explorer: 'Explorer',
+      remoteMiner: 'Remote mining car',
     },
     policy: {
       name: 'Policies',
@@ -1612,7 +1613,7 @@ export default {
         3: '/h'
       },
       sacrifice: 'Sacrifice',
-      notUnlocked: 'This offering is not unlocked yet. You can still spend offerings, but not sacrifice and the resource capacity won\'t be applied until you unlock the offering',
+      notUnlocked: 'This offering is not unlocked yet. You can still spend offerings, but not sacrifice and the resource capacity does not apply yet',
       notUnlockedHint: 'This offering is not unlocked, so the resource capacity does not apply yet',
     },
     material: 'Material',

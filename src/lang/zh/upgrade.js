@@ -44,6 +44,7 @@ export default {
     village_darkCult: '宗教政策允许你优先考虑资源或信仰增益，而牺牲其他',
     village_pyramid: '随着时间的推移，探索者会发现新的资源。 雇佣一个需要600名村民，你可能需要移民政策来实现这一点!',
     village_radar: '扫描策略允许您优先考虑战利品增益或质量，而牺牲其他',
+    village_mechanicalMine: '机械矿场允许您雇佣遥控矿车工人，大幅提高金属产量，但需要更多的工人来操作',
 
     horde_purifier: '随着时间的推移，腐化肉体会慢慢获得，可以让你减少腐化',
 
@@ -312,6 +313,7 @@ export default {
   village_radar: '雷达',
   village_waterTurbine: '水力涡轮',
   village_solarPanel: '太阳能板',
+  village_mechanicalMine: '机械矿场',
 
   // Village upgrades
   village_wallet: '钱包',
