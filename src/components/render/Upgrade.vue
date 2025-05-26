@@ -63,7 +63,7 @@
     <gb-tooltip key="upgrade-buy-collapse">
       <template v-slot:activator="{ on, attrs }">
         <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
-          <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
           <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
@@ -166,7 +166,7 @@
       <v-spacer></v-spacer>
       <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
       <div class="progress-button-wrap ml-2">
-        <div v-if="showProgressBar && !canAfford && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+        <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
         <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
       </div>
     </v-card-actions>
@@ -235,7 +235,6 @@ export default {
       return this.$store.getters['upgrade/canAfford'](this.upgrade.feature, this.splitName);
     },
     ableAfford() {
-      // 检查是否能够负担升级费用（不考虑上限）
       const price = this.price;
       if (!price) return true;
       
@@ -246,7 +245,6 @@ export default {
         const currencyState = this.$store.state.currency[currency];
         if (!currencyState) return false;
         
-        // 如果需求超过了上限，则不能负担
         if (currencyState.cap < required) {
           return false;
         }
@@ -255,15 +253,13 @@ export default {
       return true;
     },
     affordProgress() {
-      // 计算支付进度比例
-      if (this.canAfford || this.isMax || this.disabled) return 0;
+      if (this.isMax || this.disabled) return 0;
       
       const price = this.price;
       if (!price) return 0;
       
       let percents = [];
       if (this.ableAfford) {
-        // 如果理论上可以支付（上限足够），则计算当前值相对于价格的比例
         for (const currency in price) {
           const required = price[currency];
           if (required <= 0) continue;
@@ -271,11 +267,11 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          const ratio = currencyState.value < required ? currencyState.value / required : 1;
+          const currentValue = currencyState.value || 0;
+          const ratio = Math.min(currentValue / required, 1);
           percents.push(ratio);
         }
       } else {
-        // 如果理论上不能支付（上限不足），则计算上限相对于价格的比例
         for (const currency in price) {
           const required = price[currency];
           if (required <= 0) continue;
@@ -283,7 +279,8 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          const ratio = currencyState.cap < required ? currencyState.cap / required : 1;
+          const currentValue = currencyState.value || 0;
+          const ratio = currentValue / required;
           percents.push(ratio);
         }
       }
@@ -322,7 +319,7 @@ export default {
           after: this.isMax ? null : elem.value(lvl + 1)
         };
       }).filter(elem => {
-        const isBool = ['unlock', 'keepUpgrade', 'villageCraft', 'farmSeed', 'findConsumable', 'galleryIdea', 'galleryShape'].includes(elem.type);
+        const isBool = ['unlock', 'farmSeed', 'keepUpgrade', 'findConsumable', 'galleryIdea'].includes(elem.type);
         return (isBool && !elem.before && elem.after) || (!isBool && elem.before !== elem.after);
       });
     },
