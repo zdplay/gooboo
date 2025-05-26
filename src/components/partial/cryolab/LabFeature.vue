@@ -33,6 +33,10 @@
           <stat-breakdown :name="activeMultName"></stat-breakdown>
         </gb-tooltip>
       </div>
+      <div v-if="expGain > 0" class="text-center caption">
+        <v-icon x-small class="mr-1">mdi-clock-outline</v-icon>
+        距离下一级: {{ formatTimeRemaining }}
+      </div>
       <div class="d-flex flex-wrap mx-n1">
         <template v-for="(amount, currency) in prestigeGain">
           <gb-tooltip v-if="currency === 'farm_exp'" :key="`currency-gain-${ currency }`" :min-width="0">
@@ -118,6 +122,14 @@ export default {
     },
     prestigeGain() {
       return this.$store.getters['cryolab/prestigeGain'](this.name);
+    },
+    formatTimeRemaining() {
+      const totalSeconds = Math.floor((this.expNeeded - this.exp) / this.expGain * 24 * 60 * 60);
+      const days = Math.floor(totalSeconds / (24 * 60 * 60));
+      const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const seconds = totalSeconds % 60;
+      return `${days}天${hours}时${minutes}分${seconds}秒`;
     }
   },
   methods: {
