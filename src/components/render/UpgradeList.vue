@@ -125,6 +125,20 @@
         >
           {{ showMaterialsRow ? '隐藏' : '列表' }}
         </v-btn>
+        
+        <gb-tooltip v-if="showMaterialsRow" :min-width="250">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              small
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>mdi-help-circle-outline</v-icon>
+            </v-btn>
+          </template>
+          <div class="pa-2">如果材质的所有升级都已折叠，则该材质将显示为半透明。</div>
+        </gb-tooltip>
       </div>
       
       <!-- 第二行：材料筛选按钮 -->
@@ -135,10 +149,11 @@
               small
               class="material-button"
               :class="{'material-button-active': selectedMaterial === material}"
+              :style="materialCollapsedStatus[material] ? 'opacity: 0.2;' : ''"
               :color="getMaterialColor(material)"
+              @click="toggleMaterial(material)"
               v-bind="attrs"
               v-on="on"
-              @click="toggleMaterial(material)"
             >
               <v-icon small :color="selectedMaterial === material ? 'white' : undefined">{{ getMaterialIcon(material) }}</v-icon>
             </v-btn>
@@ -320,6 +335,45 @@ export default {
         }
       });
       return Array.from(materials).sort().reverse();
+    },
+    materialCollapsedStatus() {
+      const materialStatus = {};
+      
+      // 初始化每个材料的状态对象
+      this.availableMaterials.forEach(material => {
+        materialStatus[material] = {
+          totalUpgrades: 0,
+          collapsedUpgrades: 0
+        };
+      });
+      
+      // 统计每个材料相关的升级项数量和已折叠数量
+      this.baseItems.forEach(elem => {
+        const upgrade = this.$store.state.upgrade.item[elem];
+        if (upgrade.requirement(upgrade.level)) {
+          const price = upgrade.price(upgrade.level);
+          if (price) {
+            Object.keys(price).forEach(material => {
+              if (materialStatus[material]) {
+                materialStatus[material].totalUpgrades++;
+                if (upgrade.collapse) {
+                  materialStatus[material].collapsedUpgrades++;
+                }
+              }
+            });
+          }
+        }
+      });
+      
+      // 计算每个材料的折叠状态
+      const result = {};
+      Object.keys(materialStatus).forEach(material => {
+        const status = materialStatus[material];
+        // 如果所有升级项都已折叠且至少有一个升级项，则设置为true
+        result[material] = status.totalUpgrades > 0 && status.totalUpgrades === status.collapsedUpgrades;
+      });
+      
+      return result;
     }
   },
   methods: {
