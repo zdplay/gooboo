@@ -72,16 +72,7 @@
                 <span class="ml-2">{{ formatNumber(amount) }}</span>
               </div>
             </v-card>
-            
-            <!-- 宝箱统计 -->
-            <v-card class="ma-1 pa-2 summary-card" elevation="2">
-              <div class="d-flex align-center">
-                <v-icon small color="amber" class="mr-1">mdi-treasure-chest</v-icon>
-                <span class="font-weight-medium">宝箱:</span>
-                <span class="ml-2">{{ treasureCount }}个</span>
-              </div>
-            </v-card>
-            
+
             <!-- 宝箱内容统计 -->
             <template v-if="treasureCount > 0">
               <!-- 新地点 -->
