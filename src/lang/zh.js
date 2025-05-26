@@ -1389,6 +1389,10 @@ export default {
         showFarmOfflineSummary: {
           name: '农场离线汇总',
           description: '在离线汇总页面中显示农场收获预估'
+        },
+        farmNoGeneBlock: {
+          name: '跳过基因阻断',
+          description: '跳过基因阻断'
         }
       }
   },

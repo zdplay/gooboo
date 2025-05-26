@@ -173,7 +173,7 @@ export default {
                         type: 'text',
                         value: '',
                         defaultValue: '',
-                      },
+                    },
                     cloudpwd: {
                         unlock: null,
                         hasDescription: true,
@@ -509,7 +509,14 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
-                    }
+                    },
+                    farmNoGeneBlock: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             }
         },

@@ -1389,6 +1389,10 @@ export default {
       showFarmOfflineSummary: {
         name: 'Bauernhof-Offline-Zusammenfassung',
         description: 'Zeigt die Bauernhof-Ernteprognose in der Offline-Zusammenfassung an'
+      },
+      farmNoGeneBlock: {
+        name: 'Farm no gene block',
+        description: 'Skip gene block'
       }
     }
   },

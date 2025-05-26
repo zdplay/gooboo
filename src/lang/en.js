@@ -1357,6 +1357,10 @@ export default {
       showFarmOfflineSummary: {
         name: 'Farm offline summary',
         description: 'Display farm harvest estimation in the offline summary page'
+      },
+      farmNoGeneBlock: {
+        name: 'Farm no gene block',
+        description: 'Skip gene block'
       }
     }
   },

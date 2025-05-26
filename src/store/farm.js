@@ -923,8 +923,13 @@ export default {
                     commit('updateCropKey', {name, key: 'level', value: 0});
                 }
 
-                // Then add genes used this prestige
-                commit('updateCropKey', {name, key: 'genesBlocked', value: [...genesBlocked, ...crop.genes]});
+                const noGeneBlock = rootState.system.settings.experiment.items.farmNoGeneBlock.value;
+                if (!noGeneBlock) {
+                    commit('updateCropKey', {name, key: 'genesBlocked', value: [...genesBlocked, ...crop.genes]});
+                } else {
+                    commit('updateCropKey', {name, key: 'genesBlocked', value: []});
+                }
+                
                 commit('updateCropKey', {name, key: 'genes', value: []});
                 commit('updateCropKey', {name, key: 'upgrades', value: {}});
 
