@@ -13,13 +13,28 @@
 .harvest-items {
   display: flex;
   flex-wrap: wrap;
+  margin: 0 -4px; /* 负边距配合内部元素的margin */
 }
 .harvest-item {
-  display: flex;
+  margin: 4px;
+  display: inline-flex;
   align-items: center;
-  margin-bottom: 4px;
-  margin-right: 8px;
-  flex: 0 0 calc(30% - 8px);
+  border-radius: 16px;
+  padding: 2px 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease-in-out;
+}
+.harvest-item:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.harvest-item-icon {
+  margin-right: 4px;
+  /* 添加描边效果 */
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.harvest-item-text {
+  font-size: 14px;
 }
 .harvest-time {
   font-size: 12px;
@@ -44,11 +59,28 @@
     <template v-if="readyHarvests && Object.keys(readyHarvests).length > 0">
       <div class="harvest-subtitle">可收获的作物</div>
       <div class="harvest-items">
-        <div v-for="(item, itemName) in readyHarvests" :key="itemName" class="harvest-item">
-          <v-icon small :color="getItemColor(itemName)" class="mr-1">{{ getItemIcon(itemName) }}</v-icon>
-          <span>{{ getTranslatedName(itemName) }}:</span>
-          <span class="ml-1">{{ formatItemAmount(item) }}</span>
-        </div>
+        <template v-for="(item, itemName) in readyHarvests">
+          <gb-tooltip :key="itemName" :title-text="getTranslatedName(itemName)">
+            <template v-slot:activator="{ on, attrs }">
+              <div class="harvest-item v-chip v-chip--label v-size--small" 
+                  :class="[$vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', getItemColor(itemName)]"
+                  v-bind="attrs" v-on="on">
+                <v-icon small :color="getItemColor(itemName)" class="harvest-item-icon">{{ getItemIcon(itemName) }}</v-icon>
+                <span class="harvest-item-text">{{ formatItemAmount(item) }}</span>
+              </div>
+            </template>
+            <div>
+              <div>{{ getTranslatedName(itemName) }}</div>
+              <div class="text-center mt-2">
+                <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
+                <template v-if="$store.state.currency[itemName]?.cap !== null">
+                  <span> / </span>
+                  <span>{{ $formatNum($store.state.currency[itemName].cap, true) }}</span>
+                </template>
+              </div>
+            </div>
+          </gb-tooltip>
+        </template>
       </div>
     </template>
     
@@ -57,11 +89,28 @@
       <div v-for="(harvest, index) in futureHarvests" :key="index" class="harvest-group">
         <div class="harvest-time">{{ harvest.timeLabel }}</div>
         <div class="harvest-items">
-          <div v-for="(item, itemName) in harvest.items" :key="itemName" class="harvest-item">
-            <v-icon small :color="getItemColor(itemName)" class="mr-1">{{ getItemIcon(itemName) }}</v-icon>
-            <span>{{ getTranslatedName(itemName) }}:</span>
-            <span class="ml-1">{{ formatItemAmount(item) }}</span>
-          </div>
+          <template v-for="(item, itemName) in harvest.items">
+            <gb-tooltip :key="itemName" :title-text="getTranslatedName(itemName)">
+              <template v-slot:activator="{ on, attrs }">
+                <div class="harvest-item v-chip v-chip--label v-size--small" 
+                    :class="[$vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', getItemColor(itemName)]"
+                    v-bind="attrs" v-on="on">
+                  <v-icon small :color="getItemColor(itemName)" class="harvest-item-icon">{{ getItemIcon(itemName) }}</v-icon>
+                  <span class="harvest-item-text">{{ formatItemAmount(item) }}</span>
+                </div>
+              </template>
+              <div>
+                <div>{{ getTranslatedName(itemName) }}</div>
+                <div class="text-center mt-2">
+                  <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
+                  <template v-if="$store.state.currency[itemName]?.cap !== null">
+                    <span> / </span>
+                    <span>{{ $formatNum($store.state.currency[itemName].cap, true) }}</span>
+                  </template>
+                </div>
+              </div>
+            </gb-tooltip>
+          </template>
         </div>
       </div>
     </template>
