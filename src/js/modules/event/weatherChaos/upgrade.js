@@ -16,7 +16,7 @@ export default {
     fishWhistle: {type: 'weatherChaos', price(lvl) {
         return {event_plastic: Math.pow(1.15 + 0.015 * lvl, lvl) * 100};
     }, effect: [
-        {name: 'weatherChaosFishingPower', type: 'base', value: lvl => getSequence(1, lvl) * 0.1 + lvl}
+        {name: 'weatherChaosFishingPower', type: 'base', value: lvl => getSequence(1, lvl) * 0.2 + lvl}
     ]},
     pollution: {type: 'weatherChaos', price(lvl) {
         return {event_slime: Math.pow(1.35, lvl) * 100};

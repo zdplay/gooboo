@@ -7,8 +7,8 @@ export default {
         next: {minPower: 100, name: 'river'},
         effect: [
             {name: 'weatherChaosFishSizeAverage', type: 'mult', value: 1.2},
-            {name: 'weatherChaosAlgaeWeight', type: 'mult', value: 3},
-            {name: 'currencyEventAlgaeGain', type: 'mult', value: 2},
+            {name: 'weatherChaosPlasticWeight', type: 'mult', value: 3},
+            {name: 'currencyEventPlasticGain', type: 'mult', value: 2},
         ],
     },
     river: {
@@ -23,8 +23,8 @@ export default {
         next: {minPower: 500, name: 'mountain'},
         effect: [
             {name: 'weatherChaosFishSizeAverage', type: 'mult', value: 1.6},
-            {name: 'weatherChaosPlasticWeight', type: 'mult', value: 3},
-            {name: 'currencyEventPlasticGain', type: 'mult', value: 2},
+            {name: 'weatherChaosAlgaeWeight', type: 'mult', value: 3},
+            {name: 'currencyEventAlgaeGain', type: 'mult', value: 2},
         ],
     },
     mountain: {
