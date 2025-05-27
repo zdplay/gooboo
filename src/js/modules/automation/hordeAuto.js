@@ -91,12 +91,40 @@ class HordeAutomation {
   checkUpgrades() {
     const upgradeItems = store.state.upgrade.item || {};
     
+    const gemHordeUpgrades = [
+      'horde_morePower',
+      'horde_moreBones',
+      'horde_moreMonsterParts',
+      'horde_moreSouls',
+      'horde_moreMastery',
+      'horde_ancientPower',
+      'horde_ancientFortitude',
+      'horde_ancientWealth',
+      'horde_ancientSpirit',
+      'horde_ancientSharpsight',
+      'horde_ancientReaping',
+      'horde_ancientRemembrance',
+      'horde_ancientHolding',
+      'horde_ancientExpertise',
+      'horde_ancientMystery',
+      'horde_bookTraining',
+      'horde_bookLuckyStrike',
+      'horde_bookLooting',
+      'horde_bookSurvivalGuide',
+      'horde_bookCarving',
+      'horde_bookWhitePaint',
+    ];
+    
     for (const [key] of Object.entries(upgradeItems)) {
       if (!key.startsWith('horde_')) {
         continue;
       }
-      
-      const feature = key.split('_')[0];
+
+      if (gemHordeUpgrades.includes(key)) {
+        continue;
+      }
+
+      const feature = 'horde';
       const name = key.split('_').slice(1).join('_');
       
       if (store.getters['upgrade/canAfford'](feature, name)) {
