@@ -15,6 +15,7 @@ class HordeAutomation {
     
     this._equipTimeout = null;
     this._prestigeTimeout = null;
+    this._lastCheckTime = 0;
   }
 
   start() {
@@ -30,23 +31,16 @@ class HordeAutomation {
     this.equipmentInProgress = false;
     this.prestigeInProgress = false;
     
-    if (this._equipTimeout) {
-      clearTimeout(this._equipTimeout);
-      this._equipTimeout = null;
-    }
-    
-    if (this._prestigeTimeout) {
-      clearTimeout(this._prestigeTimeout);
-      this._prestigeTimeout = null;
-    }
-    
     this.isRunning = true;
     this.currentState = 'starting';
+    
+    store.dispatch('horde/unequipAll');
     
     this.timerId = setInterval(() => {
       try {
         this.tick();
       } catch (e) {
+        console.error('[HordeAuto] 运行错误:', e);
         this.stop();
       }
     }, 1000);
@@ -54,6 +48,7 @@ class HordeAutomation {
     try {
       this.tick();
     } catch (e) {
+      console.error('[HordeAuto] 初始运行错误:', e);
       this.stop();
     }
   }
@@ -70,16 +65,6 @@ class HordeAutomation {
       this.timerId = null;
     }
     
-    if (this._equipTimeout) {
-      clearTimeout(this._equipTimeout);
-      this._equipTimeout = null;
-    }
-    
-    if (this._prestigeTimeout) {
-      clearTimeout(this._prestigeTimeout);
-      this._prestigeTimeout = null;
-    }
-    
     try {
       store.commit('game/updateState');
     } catch (e) {
@@ -91,26 +76,128 @@ class HordeAutomation {
     this.config = { ...this.config, ...newConfig };
   }
 
-  equipLoadout(loadoutName) {
-    if (!store.state.horde) {
+  performChecks() {
+    const now = Date.now();
+
+    if (now - this._lastCheckTime < 1000) {
+      return;
+    }
+    this._lastCheckTime = now;
+    this.checkUpgrades();
+    this.checkSkills();
+    this.checkEquipment();
+  }
+
+  checkUpgrades() {
+    const upgradeItems = store.state.upgrade.item || {};
+    
+    for (const [key] of Object.entries(upgradeItems)) {
+      if (!key.startsWith('horde_')) {
+        continue;
+      }
+      
+      const feature = key.split('_')[0];
+      const name = key.split('_').slice(1).join('_');
+      
+      if (store.getters['upgrade/canAfford'](feature, name)) {
+        try {
+          store.dispatch('upgrade/buyMax', { feature, name });
+        } catch (e) {
+          // 忽略错误
+        }
+      }
+    }
+  }
+
+  checkSkills() {
+    const state = store.state;
+    if (!state.horde) {
       return;
     }
     
-    const loadouts = store.state.horde.loadout;
+    const allSkills = [];
     
-    if (!loadouts) {
+    if (state.system.features.horde.currentSubfeature === 1) {
+      const selectedClass = state.horde.selectedClass;
+      const fighterClass = state.horde.fighterClass[selectedClass];
+      const skillLevel = state.horde.skillLevel || {};
+      
+      for (const [skillName, skillInfo] of Object.entries(fighterClass.skills || {})) {
+        if (skillInfo.type === 'active' && (skillLevel[skillName] || 0) > 0) {
+          allSkills.push(`skill_${skillName}`);
+        }
+      }
+      
+      for (const [trinketName, trinketInfo] of Object.entries(state.horde.trinket || {})) {
+        if (trinketInfo.equipped && trinketInfo.isActive && trinketInfo.activeType !== null) {
+          allSkills.push(`trinket_${trinketName}`);
+        }
+      }
+    } else {
+      for (const [itemName, itemInfo] of Object.entries(state.horde.items || {})) {
+        if (itemInfo.equipped && !itemInfo.passive) {
+          allSkills.push(itemName);
+        }
+      }
+    }
+    
+    for (const skillKey of allSkills) {
+      try {
+        store.dispatch('horde/useActive', skillKey);
+      } catch (e) {
+        // 忽略错误，继续尝试下一个技能
+      }
+    }
+  }
+
+  checkEquipment() {
+    const state = store.state;
+    if (!state.horde) {
       return;
     }
     
-    if (!loadouts[loadoutName]) {
+    if (this.equipmentInProgress) {
+      //console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 装备操作正在进行中，跳过检查`);
       return;
     }
     
-    store.dispatch('horde/unequipAll');
+    let loadoutName = this.config.equipmentLoadout;
+    if (!loadoutName && state.horde.selectedLoadout) {
+      loadoutName = state.horde.selectedLoadout;
+    }
     
-    setTimeout(() => {
+    if (!loadoutName || !state.horde.loadout || !state.horde.loadout[loadoutName]) {
+      console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 未找到有效的装备配置`);
+      return;
+    }
+    
+    const maxEquipped = store.getters['mult/get']('hordeMaxItems');
+    
+    const equippedItems = [];
+    for (const [itemId, item] of Object.entries(state.horde.items)) {
+      if (item.equipped) {
+        equippedItems.push(itemId);
+      }
+    }
+    
+    const hasEmptySlots = equippedItems.length < maxEquipped;
+    
+    //console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 当前已装备: ${equippedItems.length}/${maxEquipped}`);
+    
+    if (hasEmptySlots) {
+      //console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 应用装备配置: ${loadoutName}`);
+      
+      this.equipmentInProgress = true;
+      
       store.dispatch('horde/equipLoadout', loadoutName);
-    }, 500);
+      
+      // 设置超时，确保装备操作完成后重置标志
+      this._equipTimeout = setTimeout(() => {
+        console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 装备操作完成`);
+        this.equipmentInProgress = false;
+        this._equipTimeout = null;
+      }, 2000);
+    }
   }
 
   tick() {
@@ -118,117 +205,90 @@ class HordeAutomation {
       return;
     }
     
-    const state = store.state;
-    const currentZone = state.horde.zone;
-    const isFighting = state.horde.enemyTimer > 0 || state.horde.enemy !== null;
-    const canPrestige = state.unlock.hordePrestige?.use || false;
-    
-    if (document.hidden) {
-      console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 浏览器处于后台，自动化暂停运行`);
-      return;
-    }
-    
-    if (this.currentState === 'idle') {
-      this.stop();
-      return;
-    }
-    
-    switch (this.currentState) {
-      case 'starting':
-        if (currentZone >= this.config.targetZone && this.config.prestigeAfterReaching && canPrestige) {
-          this.currentState = 'prestiging';
-          return;
-        }
-        
-        if (currentZone < this.config.targetZone) {
-          if (this.config.equipmentLoadout) {
-            this.currentState = 'equipping';
+    if (!document.hidden) {
+      const state = store.state;
+      const currentZone = state.horde.zone;
+      const isFighting = state.horde.enemyTimer > 0 || state.horde.enemy !== null;
+      const canPrestige = state.unlock.hordePrestige?.use || false;
+      
+      if (this.currentState === 'idle') {
+        this.stop();
+        return;
+      }
+      
+      this.performChecks();
+      
+      switch (this.currentState) {
+        case 'starting':
+          if (this.config.equipmentLoadout && state.horde.loadout && state.horde.loadout[this.config.equipmentLoadout]) {
+            const loadoutObj = state.horde.loadout[this.config.equipmentLoadout];
+            this.loadoutItems = loadoutObj && loadoutObj.content ? loadoutObj.content : [];
+          }
+          
+          if (currentZone >= this.config.targetZone && this.config.prestigeAfterReaching && canPrestige) {
+            this.currentState = 'prestiging';
             return;
           }
           
-          this.currentState = 'fighting';
-        } else {
-          this.currentState = 'idle';
-          this.stop();
-        }
-        break;
-
-      case 'fighting':
-        if (currentZone >= this.config.targetZone) {
-          
-          if (this.config.prestigeAfterReaching && canPrestige) {
-            this.currentState = 'prestiging';
+          if (currentZone < this.config.targetZone) {
+            this.currentState = 'fighting';
           } else {
             this.currentState = 'idle';
             this.stop();
           }
-          return;
-        }
-        
-        if (!isFighting) {
-          const nextZone = Math.min(currentZone + 1, this.config.targetZone);
-          store.dispatch('horde/updateZone', nextZone);
-        }
-        break;
+          break;
 
-      case 'prestiging':
-        if (this.prestigeInProgress) {
-          return;
-        }
-        
-        console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 执行声望操作`);
-        this.prestigeInProgress = true;
-        
-        try {
-          store.dispatch('horde/prestige', 0);
-        } catch (error) {
-          try {
-            store.dispatch('prestige/execute', {feature: 'horde', subfeature: 0});
-          } catch (fallbackError) {
-            this.currentState = 'idle';
-            this.prestigeInProgress = false;
-            this.stop();
+        case 'fighting':
+          if (currentZone >= this.config.targetZone) {
+            if (this.config.prestigeAfterReaching && canPrestige) {
+              this.currentState = 'prestiging';
+            } else {
+              this.currentState = 'idle';
+              this.stop();
+            }
             return;
           }
-        }
-        
-        this._prestigeTimeout = setTimeout(() => {
-          this.currentState = 'equipping';
-          this.prestigeInProgress = false;
-          this._prestigeTimeout = null;
-        }, 1500);
-        
-        break;
-
-      case 'equipping':
-        if (this.equipmentInProgress) {
-          return;
-        }
-        
-        this.equipmentInProgress = true;
-        
-        if (this.config.equipmentLoadout) {
-          console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 开始装备预载: ${this.config.equipmentLoadout}`);
-          store.dispatch('horde/unequipAll');
           
-          setTimeout(() => {
-            store.dispatch('horde/equipLoadout', this.config.equipmentLoadout);
-            
-            this._equipTimeout = setTimeout(() => {
-              this.currentState = 'fighting';
-              this.equipmentInProgress = false;
-              this._equipTimeout = null;
-            }, 500);
-          }, 500);
-        } else {
-          this.currentState = 'fighting';
-          this.equipmentInProgress = false;
-        }
-        break;
+          if (!isFighting) {
+            const nextZone = Math.min(currentZone + 1, this.config.targetZone);
+            store.dispatch('horde/updateZone', nextZone);
+          }
+          break;
 
-      default:
-        this.currentState = 'idle';
-        break;
+        case 'prestiging':
+          if (this.prestigeInProgress) {
+            return;
+          }
+          
+          console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 执行声望操作`);
+          this.prestigeInProgress = true;
+          
+          try {
+            store.dispatch('horde/prestige', 0);
+          } catch (error) {
+            try {
+              store.dispatch('prestige/execute', {feature: 'horde', subfeature: 0});
+            } catch (fallbackError) {
+              console.error('[HordeAuto] 声望操作失败:', fallbackError);
+              this.currentState = 'idle';
+              this.prestigeInProgress = false;
+              this.stop();
+              return;
+            }
+          }
+          
+          this._prestigeTimeout = setTimeout(() => {
+            this.currentState = 'fighting';
+            this.prestigeInProgress = false;
+            this._prestigeTimeout = null;
+          }, 1500);
+          
+          break;
+
+        default:
+          this.currentState = 'idle';
+          break;
+      }
     }
   }
 
