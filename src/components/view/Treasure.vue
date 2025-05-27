@@ -52,6 +52,12 @@
             </template>
             <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.treasure.destroyDescription`) }}</div>
           </gb-tooltip>
+          <gb-tooltip :min-width="0">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn data-cy="treasure-sort-button" class="ma-1" color="info" @click="sortItems" v-bind="attrs" v-on="on"><v-icon>mdi-sort</v-icon></v-btn>
+            </template>
+            <div class="mt-0">整理宝藏排列</div>
+          </gb-tooltip>
         </div>
       </div>
       <div class="d-flex flex-wrap ma-1">
@@ -155,6 +161,9 @@ export default {
     toggleDeleting() {
       this.$store.commit('treasure/updateKey', {key: 'upgrading', value: false});
       this.$store.commit('treasure/updateKey', {key: 'deleting', value: !this.$store.state.treasure.deleting});
+    },
+    sortItems() {
+      this.$store.dispatch('treasure/sortItems');
     }
   }
 }

@@ -243,6 +243,36 @@ export default {
             commit('updateKey', {key: 'upgrading', value: false});
             commit('updateKey', {key: 'deleting', value: false});
         },
+        sortItems({ state, commit, dispatch }) {
+            const featureOrder = {
+                'mining': 1,
+                'village': 2,
+                'horde': 3,
+                'farm': 4,
+                'gallery': 5
+            };
+            const filteredItems = state.items.filter(item => item !== null);
+            filteredItems.sort((a, b) => {
+                const featureA = state.effectToFeature[a.effect[0]];
+                const featureB = state.effectToFeature[b.effect[0]];
+                if (featureOrder[featureA] !== featureOrder[featureB]) {
+                    return featureOrder[featureA] - featureOrder[featureB];
+                }
+                if (a.effect[0] !== b.effect[0]) {
+                    return a.effect[0].localeCompare(b.effect[0]);
+                }
+                if (a.tier !== b.tier) {
+                    return a.tier - b.tier;
+                }
+                return a.level - b.level;
+            });
+            const newItems = Array(state.items.length).fill(null);
+            filteredItems.forEach((item, index) => {
+                newItems[index] = item;
+            });
+            commit('updateKey', {key: 'items', value: newItems});
+            dispatch('updateEffectCache');
+        },
         gain({ state, getters, rootGetters, commit }, type) {
             if (state.newItem === null) {
 
