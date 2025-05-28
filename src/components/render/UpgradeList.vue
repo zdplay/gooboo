@@ -5,10 +5,10 @@
   top: 0;
 }
 .upgrade-pagination-mobile {
-  top: 104px;
+  top: 56px;
 }
 .upgrade-pagination-mobile-notabs {
-  top: 56px;
+  top: 8px;
 }
 .upgrade-queue-speed {
   position: absolute;

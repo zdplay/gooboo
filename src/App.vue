@@ -10,7 +10,7 @@
 }
 .bottom-positioned ~ .v-main .scroll-container {
   max-height: calc(100vh - 64px);
-  padding-bottom: 56px;
+  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
 }
 .scroll-container-tab {
   overflow-y: auto;
@@ -18,7 +18,7 @@
 }
 .bottom-positioned ~ .v-main .scroll-container-tab {
   max-height: calc(100vh - 112px);
-  padding-bottom: 56px;
+  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
 }
 .mobile-tabs {
   position: sticky;
@@ -428,18 +428,20 @@
 /* When menu is at bottom, adjust the content area */
 .bottom-positioned ~ .v-main {
   padding-top: 0 !important;
+  padding-bottom: 56px !important; /* 添加底部间距，防止内容被底部菜单遮挡 */
 }
 .bottom-positioned ~ .v-main .v-content__wrap {
   padding-top: 0;
+  padding-bottom: 56px; /* 确保内容区域有足够的底部间距 */
 }
 /* Fix for strategy view */
 .bottom-positioned ~ .v-main .scroll-container {
   max-height: calc(100vh - 0px);
-  padding-bottom: 56px;
+  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
 }
 .bottom-positioned ~ .v-main .scroll-container-tab {
   max-height: calc(100vh - 48px);
-  padding-bottom: 56px;
+  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
 }
 /* Additional fixes for mobile view content */
 .bottom-positioned ~ .v-main {
