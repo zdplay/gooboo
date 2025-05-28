@@ -336,7 +336,6 @@
 }
 .theme--light.background-theme-dream {
   background: #f8f4ff;
-  backdrop-filter: blur(8px);
 }
 .theme--dark.background-theme-dream >>> .main-app-bar {
   background: linear-gradient(transparent, #12121280 75%, #121212C0),
@@ -346,7 +345,6 @@
 .theme--light.background-theme-dream >>> .main-app-bar {
   background: linear-gradient(transparent, #FFFFFF80 75%, #FFFFFFC0),
               linear-gradient(90deg, #B388FF, #C4A6FF, #E0C1FF, #FFD6F5, #FFB6E3, #FF9BBD, #B388FF);
-  backdrop-filter: blur(8px);
   animation: prismatic-navbar 20s linear infinite;
 }
 
