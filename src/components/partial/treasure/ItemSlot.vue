@@ -3,6 +3,10 @@
   position: relative;
   width: 80px;
   height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .treasure-item-slot-mobile {
   width: 64px;
@@ -13,6 +17,11 @@
   left: 0;
   top: 4px;
 }
+.item-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
 
 <template>
@@ -21,17 +30,19 @@
       <v-badge bordered overlap bottom :value="item.level > 0" :content="'+' + item.level" color="success">
         <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.treasure.tierItem`, item.tier + 1)">
           <template v-slot:activator="{ on, attrs }">
-            <v-icon class="balloon-text-black" :size="$vuetify.breakpoint.xsOnly ? 24 : 40" :color="itemColor" v-bind="attrs" v-on="on">{{ effectObj[effectToFeature[item.effect[0]]][item.effect[0]].icon }}</v-icon>
+            <v-icon class="balloon-text-black item-icon" :size="$vuetify.breakpoint.xsOnly ? 24 : 40" :color="itemColor" v-bind="attrs" v-on="on">{{ effectObj[effectToFeature[item.effect[0]]][item.effect[0]].icon }}</v-icon>
           </template>
           <div class="d-flex align-center mt-0" v-for="(effect, index) in item.effect" :key="effect">
+            <div class="d-flex align-center">
             <v-icon small class="mr-2">{{ featureIcon[effectToFeature[effect]].icon }}</v-icon>
+            </div>
             <display-row class="flex-grow-1" :name="effect" type="mult" :before="itemValue[index]" :after="(slotId !== null && upgrading) ? itemValueNext[index] : null"></display-row>
           </div>
         </gb-tooltip>
       </v-badge>
-      <div class="text-center" v-for="(effect, index) in item.effect" :key="effect" style="margin-top: 5px;">
-        <display-row :name="effect" type="mult" :style="{ fontSize: '0.7em' }"></display-row>
-        <div :style="{ fontSize: '0.7em' }">{{ itemValue[index] }}</div>
+      <div class="text-center d-flex flex-column justify-center align-center" v-for="(effect, index) in item.effect" :key="effect" style="margin-top: 5px;">
+        <div style="font-size: 0.7em;">{{ getEffectName(effect) }}</div>
+        <div style="font-size: 0.7em;">x{{ itemValue[index] !== null && itemValue[index] !== undefined ? itemValue[index].toFixed(2) : '0.00' }}</div>
       </div>
     </v-badge>
     <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
@@ -55,6 +66,18 @@ export default {
       type: Object,
       required: false,
       default: null
+    }
+  },
+  data() {
+    return {
+      localTranslations: {
+        currencyVillageCoinGain: '村庄金币增益',
+        currencyFarmFlowerGain: '农场花朵增益',
+        currencyFarmGrainGain: '农场谷物增益',
+        currencyFarmVegetableGain: '农场蔬菜增益',
+        currencyFarmLowerGain: '农场低级增益',
+        currencySailorTowerGain: '水手塔增益'
+      }
     }
   },
   computed: {
@@ -87,7 +110,7 @@ export default {
       if (this.item === null) {
         return [];
       }
-      return this.item.valueCache.map(el => (el + 1).toFixed(2));
+      return this.item.valueCache.map(el => el !== null && el !== undefined ? el + 1 : 0);
     },
     itemValueNext() {
       if (this.item === null) {
@@ -117,6 +140,14 @@ export default {
     }
   },
   methods: {
+    getEffectName(effect) {
+      if (!effect) return '';
+      try {
+        return this.$store.state.mult.cache[`mult_${effect}`] || this.$vuetify.lang.t(`$vuetify.mult.${effect}`, effect);
+      } catch (e) {
+        return effect;
+      }
+    },
     handleClick() {
       if (this.slotId !== null) {
         if (this.upgrading && this.upgradeCost !== null && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
