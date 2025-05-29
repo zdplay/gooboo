@@ -7,7 +7,12 @@ export default {
     name: 'general',
     tickspeed: 1,
     unlockNeeded: 'generalFeature',
+    queueCheckTimer: 0, // 队列检测计时器
+    queueCheckInterval: 2, // 队列检测间隔(秒)
+    hasActiveQueues: false, // 是否有非空队列
+    
     tick() {
+        // 原有的任务处理逻辑
         for (const [gkey, general] of Object.entries(store.state.general)) {
             if (general.unlock === null || store.state.unlock[general.unlock].see) {
                 for (const [qkey, quest] of Object.entries(general.quests)) {
@@ -56,6 +61,27 @@ export default {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // 处理升级队列
+        this.queueCheckTimer += 1;
+        
+        // 检查是否启用了升级队列功能
+        if (!store.state.system.settings.experiment.items.enableUpgradeQueue.value) {
+            return; // 如果未启用，直接返回
+        }
+        
+        // 只有在达到检查间隔时才处理队列
+        if (this.queueCheckTimer >= this.queueCheckInterval) {
+            this.queueCheckTimer = 0;
+            
+            // 遍历所有队列
+            for (const [key, queue] of Object.entries(store.state.upgrade.moduleQueue)) {
+                if (queue && queue.length > 0) {
+                    // 处理队列中的所有可以升级的项目
+                    store.dispatch('upgrade/processModuleQueue', key);
                 }
             }
         }

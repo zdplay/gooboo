@@ -437,6 +437,26 @@ function loadFile(file) {
             }
         }
     }
+    
+    // 加载自定义模块队列
+    if (save.moduleQueue) {
+        for (const [key, elem] of Object.entries(save.moduleQueue)) {
+            if (Array.isArray(elem) && elem.length > 0) {
+                // 如果队列不存在，先初始化
+                if (store.state.upgrade.moduleQueue[key] === undefined) {
+                    const feature = key.split('_')[0];
+                    const type = key.split('_')[1];
+                    store.commit('upgrade/initModuleQueue', {
+                        feature,
+                        type
+                    });
+                }
+                // 设置队列内容
+                Vue.set(store.state.upgrade.moduleQueue, key, [...elem]);
+            }
+        }
+    }
+    
     if (save.relic) {
         save.relic.forEach(elem => {
             if (store.state.relic.item[elem]) {
@@ -600,6 +620,7 @@ function getSavefile() {
         stat: {},
         upgrade: {},
         upgradeQueue: {},
+        moduleQueue: {},
         relic: [],
         globalLevel: {},
         settings: {},
@@ -662,6 +683,11 @@ function getSavefile() {
     for (const [key, elem] of Object.entries(store.state.upgrade.queue)) {
         if (elem.length > 0) {
             save.upgradeQueue[key] = [...elem];
+        }
+    }
+    for (const [key, elem] of Object.entries(store.state.upgrade.moduleQueue)) {
+        if (elem && elem.length > 0) {
+            save.moduleQueue[key] = [...elem];
         }
     }
     for (const [key, elem] of Object.entries(store.state.relic.item)) {

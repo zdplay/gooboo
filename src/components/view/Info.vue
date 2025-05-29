@@ -237,6 +237,7 @@ export default {
       { category: '农场', color: 'brown', content: '增加农场基因阻断跳过功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '农场', color: 'brown', content: '增加农场物品收获和使用通知功能。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场离线汇总功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '升级', color: 'purple', content: '增加升级队列功能（测试）。可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏整理排序功能。', isCurrentUpdate: true },

@@ -65,6 +65,7 @@ export default {
     effects: '效果',
     confirm: '确认',
     cancel: '取消',
+    queue: '队列',
     maxLevel: '最大等级',
     inventory: '库存',
     newGame: '新游戏',
@@ -1393,7 +1394,11 @@ export default {
         farmNoGeneBlock: {
           name: '跳过基因阻断',
           description: '跳过基因阻断'
-        }
+        },
+        enableUpgradeQueue: {
+          name: '启用升级队列',
+          description: '启用升级队列功能，自动处理队列中的升级'
+        },
       }
   },
   statBreakdown: {

@@ -517,6 +517,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    enableUpgradeQueue: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             }
         },

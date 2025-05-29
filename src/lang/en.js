@@ -65,6 +65,7 @@ export default {
     effects: 'Effects',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    queue: 'Queue',
     maxLevel: 'maximum level',
     inventory: 'Inventory',
     newGame: 'New game',
@@ -1361,6 +1362,10 @@ export default {
       farmNoGeneBlock: {
         name: 'Farm no gene block',
         description: 'Skip gene block'
+      },
+      enableUpgradeQueue: {
+        name: 'Enable upgrade queue',
+        description: 'Enable the upgrade queue feature to automatically process upgrades in queue'
       }
     }
   },

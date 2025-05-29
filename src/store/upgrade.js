@@ -7,6 +7,7 @@ export default {
         item: {},
         queue: {},
         cache: {},
+        moduleQueue: {},
         subtypeIcon: {
             village_housing: 'mdi-home-circle',
             village_workstation: 'mdi-briefcase'
@@ -179,6 +180,28 @@ export default {
                 }
             }
         },
+        initModuleQueue(state, moduleName) {
+            if (state.moduleQueue[moduleName] === undefined) {
+                Vue.set(state.moduleQueue, moduleName, []);
+            }
+        },
+        addToModuleQueue(state, o) {
+            if (state.moduleQueue[o.module] === undefined) {
+                Vue.set(state.moduleQueue, o.module, []);
+            }
+            state.moduleQueue[o.module].push(o.item);
+        },
+        removeFromModuleQueue(state, o) {
+            if (state.moduleQueue[o.module] !== undefined) {
+                const index = state.moduleQueue[o.module].indexOf(o.item);
+                if (index !== -1) {
+                    state.moduleQueue[o.module].splice(index, 1);
+                }
+            }
+        },
+        updateModuleQueue(state, o) {
+            Vue.set(state.moduleQueue, o.module, o.queue);
+        },
     },
     actions: {
         cleanState({ state, commit }) {
@@ -191,6 +214,9 @@ export default {
             }
             for (const [key] of Object.entries(state.queue)) {
                 commit('updateQueue', {key, value: []});
+            }
+            for (const [key] of Object.entries(state.moduleQueue)) {
+                commit('updateModuleQueue', {module: key, queue: []});
             }
             commit('initCache');
         },
@@ -461,6 +487,49 @@ export default {
                         }
                     }
                 }
+            }
+        },
+        processModuleQueue({ state, getters, dispatch }, moduleName) {
+            // 检查队列是否存在且不为空
+            if (state.moduleQueue[moduleName] === undefined || state.moduleQueue[moduleName].length === 0) {
+                return false;
+            }
+
+            let upgraded = false;
+            const queue = state.moduleQueue[moduleName];
+            
+            // 遍历队列中的所有项目
+            for (let i = 0; i < queue.length; i++) {
+                const item = queue[i];
+                const feature = item.split('_')[0];
+                const name = item.split('_')[1];
+                
+                // 检查是否可以购买
+                if (getters.canAfford(feature, name)) {
+                    // 使用buyMax购买这个升级
+                    dispatch('buyMax', { feature, name });
+                    upgraded = true;
+                }
+            }
+            
+            // 返回是否有任何项目被升级
+            return upgraded;
+        },
+        toggleModuleQueue({ state, commit }, o) {
+            const name = o.name;
+            const upgrade = state.item[name];
+            const moduleName = `${upgrade.feature}_${upgrade.type}`;
+            
+            if (state.moduleQueue[moduleName] === undefined) {
+                commit('initModuleQueue', moduleName);
+            }
+            
+            const isInQueue = state.moduleQueue[moduleName].includes(name);
+            
+            if (isInQueue) {
+                commit('removeFromModuleQueue', { module: moduleName, item: name });
+            } else {
+                commit('addToModuleQueue', { module: moduleName, item: name });
             }
         }
     }

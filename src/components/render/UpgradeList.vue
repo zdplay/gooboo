@@ -95,7 +95,6 @@
     </div>
     
     <div class="filter-section" v-if="showFilterFeature">
-      <!-- 第一行：满足和列表按钮 -->
       <div class="filter-container">
         <v-btn 
           small 
@@ -141,7 +140,6 @@
         </gb-tooltip>
       </div>
       
-      <!-- 第二行：材料筛选按钮 -->
       <div class="filter-row" v-if="showMaterialsRow">
         <gb-tooltip v-for="material in availableMaterials" :key="material" :min-width="0">
           <template v-slot:activator="{ on, attrs }">
@@ -162,6 +160,8 @@
         </gb-tooltip>
       </div>
     </div>
+    
+    <module-queue-list :module-name="feature" :type="type"></module-queue-list>
     
     <div v-if="items.length > 0">
       <v-row class="pa-1" no-gutters>
@@ -184,9 +184,10 @@ import { capitalize } from '../../js/utils/format';
 import AlertText from '../partial/render/AlertText.vue';
 import StatBreakdown from './StatBreakdown.vue';
 import Upgrade from './Upgrade.vue';
+import ModuleQueueList from './ModuleQueueList.vue';
 
 export default {
-  components: { Upgrade, StatBreakdown, AlertText },
+  components: { Upgrade, StatBreakdown, AlertText, ModuleQueueList },
   props: {
     feature: {
       type: String,

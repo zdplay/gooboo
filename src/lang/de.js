@@ -65,6 +65,7 @@ export default {
     effects: 'Effekte',
     confirm: 'Bestätigen',
     cancel: 'Abbrechen',
+    queue: 'In Warteschlange',
     maxLevel: 'maximale Stufe',
     inventory: 'Inventar',
     newGame: 'Neues Spiel',
@@ -1393,7 +1394,11 @@ export default {
       farmNoGeneBlock: {
         name: 'Farm no gene block',
         description: 'Skip gene block'
-      }
+      },
+      enableUpgradeQueue: {
+        name: 'Upgrade-Warteschlange aktivieren',
+        description: 'Aktiviert die Funktion der Upgrade-Warteschlange zur automatischen Verarbeitung von Upgrades in der Warteschlange'
+      },
     }
   },
   statBreakdown: {
