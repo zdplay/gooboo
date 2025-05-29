@@ -1082,7 +1082,7 @@ export default {
     horde_0: '击败最高区域首领',
     horde_1: '战斗通关等级',
     farm_0: '所有作物等级的总和',
-    gallery_0: 'Log4 整体美感',
+    gallery_0: 'Log4 整体美丽',
     debug: '调试'
   },
   theme: {

@@ -73,9 +73,9 @@
               <div>{{ getTranslatedName(itemName) }}</div>
               <div class="text-center mt-2">
                 <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
-                <template v-if="$store.state.currency[itemName]?.cap !== null">
+                <template v-if="$store.state.currency[itemName]?.cap !== null && $store.state.currency[itemName]?.cap !== undefined">
                   <span> / </span>
-                  <span>{{ $formatNum($store.state.currency[itemName].cap, true) }}</span>
+                  <span>{{ $formatNum($store.state.currency[itemName]?.cap, true) }}</span>
                 </template>
               </div>
             </div>
@@ -103,9 +103,9 @@
                 <div>{{ getTranslatedName(itemName) }}</div>
                 <div class="text-center mt-2">
                   <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
-                  <template v-if="$store.state.currency[itemName]?.cap !== null">
+                  <template v-if="$store.state.currency[itemName]?.cap !== null && $store.state.currency[itemName]?.cap !== undefined">
                     <span> / </span>
-                    <span>{{ $formatNum($store.state.currency[itemName].cap, true) }}</span>
+                    <span>{{ $formatNum($store.state.currency[itemName]?.cap, true) }}</span>
                   </template>
                 </div>
               </div>
@@ -516,7 +516,7 @@ export default {
       }
       
       const currency = this.$store.state.currency[currencyName];
-      return currency.cap !== null ? currency.cap : Infinity;
+      return (currency && currency.cap !== undefined && currency.cap !== null) ? currency.cap : Infinity;
     },
     
     // 合并物品时考虑资源上限
