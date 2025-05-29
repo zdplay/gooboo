@@ -468,12 +468,20 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    screenLayoutMode: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'select',
+                        items: ['auto', 'medium', 'large', 'xlarge'],
+                        value: 'auto',
+                        defaultValue: 'auto'
+                    },
                     upgradeFilterFeature: {
                         unlock: null,
                         hasDescription: true,
                         type: 'switch',
-                        value: true,
-                        defaultValue: true
+                        value: false,
+                        defaultValue: false
                     },
                     upgradeBuyProgress: {
                         unlock: null,

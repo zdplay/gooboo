@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$vuetify.breakpoint.xlOnly">
+  <div v-if="isCustomXlOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#gallery"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.gallery')" icon="mdi-image-frame"></tab-icon-text></v-tab>
       <v-tab href="#shapes" v-if="canSeeShapes"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.shapes.name')" icon="mdi-shape-plus"></tab-icon-text></v-tab>
@@ -36,7 +36,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.lgOnly">
+  <div v-else-if="isCustomLgOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#gallery"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.gallery')" icon="mdi-image-frame"></tab-icon-text></v-tab>
       <v-tab href="#shapes" v-if="canSeeShapes"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.shapes.name')" icon="mdi-shape-plus"></tab-icon-text></v-tab>
@@ -73,7 +73,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#gallery"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.gallery')" icon="mdi-image-frame"></tab-icon-text></v-tab>
       <v-tab href="#upgrades"><tab-icon-text name="upgrades"></tab-icon-text></v-tab>
@@ -133,9 +133,11 @@ import PrestigeStatus from '../partial/gallery/PrestigeStatus.vue';
 import ShapeMinigame from '../partial/gallery/ShapeMinigame.vue';
 import TabIconText from '../partial/render/TabIconText.vue';
 import UpgradeList from '../render/UpgradeList.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { UpgradeList, Inventory, PrestigeStatus, PrestigeInventory, IdeaList, TabIconText, ShapeMinigame },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'gallery'
   }),

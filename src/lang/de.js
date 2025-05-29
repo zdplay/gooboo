@@ -1367,6 +1367,14 @@ export default {
         name: 'Mobilmenü am unteren Rand',
         description: 'Platziert die Hauptmenüleiste auf mobilen Geräten am unteren Rand des Bildschirms anstatt am oberen'
       },
+      screenLayoutMode: {
+        name: 'Bildschirmlayout-Modus',
+        description: 'Legt die Größe des Interfacelayouts fest. Auto passt sich basierend auf Ihrem Gerätebildschirm an, andere Optionen erzwingen bestimmte Layoutgrößen. Hinweis: Diese Einstellung hat auf mobilen Geräten keine Auswirkung',
+        auto: 'Automatisch',
+        medium: 'Mittlerer Bildschirm',
+        large: 'Großer Bildschirm',
+        xlarge: 'Extra großer Bildschirm'
+      },
       upgradeFilterFeature: {
         name: 'Upgrade-Menü Filterfunktion',
         description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'

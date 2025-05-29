@@ -1367,6 +1367,14 @@ export default {
           name: '手机菜单移动底部',
           description: '将手机界面的主菜单栏从顶部移动到底部'
         },
+        screenLayoutMode: {
+          name: '屏幕布局模式',
+          description: '设置界面布局大小，自动将根据设备屏幕自动调整，其他选项可以强制使用特定布局尺寸。注意：在手机设备上此设置将无效',
+          auto: '自动',
+          medium: '中屏幕',
+          large: '大屏幕',
+          xlarge: '超大屏幕'
+        },
         upgradeFilterFeature: {
           name: '升级菜单筛选功能',
           description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目'

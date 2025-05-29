@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$vuetify.breakpoint.xlOnly">
+  <div v-if="isCustomXlOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#mine"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.mine')" icon="mdi-pickaxe"></tab-icon-text></v-tab>
       <v-tab href="#dweller" v-if="unlock.miningDepthDweller.see"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.depthDweller')" icon="mdi-elevator-down"></tab-icon-text></v-tab>
@@ -27,7 +27,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.lgOnly">
+  <div v-else-if="isCustomLgOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#mine"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.mine')" icon="mdi-pickaxe"></tab-icon-text></v-tab>
       <v-tab href="#dweller" v-if="unlock.miningDepthDweller.see"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.depthDweller')" icon="mdi-elevator-down"></tab-icon-text></v-tab>
@@ -55,7 +55,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#mine"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.mine')" icon="mdi-pickaxe"></tab-icon-text></v-tab>
       <v-tab href="#upgrades"><tab-icon-text name="upgrades"></tab-icon-text></v-tab>
@@ -107,9 +107,11 @@ import PrestigeStatus from '../partial/mining/PrestigeStatus.vue';
 import Status from '../partial/mining/Status.vue';
 import TabIconText from '../partial/render/TabIconText.vue';
 import UpgradeList from '../render/UpgradeList.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { UpgradeList, Inventory, Status, PrestigeStatus, PrestigeInventory, TabIconText },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'mine'
   }),

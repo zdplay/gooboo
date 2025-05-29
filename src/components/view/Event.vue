@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$vuetify.breakpoint.xlOnly">
+  <div v-if="isCustomXlOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#calendar"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.calendar')" icon="mdi-calendar"></tab-icon-text></v-tab>
       <v-tab href="#rewards" v-if="eventReward"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.rewards')" icon="mdi-store"></tab-icon-text></v-tab>
@@ -73,7 +73,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.lgOnly">
+  <div v-else-if="isCustomLgOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#calendar"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.calendar')" icon="mdi-calendar"></tab-icon-text></v-tab>
       <v-tab href="#rewards" v-if="eventReward"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.rewards')" icon="mdi-store"></tab-icon-text></v-tab>
@@ -147,7 +147,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#calendar"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.calendar')" icon="mdi-calendar"></tab-icon-text></v-tab>
       <v-tab href="#rewards" v-if="eventReward"><tab-icon-text :text="$vuetify.lang.t('$vuetify.event.rewards')" icon="mdi-store"></tab-icon-text></v-tab>
@@ -283,9 +283,11 @@ import WeatherChaosInventory from '../partial/event/WeatherChaosInventory.vue';
 import WeatherChaosStatus from '../partial/event/WeatherChaosStatus.vue';
 import TabIconText from '../partial/render/TabIconText.vue';
 import UpgradeList from '../render/UpgradeList.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { EventCalendar, SnowdownItemList, SnowdownInventory, SnowballFight, UpgradeList, ShopList, Bank, Casino, CindersInventory, BloomInventory, TabIconText, NightHuntInventory, NightHuntPotionList, SummerFestivalInventory, SummerFestivalIsland, WeatherChaosInventory, WeatherChaosStatus },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'calendar',
     eventIcon: {

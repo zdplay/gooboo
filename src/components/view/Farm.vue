@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="$vuetify.breakpoint.xlOnly" no-gutters>
+  <v-row v-if="isCustomXlOnly" no-gutters>
     <v-col class="scroll-container" cols="6">
       <field-bar></field-bar>
       <field class="mx-auto"></field>
@@ -11,7 +11,7 @@
       <upgrade-list feature="farm" :requirementCustom="upgradeNextRequired" key="farm-regular"></upgrade-list>
     </v-col>
   </v-row>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#farm"><tab-icon-text :text="$vuetify.lang.t('$vuetify.farm.farm')" icon="mdi-barn"></tab-icon-text></v-tab>
       <v-tab href="#inventory"><tab-icon-text name="inventory"></tab-icon-text></v-tab>
@@ -52,9 +52,11 @@ import FieldBar from '../partial/farm/FieldBar.vue';
 import Inventory from '../partial/farm/Inventory.vue';
 import TabIconText from '../partial/render/TabIconText.vue';
 import UpgradeList from '../render/UpgradeList.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { UpgradeList, Field, FieldBar, Inventory, TabIconText },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'farm'
   }),

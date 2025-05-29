@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$vuetify.breakpoint.xlOnly">
+  <div v-if="isCustomXlOnly">
       <v-tabs v-model="tab" grow show-arrows>
         <v-tab href="#horde"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.horde')" icon="mdi-account-group"></tab-icon-text></v-tab>
         <v-tab href="#battlepass" v-if="canSeeBattlePass"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.battlePass.name')" icon="mdi-passport"></tab-icon-text></v-tab>
@@ -37,7 +37,7 @@
         </v-col>
       </v-row>
     </div>
-  <div v-else-if="$vuetify.breakpoint.lgOnly">
+  <div v-else-if="isCustomLgOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#horde"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.horde')" icon="mdi-account-group"></tab-icon-text></v-tab>
       <v-tab href="#battlepass" v-if="canSeeBattlePass"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.battlePass.name')" icon="mdi-passport"></tab-icon-text></v-tab>
@@ -75,7 +75,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#horde"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.horde')" icon="mdi-account-group"></tab-icon-text></v-tab>
       <v-tab href="#upgrades"><tab-icon-text name="upgrades"></tab-icon-text></v-tab>
@@ -147,9 +147,11 @@ import { mapState } from 'vuex';
 import SkillTree from '../partial/horde/SkillTree.vue';
 import TrinketList from '../partial/horde/TrinketList.vue';
 import BattlePass from '../partial/horde/BattlePass.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { UpgradeList, ItemList, Status, PrestigeStatus, PrestigeInventory, TabIconText, SkillTree, TrinketList, BattlePass },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'horde'
   }),

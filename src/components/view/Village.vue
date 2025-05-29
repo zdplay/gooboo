@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$vuetify.breakpoint.xlOnly">
+  <div v-if="isCustomXlOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#village"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.village')" icon="mdi-home-group"></tab-icon-text></v-tab>
       <v-tab href="#offering" v-if="canSeeOffering"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.offering.name')" icon="mdi-candle"></tab-icon-text></v-tab>
@@ -46,7 +46,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.lgOnly">
+  <div v-else-if="isCustomLgOnly">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#village"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.village')" icon="mdi-home-group"></tab-icon-text></v-tab>
       <v-tab href="#offering" v-if="canSeeOffering"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.offering.name')" icon="mdi-candle"></tab-icon-text></v-tab>
@@ -93,7 +93,7 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="$vuetify.breakpoint.mdAndUp">
+  <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#village"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.village')" icon="mdi-home-group"></tab-icon-text></v-tab>
       <v-tab href="#upgrades"><tab-icon-text name="upgrades"></tab-icon-text></v-tab>
@@ -189,9 +189,11 @@ import PrestigeStatus from '../partial/village/PrestigeStatus.vue';
 import Resources from '../partial/village/Resources.vue';
 import UpgradeList from '../render/UpgradeList.vue';
 import UpgradeQueue from '../render/UpgradeQueue.vue';
+import { screenLayoutMixin } from '../../mixins/screenLayout';
 
 export default {
   components: { UpgradeList, Resources, JobList, PrestigeStatus, PrestigeInventory, UpgradeQueue, OfferingInventory, OfferingList, PolicyList, TabIconText, BuildingStatBar, CraftingList },
+  mixins: [screenLayoutMixin],
   data: () => ({
     tab: 'village'
   }),

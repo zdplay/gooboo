@@ -47,9 +47,9 @@
 
 <template>
   <table :class="{
-    'field-table-xs': $vuetify.breakpoint.smAndDown,
-    'field-table-sm': $vuetify.breakpoint.md || $vuetify.breakpoint.lg,
-    'field-table-lg': $vuetify.breakpoint.xlOnly
+    'field-table-xs': isCustomSmAndDown,
+    'field-table-sm': isCustomMdOnly || isCustomLgOnly,
+    'field-table-lg': isCustomXlOnly
   }">
     <tr v-for="(row, y) in field" :key="'field-row-' + y">
       <td class="field-cell text-center" :class="{'field-cell-filled bg-tile-default elevation-2': cell !== null}" v-for="(cell, x) in row" :key="'field-cell-' + y + '-' + x" @click="selectTile(x, y)">
@@ -65,9 +65,11 @@
 import { mapState } from 'vuex';
 import Building from './Building.vue';
 import Crop from './Crop.vue';
+import { screenLayoutMixin } from '../../../mixins/screenLayout';
 
 export default {
   components: { Crop, Building },
+  mixins: [screenLayoutMixin],
   computed: {
     ...mapState({
       field: state => state.farm.field,

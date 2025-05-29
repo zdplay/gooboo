@@ -215,6 +215,7 @@ export default {
     updateItems: [
       // 本次更新项（isCurrentUpdate: true 表示属于本次更新）
       // 历史更新项（isCurrentUpdate: false 或不设置表示历史更新）
+      { category: '设置', color: 'teal', content: '增加屏幕布局模式选项，可以手动选择界面布局大小。在【设置】-【实验性】设置。', isCurrentUpdate: true },
       { category: '设置', color: 'teal', content: '增加云存档功能，在【设置】-【通用】设置。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '增加自定义壁纸功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '完善【设置】-【键盘绑定】里面的快捷键功能。', isCurrentUpdate: false },
@@ -249,7 +250,6 @@ export default {
       { category: '事件', color: 'blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择。', isCurrentUpdate: false },
-      { category: '其他', color: 'cyan', content: '调整低分辨率的画面布局。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '在升级菜单中添加材料筛选功能。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false }

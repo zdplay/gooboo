@@ -1211,129 +1211,18 @@ export default {
       cloudpwd: {
         name: 'Cloud Password',
         description: 'Please remember, recovery is not provided.'
-      }
-    },
-    automation: {
-      name: 'Automation',
-      progressMining: {
-        name: 'Mining autoprogress limit',
-        description: 'When breaking a rock for the first time, you automatically advance to the next depth if breaking it takes X seconds or less'
-      },
-      fightHordeBoss: {
-        name: 'Autofight horde boss'
-      }
-    },
-    performance: {
-      name: 'Performance',
-      upgradeListItems: {
-        name: 'Upgrades per page'
-      },
-      cssShadows: {
-        name: 'Text shadows',
-        0: 'None',
-        1: 'Simple',
-        2: 'Smooth'
-      },
-      particleAmount: {
-        name: 'Particle amount',
-        0: 'None',
-        1: 'Reduced',
-        2: 'Average',
-        3: 'Increased'
-      },
-      recordAutoplay: {
-        name: 'Record autoplay data'
-      }
-    },
-    notification: {
-      name: 'Notifications',
-      position: {
-        name: 'Position',
-        0: 'Top left',
-        1: 'Top',
-        2: 'Top right',
-        3: 'Bottom right',
-        4: 'Bottom',
-        5: 'Bottom left'
-      },
-      autosave: {
-        name: 'Autosave hint'
-      },
-      backupHint: {
-        name: 'Backup hint',
-        0: 'Off',
-        1: 'Rare',
-        2: 'Average',
-        3: 'Common'
-      },
-      updateCheck: {
-        name: 'Check for updates'
-      },
-      note: {
-        name: 'Note hint'
-      },
-      achievement: {
-        name: 'Achievement hint'
-      },
-      heirloom: {
-        name: 'Heirloom hint'
-      },
-      cardPackContent: {
-        name: 'Card pack content'
-      },
-      cropReady: {
-        name: 'Crop ready'
-      },
-      farmHarvest: {
-        name: 'Farm harvest notification'
-      }
-    },
-    confirm: {
-      name: 'Confirmation',
-      prestige: {
-        name: 'Prestiges'
-      },
-      gem: {
-        name: 'Gem purchases'
-      },
-      eventToken: {
-        name: 'Event token purchases'
-      },
-      farmRareResources: {
-        name: 'Rare farm resource purchases'
-      },
-      treasureDelete: {
-        name: 'Treasure deletion'
-      }
-    },
-    experiment: {
-      name: 'Experimental',
-      warning: 'These settings are still experimental and may be buggy, unfinished, performance heavy or confusing. Enable them at your own risk, and please leave feedback if you are using them! If this section is empty, no experimental settings are available at the time or you have not progressed far enough to be able to see them',
-      currencyLabel: {
-        name: 'Show currency labels',
-        description: 'Display currency gain and time until you reach capacity without needing to hover'
-      },
-      currencynewLabel: {
-        name: 'New UI Tag',
-        description: 'Only effective when [Show Currency Tag] is enabled'
-      },
-      card1newLabel: {
-        name: 'Card draw display card pack',
-      },
-      card2newLabel: {
-        name: 'Reputation card display card pack',
-      },
-      wallpaperPath: {
-        name: 'Custom wallpaper path',
-        description: 'Enter a URL for an online image to use as background wallpaper. If empty, the theme background will be used. If the image fails to load, a solid color background will be used'
-      },
-      wallpaperBlur: {
-        name: 'Wallpaper frosted glass effect',
-        description: 'Adjust the blur level of the wallpaper, 0 for no blur, 100 for maximum blur effect'
       },
       mobileMenuAtBottom: {
         name: 'Mobile menu at bottom',
         description: 'Places the main menu bar at the bottom of the screen on mobile devices instead of at the top'
+      },
+      screenLayoutMode: {
+        name: 'Screen layout mode',
+        description: 'Set the interface layout size. Auto will adjust based on your device screen, other options force specific layout sizes. Note: This setting will have no effect on mobile devices',
+        auto: 'Auto',
+        medium: 'Medium screen',
+        large: 'Large screen',
+        xlarge: 'Extra large screen'
       },
       upgradeFilterFeature: {
         name: 'Upgrade menu filter feature',
