@@ -141,6 +141,9 @@
       <v-btn class="ma-1" color="primary" :disabled="enhancementBars >= enhancementBarsNeeded || !canEnhanceBars" @click="performEnhancementBars">{{ $vuetify.lang.t('$vuetify.gooboo.add') }}</v-btn>
       <v-btn class="ma-1" color="primary" :disabled="enhancementBars < enhancementBarsNeeded || !canEnhanceFinal" @click="performEnhancementFinal">{{ $vuetify.lang.t('$vuetify.mining.enhance') }}</v-btn>
     </div>
+    <div v-if="unlock.miningEnhancement.use && subfeature === 0 && enhancementIngredient" class="d-flex flex-column justify-center align-center flex-wrap mt-2 grey--text text--darken-1">
+      <div>下级增加需要: {{ $formatNum(nextLevelEnhancementBarsNeeded) }}，增强需要: {{ $formatNum(enhancementFinalNeeded) }}</div>
+    </div>
     <smeltery v-if="unlock.miningSmeltery.see && subfeature === 0" class="mt-4 mt-lg-8"></smeltery>
   </div>
 </template>
@@ -149,11 +152,12 @@
 import { mapGetters, mapState } from 'vuex';
 import Consumable from '../../render/Consumable.vue';
 import Currency from '../../render/Currency.vue'
-import PriceTag from '../../render/PriceTag.vue';
-import StatBreakdown from '../../render/StatBreakdown.vue';
-import AlertText from '../render/AlertText.vue';
 import Ingredient from './Ingredient.vue';
 import Smeltery from './Smeltery.vue';
+import StatBreakdown from '../../render/StatBreakdown.vue';
+import AlertText from '../render/AlertText.vue';
+import PriceTag from '../../render/PriceTag.vue';
+import { MINING_ENHANCEMENT_BARS} from '../../../js/constants';
 
 export default {
   components: { Currency, Ingredient, Consumable, StatBreakdown, PriceTag, Smeltery, AlertText },
@@ -238,7 +242,16 @@ export default {
     },
     canEnhanceFinal() {
       return this.enhancementIngredient !== null && this.currency['mining_' + this.enhancementIngredient].value >= this.enhancementFinalNeeded;
-    }
+    },
+    nextLevelEnhancementBarsNeeded() {
+      let nextLevel = this.$store.getters['mining/enhancementLevel'];
+      
+      if (this.enhancementBars >= this.enhancementBarsNeeded) {
+        nextLevel += 1;
+      }
+      
+      return Math.ceil(MINING_ENHANCEMENT_BARS * Math.pow(this.$store.getters['mult/get']('miningEnhancementBarsIncrement') + 1, nextLevel));
+    },
   },
   methods: {
     addIngredient(name) {
