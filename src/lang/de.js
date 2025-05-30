@@ -1341,6 +1341,8 @@ export default {
     experiment: {
       name: 'Experimentell',
       warning: 'Diese Einstellungen sind noch experimentell und können fehlerhaft, unfertig, langsam oder verwirrend sein. Aktiviere sie auf eigene Gefahr, und bitte gebe Feedback, falls du sie benutzen solltest! Wenn diese Sektion leer ist, sind gerade keine experimentellen Einstellungen vorhanden oder dein Fortschritt reicht nicht aus, um sie zu sehen',
+      layoutSettings: 'Layout-Einstellungen',
+      featureSettings: 'Funktionseinstellungen',
       currencyLabel: {
         name: 'Zeige Währungsschilder',
         description: 'Währungseinkommen und Zeit bis zur Kapazität werden ohne Herüberfahren mit der Maus angezeigt'

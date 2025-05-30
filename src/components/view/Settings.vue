@@ -70,13 +70,31 @@
       <theme-item class="ma-1" v-for="(theme, name) in themes" :key="'theme-' + name" :name="name"></theme-item>
     </div>
     <div v-else :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container-tab' : ''">
-      <v-row no-gutters>
+      <v-row no-gutters v-if="tab !== 'experiment'">
         <v-col v-for="(item, key) in settings[tab].items" class="d-flex align-center" :key="'setting-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
           <setting-item class="ma-2" :category="tab" :name="key"></setting-item>
         </v-col>
       </v-row>
-      <div v-if="tab === 'experiment'" class="d-flex justify-center ma-2">
-        <alert-text type="warning" style="max-width: 600px;">{{ $vuetify.lang.t(`$vuetify.settings.experiment.warning`) }}</alert-text>
+      <div v-if="tab === 'experiment'">
+        <v-card class="ma-2 pa-2">
+          <v-card-title class="justify-center text-subtitle-1">{{ $vuetify.lang.t('$vuetify.settings.experiment.layoutSettings') }}</v-card-title>
+          <v-row no-gutters>
+            <v-col v-for="(item, key) in uiExperimentSettings" class="d-flex align-center" :key="'setting-ui-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
+              <setting-item class="ma-2" :category="tab" :name="key"></setting-item>
+            </v-col>
+          </v-row>
+        </v-card>
+        <v-card class="ma-2 pa-2">
+          <v-card-title class="justify-center text-subtitle-1">{{ $vuetify.lang.t('$vuetify.settings.experiment.featureSettings') }}</v-card-title>
+          <v-row no-gutters>
+            <v-col v-for="(item, key) in featureExperimentSettings" class="d-flex align-center" :key="'setting-feature-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
+              <setting-item class="ma-2" :category="tab" :name="key"></setting-item>
+            </v-col>
+          </v-row>
+        </v-card>
+        <div class="d-flex justify-center ma-2">
+          <alert-text type="warning" style="max-width: 600px;">{{ $vuetify.lang.t(`$vuetify.settings.experiment.warning`) }}</alert-text>
+        </div>
       </div>
     </div>
   </div>
@@ -132,6 +150,74 @@ export default {
       for (const [key, elem] of Object.entries(this.$store.state.system.themes)) {
         if (elem.owned || elem.price !== null) {
           obj[key] = elem;
+        }
+      }
+      return obj;
+    },
+    uiSettings() {
+      let obj = {};
+      for (const [key, elem] of Object.entries(this.$store.state.system.settings)) {
+        if (key === 'ui') {
+          for (const [subkey, subelem] of Object.entries(elem.items)) {
+            if (
+              (subelem.unlock === null || (this.unlock[subelem.unlock] && this.unlock[subelem.unlock].see)) &&
+              (subelem.mobile === undefined || (subelem.mobile === this.$vuetify.breakpoint.smAndDown)) &&
+              (this.canSeeUpdates || key !== 'notification' || subkey !== 'updateCheck')
+            ) {
+              obj[subkey] = subelem;
+            }
+          }
+        }
+      }
+      return obj;
+    },
+    featureSettings() {
+      let obj = {};
+      for (const [key, elem] of Object.entries(this.$store.state.system.settings)) {
+        if (key !== 'ui') {
+          for (const [subkey, subelem] of Object.entries(elem.items)) {
+            if (
+              (subelem.unlock === null || (this.unlock[subelem.unlock] && this.unlock[subelem.unlock].see)) &&
+              (subelem.mobile === undefined || (subelem.mobile === this.$vuetify.breakpoint.smAndDown)) &&
+              (this.canSeeUpdates || key !== 'notification' || subkey !== 'updateCheck')
+            ) {
+              obj[subkey] = subelem;
+            }
+          }
+        }
+      }
+      return obj;
+    },
+    uiExperimentSettings() {
+      // UI相关的设置项
+      const uiRelatedKeys = [
+        'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
+        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation'
+      ];
+      
+      let obj = {};
+      if (this.settings['experiment'] && this.settings['experiment'].items) {
+        for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
+          if (uiRelatedKeys.includes(key)) {
+            obj[key] = item;
+          }
+        }
+      }
+      return obj;
+    },
+    featureExperimentSettings() {
+      // 功能相关的设置项
+      const uiRelatedKeys = [
+        'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
+        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation' 
+      ];
+      
+      let obj = {};
+      if (this.settings['experiment'] && this.settings['experiment'].items) {
+        for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
+          if (!uiRelatedKeys.includes(key)) {
+            obj[key] = item;
+          }
         }
       }
       return obj;

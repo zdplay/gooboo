@@ -1341,6 +1341,8 @@ export default {
       experiment: {
         name: '实验性',
         warning: '这些设置仍处于实验阶段，可能存在错误、未完成、性能不佳或令人困惑。 启用它们的风险由您自行承担，如果您正在使用它们，请留下反馈！ 如果此部分为空，则表示当时没有可用的实验设置，或者您尚未取得足够的进展，无法看到它们',
+        layoutSettings: '界面布局设置',
+        featureSettings: '功能性设置',
         currencyLabel: {
           name: '显示货币标签',
           description: '显示货币收益和达到容量所需的时间，无需悬停'

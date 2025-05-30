@@ -238,6 +238,14 @@ export default {
             experiment: {
                 unlock: null,
                 items: {
+                    screenLayoutMode: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'select',
+                        items: ['auto', 'medium', 'large', 'xlarge'],
+                        value: 'auto',
+                        defaultValue: 'auto'
+                    },
                     wallpaperPath: {
                         unlock: null,
                         hasDescription: true,
@@ -283,20 +291,33 @@ export default {
                         value: true,
                         defaultValue: true
                     },
-                    mobileMenuAtBottom: {
+                    showFarmCropName: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    showScientificNotation: {
                         unlock: null,
                         hasDescription: true,
                         type: 'switch',
                         value: false,
                         defaultValue: false
                     },
-                    screenLayoutMode: {
+                    enablePlayerName: {
                         unlock: null,
                         hasDescription: true,
-                        type: 'select',
-                        items: ['auto', 'medium', 'large', 'xlarge'],
-                        value: 'auto',
-                        defaultValue: 'auto'
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    mobileMenuAtBottom: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
                     },
                     upgradeFilterFeature: {
                         unlock: null,
@@ -312,26 +333,12 @@ export default {
                         value: false,
                         defaultValue: false
                     },
-                    showFarmCropName: {
-                        unlock: 'farmFeature',
-                        hasDescription: true,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
                     showFarmHarvestNotify: {
                         unlock: 'farmFeature',
                         hasDescription: true,
                         type: 'switch',
                         value: true,
                         defaultValue: true
-                    },
-                    showScientificNotation: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
                     },
                     showFarmOfflineSummary: {
                         unlock: 'farmFeature',
@@ -353,13 +360,6 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
-                    },
-                    enablePlayerName: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
                     },
                 }
             },
