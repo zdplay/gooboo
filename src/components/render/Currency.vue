@@ -62,6 +62,7 @@
 }
 .currency-label {
   border: 2px solid white;
+  white-space: nowrap;
 }
 
 /* 新样式 */
@@ -203,12 +204,12 @@
               v-if="!currency.hideGainTag && gainTimerAmount > 0"
               class="currency-label balloon-text-dynamic rounded mx-1 px-1"
               :style="`background-color: var(--v-${ currency.color }-base);`"
-            >+{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+            >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
             <div
               v-if="capTimerNeeded !== null"
               class="currency-label balloon-text-dynamic rounded mx-1 px-1"
               :style="`background-color: var(--v-${ currency.color }-base);`"
-            >{{ currency.timerIsEstimate ? '~' : '' }}{{ $formatTime(capTimerNeeded) }}</div>
+            >{{ $formatTime(capTimerNeeded) }}</div>
           </div>
         </template>
         
