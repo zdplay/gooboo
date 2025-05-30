@@ -1407,6 +1407,10 @@ export default {
         name: 'Upgrade-Warteschlange aktivieren',
         description: 'Aktiviert die Funktion der Upgrade-Warteschlange zur automatischen Verarbeitung von Upgrades in der Warteschlange'
       },
+      enablePlayerName: {
+        name: 'Spielername aktivieren',
+        description: 'Zeigt einen benutzerdefinierten Spielernamen in der Horde-Oberfläche an, oder verwendet den Standardnamen, wenn diese Funktion deaktiviert ist'
+      }
     }
   },
   statBreakdown: {

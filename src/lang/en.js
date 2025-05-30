@@ -1165,98 +1165,221 @@ export default {
       name: 'Theme'
     },
     general: {
-      name: 'Generic',
+      name: 'General',
       pause: {
         name: 'Pause'
       },
       dark: {
-        name: 'Dark mode'
+        name: 'Dark Mode'
       },
       autosaveTimer: {
-        name: 'Autosave'
+        name: 'Auto Save'
       },
       lang: {
         name: 'Language',
-        zh: '简体中文',
+        zh: 'Simplified Chinese',
         en: 'English',
-        de: 'Deutsch'
+        de: 'German'
       },
       tabDisplayDesktop: {
-        name: 'Tab display',
-        icon: 'Icon only',
-        text: 'Text only',
-        both: 'Icon and text'
+        name: 'Tab Display',
+        icon: 'Icons Only',
+        text: 'Text Only',
+        both: 'Icons and Text'
       },
       tabDisplayMobile: {
-        name: 'Tab display',
-        icon: 'Icon only',
-        text: 'Text only',
-        both: 'Icon and text'
+        name: 'Tab Display',
+        icon: 'Icons Only',
+        text: 'Text Only',
+        both: 'Icons and Text'
       },
       relativeUpgradeStats: {
-        name: 'Relative upgrade stats',
-        description: 'Shows the difference instead of before / after values'
+        name: 'Relative Upgrade Stats',
+        description: 'Show differences instead of before/after values'
       },
       useLegacyFarmSelect: {
-        name: 'Old farm selection',
-        description: 'Uses the old menu to select crops and buildings in the farm'
+        name: 'Legacy Farm Selection',
+        description: 'Use the old menu to select crops and buildings in the farm'
       },
       cloudautosaveTimer: {
-        name: 'Cloud Autosave'
+        name: 'Cloud Auto Save'
       },
       clouduser: {
         name: 'Cloud Username',
-        description: 'Please remember, recovery is not provided.'
+        description: 'Please remember, recovery not provided'
       },
       cloudpwd: {
         name: 'Cloud Password',
-        description: 'Please remember, recovery is not provided.'
-      },
-      mobileMenuAtBottom: {
-        name: 'Mobile menu at bottom',
-        description: 'Places the main menu bar at the bottom of the screen on mobile devices instead of at the top'
-      },
-      screenLayoutMode: {
-        name: 'Screen layout mode',
-        description: 'Set the interface layout size. Auto will adjust based on your device screen, other options force specific layout sizes. Note: This setting will have no effect on mobile devices',
-        auto: 'Auto',
-        medium: 'Medium screen',
-        large: 'Large screen',
-        xlarge: 'Extra large screen'
-      },
-      upgradeFilterFeature: {
-        name: 'Upgrade menu filter feature',
-        description: 'Add material filtering functionality to the upgrade menu for easier browsing of upgrades'
-      },
-      upgradeBuyProgress: {
-        name: 'Upgrade buy button progress bar',
-        description: 'Show a progress bar on buy buttons indicating how close you are to affording the upgrade based on required materials'
-      },
-      showFarmCropName: {
-        name: 'Show farm crop names',
-        description: 'Display crop names in farm cells for easier identification of different plants'
-      },
-      showFarmHarvestNotify: {
-        name: 'Farm notifications',
-        description: 'Show notifications of items gained when harvesting farm crops, with summary notifications for batch harvests'
-      },
-      showScientificNotation: {
-        name: 'Show scientific notation',
-        description: 'Use scientific notation (e.g., 9.73×10^9) instead of abbreviated representation (e.g., 9.738B)'
-      },
-      showFarmOfflineSummary: {
-        name: 'Farm offline summary',
-        description: 'Display farm harvest estimation in the offline summary page'
-      },
-      farmNoGeneBlock: {
-        name: 'Farm no gene block',
-        description: 'Skip gene block'
-      },
-      enableUpgradeQueue: {
-        name: 'Enable upgrade queue',
-        description: 'Enable the upgrade queue feature to automatically process upgrades in queue'
+        description: 'Please remember, recovery not provided'
       }
-    }
+    },
+    automation: {
+      name: 'Automation',
+      progressMining: {
+        name: 'Mining Auto Progress Limit',
+        description: 'When breaking a rock for the first time, if the break takes X seconds or less, you will automatically advance to the next depth'
+      },
+      fightHordeBoss: {
+        name: 'Auto Fight Horde Boss'
+      }
+    },
+    performance: {
+      name: 'Performance',
+      upgradeListItems: {
+        name: 'Upgrades Per Page'
+      },
+      cssShadows: {
+        name: 'Text Shadows',
+        0: 'None',
+        1: 'Simple',
+        2: 'Smooth'
+      },
+      particleAmount: {
+        name: 'Particle Amount',
+        0: 'None',
+        1: 'Reduced',
+        2: 'Average',
+        3: 'Increased'
+      },
+      recordAutoplay: {
+        name: 'Record Autoplay Data'
+      }
+    },
+    notification: {
+      name: 'Notifications',
+      position: {
+        name: 'Position',
+        0: 'Top Left',
+        1: 'Top',
+        2: 'Top Right',
+        3: 'Bottom Right',
+        4: 'Bottom',
+        5: 'Bottom Left'
+      },
+      autosave: {
+        name: 'Auto Save Alert'
+      },
+      backupHint: {
+        name: 'Backup Hint',
+        0: 'Off',
+        1: 'Rare',
+        2: 'Average',
+        3: 'Normal'
+      },
+      updateCheck: {
+        name: 'Check for Updates'
+      },
+      note: {
+        name: 'Note Notifications'
+      },
+      achievement: {
+        name: 'Achievement Notifications'
+      },
+      heirloom: {
+        name: 'Heirloom Notifications'
+      },
+      cardPackContent: {
+        name: 'Card Pack Contents'
+      },
+      cropReady: {
+        name: 'Crop Ready'
+      },
+      farmHarvest: {
+        name: 'Farm Notifications'
+      }
+    },
+    confirm: {
+      name: 'Confirmations',
+      prestige: {
+        name: 'Prestige'
+      },
+      gem: {
+        name: 'Gem Purchases'
+      },
+      eventToken: {
+        name: 'Event Token Purchases'
+      },
+      farmRareResources: {
+        name: 'Rare Farm Resource Purchases'
+      },
+      treasureDelete: {
+        name: 'Treasure Deletion'
+      }
+    },
+      experiment: {
+        name: 'Experimental',
+        warning: 'These settings are still experimental and may contain bugs, be incomplete, perform poorly or be confusing. You enable them at your own risk, and please leave feedback if you are using them! If this section is empty, it means that there are no experimental settings available at the moment, or you have not progressed far enough to see them',
+        currencyLabel: {
+          name: 'Show Currency Labels',
+          description: 'Show currency gains and time to reach capacity without hovering'
+        },
+        currencynewLabel: {
+          name: 'New UI Labels',
+          description: 'Requires "Show Currency Labels" to be enabled'
+        },
+        card1newLabel: {
+          name: 'Show Card Pack in Card Draw',
+        },
+        card2newLabel: {
+          name: 'Show Card Pack in Prestige Cards',
+        },
+        wallpaperPath: {
+          name: 'Wallpaper Path',
+          description: 'Set wallpaper path, supports web images'
+        },
+        wallpaperBlur: {
+          name: 'Wallpaper Blur Effect',
+          description: 'Adjust the blur level of the wallpaper, 0 for no blur, 100 for maximum blur'
+        },
+        mobileMenuAtBottom: {
+          name: 'Mobile Menu at Bottom',
+          description: 'Move the main menu bar from top to bottom on mobile interface'
+        },
+        screenLayoutMode: {
+          name: 'Screen Layout Mode',
+          description: 'Set interface layout size, auto will adjust based on device screen, other options can force specific layout sizes. Note: This setting will not work on mobile devices',
+          auto: 'Auto',
+          medium: 'Medium Screen',
+          large: 'Large Screen',
+          xlarge: 'Extra Large Screen'
+        },
+        upgradeFilterFeature: {
+          name: 'Upgrade Menu Filter',
+          description: 'Add material filtering in the upgrade menu for easier finding of needed upgrade items'
+        },
+        upgradeBuyProgress: {
+          name: 'Upgrade Button Progress Bar',
+          description: 'Show a progress bar on buy buttons indicating how close you are to being able to purchase the upgrade based on required materials'
+        },
+        showFarmCropName: {
+          name: 'Show Farm Plant Names',
+          description: 'Display plant names in farm cells for easier identification of different crops'
+        },
+        showFarmHarvestNotify: {
+          name: 'Farm Harvest Notifications',
+          description: 'Display notifications for items gained when harvesting farm crops, with summary notifications for batch harvests'
+        },
+        showScientificNotation: {
+          name: 'Show Scientific Notation',
+          description: 'Use scientific notation (e.g., 9.73×10^9) instead of abbreviated display (e.g., 9.738B)'
+        },
+        showFarmOfflineSummary: {
+          name: 'Farm Offline Summary',
+          description: 'Show farm harvest estimates in the offline summary page'
+        },
+        farmNoGeneBlock: {
+          name: 'Skip Gene Block',
+          description: 'Skip gene blocking'
+        },
+        enableUpgradeQueue: {
+          name: 'Enable Upgrade Queue',
+          description: 'Enable upgrade queue functionality to automatically process queued upgrades'
+        },
+        enablePlayerName: {
+          name: 'Enable Player Name',
+          description: 'Display custom player name in the Horde interface, or use default name when disabled'
+        },
+      }
   },
   statBreakdown: {
     base: 'Base value',

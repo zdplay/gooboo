@@ -1407,6 +1407,10 @@ export default {
           name: '启用升级队列',
           description: '启用升级队列功能，自动处理队列中的升级'
         },
+        enablePlayerName: {
+          name: '显示玩家名称',
+          description: '在部落界面显示自定义玩家名称，或使用默认名称'
+        }
       }
   },
   statBreakdown: {

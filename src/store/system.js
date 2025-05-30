@@ -235,6 +235,134 @@ export default {
                     }
                 }
             },
+            experiment: {
+                unlock: null,
+                items: {
+                    wallpaperPath: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'text',
+                        value: '',
+                        defaultValue: ''
+                    },
+                    wallpaperBlur: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        step: 1,
+                        value: 0,
+                        defaultValue: 0
+                    },
+                    currencyLabel: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    currencynewLabel: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    card1newLabel: {
+                        unlock: null,
+                        hasDescription: false,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    card2newLabel: {
+                        unlock: null,
+                        hasDescription: false,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    mobileMenuAtBottom: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    screenLayoutMode: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'select',
+                        items: ['auto', 'medium', 'large', 'xlarge'],
+                        value: 'auto',
+                        defaultValue: 'auto'
+                    },
+                    upgradeFilterFeature: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    upgradeBuyProgress: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    showFarmCropName: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    showFarmHarvestNotify: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    showScientificNotation: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    showFarmOfflineSummary: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    farmNoGeneBlock: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    enableUpgradeQueue: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    enablePlayerName: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                }
+            },
             automation: {
                 unlock: null,
                 items: {
@@ -412,128 +540,7 @@ export default {
                         defaultValue: true
                     }
                 }
-            },
-            experiment: {
-                unlock: null,
-                items: {
-                    wallpaperPath: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'text',
-                        value: '',
-                        defaultValue: ''
-                    },
-                    wallpaperBlur: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'number',
-                        min: 0,
-                        max: 100,
-                        step: 1,
-                        value: 0,
-                        defaultValue: 0
-                    },
-                    currencyLabel: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    currencynewLabel: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    card1newLabel: {
-                        unlock: null,
-                        hasDescription: false,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
-                    card2newLabel: {
-                        unlock: null,
-                        hasDescription: false,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
-                    mobileMenuAtBottom: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    screenLayoutMode: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'select',
-                        items: ['auto', 'medium', 'large', 'xlarge'],
-                        value: 'auto',
-                        defaultValue: 'auto'
-                    },
-                    upgradeFilterFeature: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    upgradeBuyProgress: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    showFarmCropName: {
-                        unlock: 'farmFeature',
-                        hasDescription: true,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
-                    showFarmHarvestNotify: {
-                        unlock: 'farmFeature',
-                        hasDescription: true,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
-                    showScientificNotation: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    showFarmOfflineSummary: {
-                        unlock: 'farmFeature',
-                        hasDescription: true,
-                        type: 'switch',
-                        value: true,
-                        defaultValue: true
-                    },
-                    farmNoGeneBlock: {
-                        unlock: 'farmFeature',
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                    enableUpgradeQueue: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
-                }
-            }
+            }        
         },
         keybinds: {
             prevMainFeature: null,

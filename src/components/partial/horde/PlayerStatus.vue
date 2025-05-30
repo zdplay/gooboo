@@ -22,8 +22,8 @@
 <template>
   <v-card>
     <v-card-title class="pa-2 justify-center">
-      <span v-if="subfeature === 1">{{ $vuetify.lang.t(`$vuetify.horde.classes.${ selectedClass }.name`) }}</span>
-      <span v-else>{{ $vuetify.lang.t('$vuetify.horde.player') }}</span>
+      <span v-if="subfeature === 1">{{ $vuetify.lang.t(`$vuetify.horde.classes.${ selectedClass }.name`) }}{{ isPlayerNameEnabled && $store.state.system.playerName && $store.state.system.playerName.trim() ? ' ' + $store.state.system.playerName : '' }}</span>
+      <span v-else>{{ isPlayerNameEnabled && $store.state.system.playerName && $store.state.system.playerName.trim() ? $store.state.system.playerName : $vuetify.lang.t('$vuetify.horde.player') }}</span>
     </v-card-title>
     <v-card-text class="pb-2">
       <gb-tooltip v-if="respawn > 0" :title-text="$vuetify.lang.t('$vuetify.mult.hordeRespawn')">
@@ -175,6 +175,9 @@ export default {
     },
     enemyExecute() {
       return this.$store.state.horde.enemy ? this.$store.state.horde.enemy.execute : 0;
+    },
+    isPlayerNameEnabled() {
+      return this.$store.state.system.settings.experiment.items.enablePlayerName.value;
     }
   },
   methods: {
