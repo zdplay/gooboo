@@ -27,11 +27,18 @@
   cursor: pointer;
   user-select: none;
 }
+.compact-card {
+  min-height: unset !important;
+}
+.compact-header {
+  padding: 4px 0;
+  line-height: 1;
+}
 </style>
 
 <template>
-  <v-card class="d-flex flex-column justify-space-between ma-2" min-height="52" v-if="enabled && showQueue">
-    <div class="text-center py-1 queue-header d-flex align-center justify-center" @click="toggleExpanded">
+  <v-card class="d-flex flex-column justify-space-between ma-2" :class="{'compact-card': !expanded}" :min-height="expanded ? 52 : 'unset'" v-if="enabled && showQueue">
+    <div class="text-center queue-header d-flex align-center justify-center" :class="{'compact-header': !expanded, 'py-1': expanded}" @click="toggleExpanded">
       <span>升级队列</span>
       <v-icon small class="ml-2">{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
     </div>

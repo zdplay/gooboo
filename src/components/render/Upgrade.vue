@@ -32,21 +32,6 @@
 .error-overlay {
   background-color: rgba(244, 67, 54, 0.5);
 }
-.action-buttons-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-/* 在小屏幕上减小按钮间距 */
-@media (max-width: 600px) {
-  .action-buttons-container .v-btn {
-    margin: 2px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-  }
-}
 </style>
 
 <template>
@@ -74,20 +59,18 @@
       <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
     <v-spacer></v-spacer>
-    <div class="action-buttons-container">
-      <v-btn key="upgrade-queue-collapse" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
-      <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-      <gb-tooltip key="upgrade-buy-collapse">
-        <template v-slot:activator="{ on, attrs }">
-          <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
-            <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-            <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
-          </div>
-        </template>
-        <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
-        <display-row class="mt-0" v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
-      </gb-tooltip>
-    </div>
+    <v-btn key="upgrade-queue-collapse" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
+    <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+    <gb-tooltip key="upgrade-buy-collapse">
+      <template v-slot:activator="{ on, attrs }">
+        <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
+          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+          <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+        </div>
+      </template>
+      <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
+      <display-row class="mt-0" v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
+    </gb-tooltip>
     <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
   <v-card v-else>
@@ -182,13 +165,11 @@
         </gb-tooltip>
       </div>
       <v-spacer></v-spacer>
-      <div class="action-buttons-container">
-        <v-btn key="upgrade-queue" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2 mr-1" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
-        <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-        <div class="progress-button-wrap ml-2">
-          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-          <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
-        </div>
+      <v-btn key="upgrade-queue" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2 mr-1" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
+      <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+      <div class="progress-button-wrap ml-2">
+        <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+        <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
       </div>
     </v-card-actions>
     <v-btn class="upgrade-collapse" icon @click="toggleCollapse"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
