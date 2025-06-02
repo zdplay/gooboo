@@ -31,7 +31,7 @@
 
 <template>
   <v-card class="d-flex align-center pa-1 flex-nowrap" v-if="upgrade.collapse">
-    <gb-tooltip min-width="120" content-class="text-center">
+    <gb-tooltip :min-width="120" content-class="text-center">
       <template v-slot:activator="{ on, attrs }">
         <v-icon v-if="upgrade.icon" class="ma-1" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'primary--text': isInModuleQueue && showUpgradeQueue}">{{ upgrade.icon }}</v-icon>
         <div v-else class="upgrade-name text-truncate" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
@@ -78,7 +78,7 @@
   <v-card v-else>
     <v-card-title class="pa-2 justify-center">
       <v-icon v-if="upgrade.icon" class="mr-2">{{ upgrade.icon }}</v-icon>
-      <gb-tooltip min-width="120" content-class="text-center">
+      <gb-tooltip :min-width="120" content-class="text-center">
         <template v-slot:activator="{ on, attrs }">
           <div class="upgrade-name" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
             {{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}

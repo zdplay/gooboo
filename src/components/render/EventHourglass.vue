@@ -6,7 +6,24 @@
       <div class="d-flex justify-center ma-1">
         <currency class="ma-1" name="gem_amethyst"></currency>
       </div>
-      <v-text-field class="ma-2" type="number" step="1" min="0" :label="$vuetify.lang.t('$vuetify.eventHourglass.timeInMinutes')" outlined hide-details v-model="minutes"></v-text-field>
+      <v-text-field 
+        class="ma-2" 
+        type="number" 
+        step="1" 
+        min="0" 
+        :max="eventRemainingTime"
+        :label="$vuetify.lang.t('$vuetify.eventHourglass.timeInMinutes')" 
+        outlined 
+        :error-messages="isTimeExceeded ? `最大可加速时间为 ${eventRemainingTime} 分钟` : ''"
+        hide-details="auto" 
+        v-model="minutes"
+      ></v-text-field>
+      <div class="d-flex justify-center ma-1">
+        <v-chip color="info" small class="ma-1">
+          <v-icon small left>mdi-information</v-icon>
+          剩余事件时间: {{ $formatTime(eventRemainingTime * 60) }}
+        </v-chip>
+      </div>
       <div class="d-flex flex-wrap justify-center align-center ma-1">
         <div class="d-flex flex-wrap justify-center">
           <v-btn small dense class="ma-1" color="info" @click="setMinutes(3)">3分</v-btn>
@@ -25,7 +42,12 @@
       </div>
     </v-card-text>
     <v-card-actions class="flex-wrap ma-n1">
-      <v-btn class="ma-1" color="success" :disabled="!canAfford" @click="performTimeSkip">{{ $vuetify.lang.t('$vuetify.gooboo.skip') }}</v-btn>
+      <v-btn 
+        class="ma-1" 
+        color="success" 
+        :disabled="!canAfford || isTimeExceeded" 
+        @click="performTimeSkip"
+      >{{ $vuetify.lang.t('$vuetify.gooboo.skip') }}</v-btn>
       <price-tag v-if="amethystCost !== null" class="ma-1" currency="gem_amethyst" :amount="amethystCost"></price-tag>
       <v-spacer></v-spacer>
       <v-btn class="ma-1" color="error" @click="emitCancel">{{ $vuetify.lang.t('$vuetify.gooboo.cancel') }}</v-btn>
@@ -51,22 +73,39 @@ export default {
       return this.isValidTime ? this.$formatTime(this.minutes * 60, 'm') : '-';
     },
     amethystCost() {
-      // 1:1.5 ratio - 1 amethyst = 1.5 minutes of acceleration
       return this.isValidTime ? Math.ceil(this.minutes / 1.5) : null;
     },
     canAfford() {
       return this.isValidTime && this.$store.getters['currency/value']('gem_amethyst') >= this.amethystCost;
+    },
+    eventRemainingTime() {
+      const currentEvent = this.$store.getters['event/currentEvent'];
+      if (currentEvent && this.$store.getters['event/eventIsBig'](currentEvent)) {
+        const currentTime = this.$store.state.system.time || Math.floor(Date.now() / 1000);
+        
+        const year = new Date(currentTime * 1000).getFullYear();
+        const endDate = this.$store.state.event.big[currentEvent].end;
+        const eventEndTime = Math.floor(new Date(`${year}-${endDate}T23:59:59`).getTime() / 1000);
+        
+
+        return Math.floor(Math.max(0, Math.floor((eventEndTime - currentTime) / 60)));
+      }
+      return 0;
+    },
+    isTimeExceeded() {
+      return this.isValidTime && parseFloat(this.minutes) > this.eventRemainingTime;
     }
   },
   methods: {
     performTimeSkip() {
-      if (this.canAfford) {
+      if (this.canAfford && !this.isTimeExceeded) {
         const currentEvent = this.$store.getters['event/currentEvent'];
         if (currentEvent && this.$store.getters['event/eventIsBig'](currentEvent)) {
           const currentTime = this.$store.state.system.time || Math.floor(Date.now() / 1000);
-          const skipTime = Math.round(this.minutes * 60);
+          const skipTime = Math.round(parseFloat(this.minutes) * 60);
           event.tick(skipTime, currentTime, currentTime + skipTime);
           this.$store.dispatch('currency/spend', {feature: 'gem', name: 'amethyst', amount: this.amethystCost});
+          this.$emit('cancel');
         }
       }
     },
@@ -74,11 +113,13 @@ export default {
       this.$emit('cancel');
     },
     setToMax() {
+
       const amethystAmount = Math.floor(this.$store.getters['currency/value']('gem_amethyst'));
-      this.minutes = amethystAmount * 1.5;
+      this.minutes = Math.min(this.eventRemainingTime, amethystAmount * 1.5).toString();
     },
     setMinutes(value) {
-      this.minutes = value;
+
+      this.minutes = Math.min(value, this.eventRemainingTime).toString();
     }
   }
 }
