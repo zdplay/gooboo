@@ -101,14 +101,49 @@ export default {
     },
     rareDropSource() {
       const drops = {};
-      for(const crop in this.crops) {
-        this.crops[crop].rareDrop.forEach((drop) => {
-          if (drops[drop.name] === undefined) {
-            drops[drop.name] = [];
-          }
-          drops[drop.name].push(crop);
-        });
+
+      // Process crop rare drops
+      for(const cropName in this.crops) {
+        const crop = this.crops[cropName];
+        if (crop.rareDrop) {
+          crop.rareDrop.forEach((drop) => {
+            // Only show found rare drops
+            if (drop.found) {
+              if (drops[drop.name] === undefined) {
+                drops[drop.name] = [];
+              }
+              if (!drops[drop.name].includes(cropName)) {
+                drops[drop.name].push(cropName);
+              }
+            }
+          });
+        }
+        
+        // Check crop gene stats for rare drops
+        const cropGeneStats = this.$store.getters['farm/cropGeneStats'](cropName);
+        if (cropGeneStats && cropGeneStats.rareDrop && cropGeneStats.rareDrop.length > 0) {
+          cropGeneStats.rareDrop.forEach(drop => {
+            if (drops[drop.name] === undefined) {
+              drops[drop.name] = [];
+            }
+            if (!drops[drop.name].includes(cropName)) {
+              drops[drop.name].push(cropName);
+            }
+          });
+        }
       }
+      
+      // Check grass gene
+      const genes = this.$store.state.farm.gene;
+      if (genes && genes.grass && genes.grass.active) {
+        if (drops['farm_grass'] === undefined) {
+          drops['farm_grass'] = [];
+        }
+        if (!drops['farm_grass'].includes('gene_system')) {
+          drops['farm_grass'].push('gene_system');
+        }
+      }
+      
       return drops;
     }
   },
