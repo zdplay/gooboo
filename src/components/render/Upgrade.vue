@@ -27,6 +27,26 @@
   flex-wrap: nowrap !important;
   overflow-x: auto;
 }
+.progress-button-wrap {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.primary-overlay {
+  background-color: rgba(33, 150, 243, 0.5);
+}
+.error-overlay {
+  background-color: rgba(244, 67, 54, 0.5);
+}
 </style>
 
 <template>
@@ -66,8 +86,9 @@
     <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
     <gb-tooltip key="upgrade-buy-collapse">
       <template v-slot:activator="{ on, attrs }">
-        <div class="ma-1 rounded" v-bind="attrs" v-on="on">
-          <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+        <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
+          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+          <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
       <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
@@ -278,8 +299,9 @@ export default {
           
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
-          
-          percents.push(Math.min(100, (currencyState.value / required) * 100));
+          const currentValue = currencyState.value || 0;
+          const ratio = Math.min(currentValue / required, 1);
+          percents.push(ratio);
         }
       } else {
         for (const currency in price) {
@@ -289,15 +311,14 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          if (currencyState.cap < required) {
-            percents.push(0);
-          } else {
-            percents.push(Math.min(100, (currencyState.value / required) * 100));
-          }
+          const currentValue = currencyState.value || 0;
+          const ratio = currentValue / required;
+          percents.push(ratio);
         }
       }
       
-      return percents.length > 0 ? Math.min(...percents) : 0;
+      if (percents.length === 0) return 0;
+      return percents.reduce((a, b) => a + b, 0) / percents.length * 100;
     },
     isMax() {
       return this.upgrade.cap !== null && this.upgrade.bought >= this.upgrade.cap;
@@ -402,7 +423,7 @@ export default {
               after: elem.value(lvl + 1)
             };
           }).filter(elem => {
-            const isBool = ['unlock', 'farmSeed', 'keepUpgrade', 'findConsumable', 'galleryIdea'].includes(elem.type);
+            const isBool = ['unlock', 'keepUpgrade', 'villageCraft', 'farmSeed', 'findConsumable', 'galleryIdea', 'galleryShape'].includes(elem.type);
             return (isBool && !elem.before && elem.after) || (!isBool && elem.before !== elem.after);
           })
         });
