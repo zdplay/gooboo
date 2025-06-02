@@ -24,34 +24,30 @@
       </div>
     </gb-tooltip>
     <active class="ma-1" :pretend="isPretend" :name="name"></active>
-    <gb-tooltip key="item-upgrade-collapse" v-if="found && canUpgrade">
-      <template v-slot:activator="{ on, attrs }">
-        <div class="ma-1 rounded" v-bind="attrs" v-on="on">
-          <v-btn small @click="upgradeItem(name)" :disabled="!canBuy || disabled" color="secondary" class="px-2" min-width="36">
-            <v-icon small>mdi-chevron-double-up</v-icon>
-            {{ $formatNum(upgradePrice) }}
-          </v-btn>
-        </div>
-      </template>
-      <display-row class="mt-0" v-for="(item, key) in statDiff" :key="key" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
-      <price-tag currency="horde_monsterPart" :amount="upgradePrice"></price-tag>
-    </gb-tooltip>
-    <v-chip key="item-max-collapse" disabled label small class="ma-1 px-2" style="text-transform: uppercase;" v-else-if="isMaxed">{{ $vuetify.lang.t('$vuetify.gooboo.maxed') }}</v-chip>
+    <template v-if="found && canUpgrade">
+      <gb-tooltip key="item-upgrade-collapse">
+        <template v-slot:activator="{ on, attrs }">
+          <div class="ma-1 rounded" v-bind="attrs" v-on="on">
+            <v-btn small @click="upgradeItem(name)" :disabled="!canBuy || disabled" color="secondary" class="px-2" min-width="36">
+              <v-icon small>mdi-chevron-double-up</v-icon>
+              {{ $formatNum(upgradePrice) }}
+            </v-btn>
+          </div>
+        </template>
+        <display-row class="mt-0" v-for="(item, key) in statDiff" :key="key" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
+        <price-tag currency="horde_monsterPart" :amount="upgradePrice"></price-tag>
+      </gb-tooltip>
+    </template>
+    <v-chip v-else-if="isMaxed" key="item-max-collapse" disabled label small class="ma-1 px-2" style="text-transform: uppercase;">{{ $vuetify.lang.t('$vuetify.gooboo.maxed') }}</v-chip>
     <v-spacer></v-spacer>
     <template v-if="found">
       <v-btn class="ma-1 px-2" v-if="item.masteryLevel >= 2" color="primary" min-width="36" :disabled="disabled" @click="togglePassive"><v-icon>{{ item.passive ? 'mdi-sleep-off' : 'mdi-sleep' }}</v-icon></v-btn>
       <v-btn class="ma-1 px-2" v-if="!item.equipped" color="primary" @click="equipItem(name)" :disabled="itemsFull || disabled">{{ $vuetify.lang.t('$vuetify.gooboo.equip') }}</v-btn>
       <v-btn class="ma-1 px-2" v-else color="error" :disabled="disabled" @click="unequipItem(name)">{{ $vuetify.lang.t('$vuetify.gooboo.unequip') }}</v-btn>
     </template>
-    <div v-else-if="zone < item.findZone">{{ $vuetify.lang.t('$vuetify.horde.zone') }} {{ item.findZone }}+</div>
-    <gb-tooltip key="item-chance-collapse" v-else>
-      <template v-slot:activator="{ on, attrs }">
-        <div v-bind="attrs" v-on="on">{{ $formatNum(findChance * 100, true) }}%</div>
-      </template>
-      <div class="mt-0">{{ $vuetify.lang.t('$vuetify.horde.itemFindDescription') }}</div>
-      <stat-breakdown name="hordeItemChance" :base="item.findChance" :multArray="findChanceArray"></stat-breakdown>
-    </gb-tooltip>
-    <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
+    <v-btn v-else-if="zone >= item.findZone" color="success" class="ma-1 px-2" :disabled="disabled" @click="findItem(name)">{{ $formatNum(findChance * 100, true) }}%</v-btn>
+    <div v-else class="ma-1 px-2">{{ $vuetify.lang.t('$vuetify.horde.zone') }} {{ item.findZone }}+</div>
+    <v-btn class="ma-1 px-2" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
   <v-card v-else>
     <v-card-title class="pa-2 justify-center"><v-icon class="mr-2">{{ item.icon }}</v-icon>{{ $vuetify.lang.t(`$vuetify.horde.items.${name}`) }}</v-card-title>
@@ -97,33 +93,33 @@
     </v-card-text>
     <v-card-actions>
       <active :pretend="isPretend" :name="name"></active>
-      <gb-tooltip key="item-upgrade-full" v-if="found && canUpgrade">
-        <template v-slot:activator="{ on, attrs }">
-          <div class="ml-2 rounded" v-bind="attrs" v-on="on">
-            <v-btn small @click="upgradeItem(name)" :disabled="!canBuy || disabled" color="secondary" class="px-2" min-width="36">
-              <v-icon small>mdi-chevron-double-up</v-icon>
-              {{ $formatNum(upgradePrice) }}
-            </v-btn>
-          </div>
-        </template>
-        <display-row class="mt-0" v-for="(item, key) in statDiff" :key="key" :name="item.name" :type="item.type" :before="item.before" :after="item.after" :is-buff="item.isBuff"></display-row>
-        <price-tag currency="horde_monsterPart" :amount="upgradePrice"></price-tag>
-      </gb-tooltip>
-      <v-chip key="item-max-full" disabled label small class="ml-2 px-2" style="text-transform: uppercase;" v-else-if="isMaxed">{{ $vuetify.lang.t('$vuetify.gooboo.maxed') }}</v-chip>
+      <template v-if="found && canUpgrade">
+        <gb-tooltip key="item-upgrade-full">
+          <template v-slot:activator="{ on, attrs }">
+            <div class="ml-2 rounded" v-bind="attrs" v-on="on">
+              <v-btn small @click="upgradeItem(name)" :disabled="!canBuy || disabled" color="secondary" class="px-2" min-width="36">
+                <v-icon small>mdi-chevron-double-up</v-icon>
+                {{ $formatNum(upgradePrice) }}
+              </v-btn>
+            </div>
+          </template>
+          <display-row class="mt-0" v-for="(item, key) in statDiff" :key="key" :name="item.name" :type="item.type" :before="item.before" :after="item.after" :is-buff="item.isBuff"></display-row>
+          <price-tag currency="horde_monsterPart" :amount="upgradePrice"></price-tag>
+        </gb-tooltip>
+        <v-btn small @click="upgradeItemMax(name)" :disabled="!canBuy || disabled" color="secondary" class="ml-2 px-2">
+          <v-icon small class="mr-1">mdi-chevron-triple-up</v-icon>
+          {{ $vuetify.lang.t('$vuetify.gooboo.max') }}
+        </v-btn>
+      </template>
+      <v-chip v-else-if="isMaxed" key="item-max-full" disabled label small class="ml-2 px-2" style="text-transform: uppercase;">{{ $vuetify.lang.t('$vuetify.gooboo.maxed') }}</v-chip>
       <v-spacer></v-spacer>
       <template v-if="found">
         <v-btn v-if="item.masteryLevel >= 2" color="primary" min-width="36" :disabled="disabled" @click="togglePassive"><v-icon>{{ item.passive ? 'mdi-sleep-off' : 'mdi-sleep' }}</v-icon></v-btn>
         <v-btn v-if="!item.equipped" color="primary" @click="equipItem(name)" :disabled="itemsFull || disabled">{{ $vuetify.lang.t('$vuetify.gooboo.equip') }}</v-btn>
         <v-btn v-else color="error" :disabled="disabled" @click="unequipItem(name)">{{ $vuetify.lang.t('$vuetify.gooboo.unequip') }}</v-btn>
       </template>
-      <div v-else-if="zone < item.findZone">{{ $vuetify.lang.t('$vuetify.horde.zone') }} {{ item.findZone }}+</div>
-      <gb-tooltip key="item-chance-full" v-else>
-        <template v-slot:activator="{ on, attrs }">
-          <div v-bind="attrs" v-on="on">{{ $formatNum(findChance * 100, true) }}%</div>
-        </template>
-        <div class="mt-0">{{ $vuetify.lang.t('$vuetify.horde.itemFindDescription') }}</div>
-        <stat-breakdown name="hordeItemChance" :base="item.findChance" :multArray="findChanceArray"></stat-breakdown>
-      </gb-tooltip>
+      <v-btn v-else-if="zone >= item.findZone" color="success" class="ma-1 px-2" :disabled="disabled" @click="findItem(name)">{{ $formatNum(findChance * 100, true) }}%</v-btn>
+      <div v-else class="ma-1 px-2">{{ $vuetify.lang.t('$vuetify.horde.zone') }} {{ item.findZone }}+</div>
     </v-card-actions>
     <v-btn class="item-collapse" icon @click="toggleCollapse"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
   </v-card>
@@ -292,8 +288,12 @@ export default {
     ...mapActions({
       equipItem: 'horde/equipItem',
       unequipItem: 'horde/unequipItem',
-      upgradeItem: 'horde/upgradeItem'
+      upgradeItem: 'horde/upgradeItem',
+      findItem: 'horde/findItem'
     }),
+    upgradeItemMax(name) {
+      this.$store.dispatch('horde/upgradeItemMax', name);
+    },
     toggleCollapse() {
       this.$store.commit('horde/updateItemKey', {name: this.name, key: 'collapse', value: !this.item.collapse});
     },

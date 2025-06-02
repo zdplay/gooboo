@@ -339,6 +339,36 @@ export default {
                 {name: 'hordeMaxItems', type: 'bonus', value: lvl * -1},
             ];
         },
+        maxAfford: (state, getters, rootState, rootGetters) => (name) => {
+            const item = state.items[name];
+            if (!item || !item.found) return 0;
+            if (item.cap !== null && item.level >= item.cap) {
+                return 0;
+            }
+            
+            let amount = 0;
+            let totalCost = 0;
+            let canAfford = true;
+            while (canAfford) {
+                if (item.cap !== null && (item.level + amount) >= item.cap) {
+                    break;
+                }
+                const nextCost = item.price(item.level + amount);
+                totalCost += nextCost;
+                if (rootGetters['currency/value']('horde_monsterPart') < totalCost) {
+                    canAfford = false;
+                } else {
+                    amount++;
+                }
+            }
+            return amount;
+        },
+        upgradePrice: (state) => (name, level = null) => {
+            const item = state.items[name];
+            if (!item) return 0;
+            const currentLevel = level !== null ? level : item.level;
+            return item.price(currentLevel);
+        }
     },
     mutations: {
         updateKey(state, o) {
@@ -1292,6 +1322,24 @@ export default {
                 commit('updateItemKey', {name, key: 'level', value: item.level + 1});
                 if (item.equipped) {
                     dispatch('applyItemEffects', name);
+                }
+            }
+        },
+        upgradeItemMax({ state, getters, rootGetters, commit, dispatch }, name) {
+            const maxAmount = getters.maxAfford(name);
+            if (maxAmount > 0) {
+                let totalCost = 0;
+                const item = state.items[name];
+                
+                for (let i = 0; i < maxAmount; i++) {
+                    totalCost += item.price(item.level + i);
+                }
+                if (rootGetters['currency/value']('horde_monsterPart') >= totalCost) {
+                    dispatch('currency/spend', {feature: 'horde', name: 'monsterPart', amount: totalCost}, {root: true});
+                    commit('updateItemKey', {name, key: 'level', value: item.level + maxAmount});
+                    if (item.equipped) {
+                        dispatch('applyItemEffects', name);
+                    }
                 }
             }
         },
