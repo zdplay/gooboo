@@ -12,32 +12,36 @@
 .reduced-height {
   height: 28px;
 }
-.progress-button-wrap {
-  position: relative;
-  border-radius: 4px;
+.upgrade-name {
+  max-width: 120px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
 }
-.progress-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+.queued-name {
+  color: var(--v-primary-base);
+  text-decoration: underline;
 }
-.primary-overlay {
-  background-color: rgba(33, 150, 243, 0.5);
-}
-.error-overlay {
-  background-color: rgba(244, 67, 54, 0.5);
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
 }
 </style>
 
 <template>
-  <v-card class="d-flex align-center pa-1" v-if="upgrade.collapse">
-    <v-icon v-if="upgrade.icon" class="ma-1">{{ upgrade.icon }}</v-icon>
-    <div v-else class="ma-1">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
+  <v-card class="d-flex align-center pa-1 flex-nowrap" v-if="upgrade.collapse">
+    <gb-tooltip min-width="120" content-class="text-center">
+      <template v-slot:activator="{ on, attrs }">
+        <v-icon v-if="upgrade.icon" class="ma-1" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'primary--text': isInModuleQueue && showUpgradeQueue}">{{ upgrade.icon }}</v-icon>
+        <div v-else class="upgrade-name text-truncate" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
+          {{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}
+        </div>
+      </template>
+      <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
+      <v-divider class="my-1"></v-divider>
+      <div v-if="showUpgradeQueue">{{ isInModuleQueue ? '点击取消队列' : '点击加入队列' }}</div>
+    </gb-tooltip>
     <gb-tooltip key="upgrade-bought-collapse" v-if="upgrade.bought || (upgrade.cap !== null && !upgrade.hideCap)" :min-width="0">
       <template v-slot:activator="{ on, attrs }">
         <v-chip label small class="ma-1 px-2" v-bind="attrs" v-on="on">
@@ -56,16 +60,14 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="ma-1" small v-bind="attrs" v-on="on">mdi-lock</v-icon>
       </template>
-      <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
+      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
     <v-spacer></v-spacer>
-    <v-btn key="upgrade-queue-collapse" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
     <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
     <gb-tooltip key="upgrade-buy-collapse">
       <template v-slot:activator="{ on, attrs }">
-        <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
-          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-          <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+        <div class="ma-1 rounded" v-bind="attrs" v-on="on">
+          <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
       <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
@@ -76,7 +78,16 @@
   <v-card v-else>
     <v-card-title class="pa-2 justify-center">
       <v-icon v-if="upgrade.icon" class="mr-2">{{ upgrade.icon }}</v-icon>
-      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.${ name }`) }}</div>
+      <gb-tooltip min-width="120" content-class="text-center">
+        <template v-slot:activator="{ on, attrs }">
+          <div class="upgrade-name" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
+            {{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}
+          </div>
+        </template>
+        <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
+        <v-divider class="my-1"></v-divider>
+        <div v-if="showUpgradeQueue">{{ isInModuleQueue ? '点击取消队列' : '点击加入队列' }}</div>
+      </gb-tooltip>
     </v-card-title>
     <v-card-text class="pb-0">
       <display-row v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
@@ -115,7 +126,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-icon class="ma-1" small v-bind="attrs" v-on="on">{{ subtypeIcon }}</v-icon>
           </template>
-          <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.subtype.${ subtype }`) }}</div>
+          <div>{{ $vuetify.lang.t(`$vuetify.upgrade.subtype.${ subtype }`) }}</div>
         </gb-tooltip>
       </div>
       <div>
@@ -134,7 +145,7 @@
               <span v-if="upgrade.cap !== null && !upgrade.hideCap">&nbsp;/ {{ upgrade.cap }}</span>
             </v-chip>
           </template>
-          <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.bought`) }}</div>
+          <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.bought`) }}</div>
         </gb-tooltip>
       </div>
       <v-chip
@@ -165,7 +176,6 @@
         </gb-tooltip>
       </div>
       <v-spacer></v-spacer>
-      <v-btn key="upgrade-queue" small v-if="!isMax && showUpgradeQueue" :color="isInModuleQueue ? 'error' : 'info'" class="ma-1 px-2 mr-1" :disabled="disabled" @click="toggleModuleQueue">{{ isInModuleQueue ? $vuetify.lang.t('$vuetify.gooboo.cancel') : $vuetify.lang.t('$vuetify.gooboo.queue') }}</v-btn>
       <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
       <div class="progress-button-wrap ml-2">
         <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
@@ -177,7 +187,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="upgrade-persistent" small v-bind="attrs" v-on="on">mdi-lock</v-icon>
       </template>
-      <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
+      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
   </v-card>
 </template>
@@ -269,9 +279,7 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          const currentValue = currencyState.value || 0;
-          const ratio = Math.min(currentValue / required, 1);
-          percents.push(ratio);
+          percents.push(Math.min(100, (currencyState.value / required) * 100));
         }
       } else {
         for (const currency in price) {
@@ -281,14 +289,15 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          const currentValue = currencyState.value || 0;
-          const ratio = currentValue / required;
-          percents.push(ratio);
+          if (currencyState.cap < required) {
+            percents.push(0);
+          } else {
+            percents.push(Math.min(100, (currencyState.value / required) * 100));
+          }
         }
       }
       
-      if (percents.length === 0) return 0;
-      return percents.reduce((a, b) => a + b, 0) / percents.length * 100;
+      return percents.length > 0 ? Math.min(...percents) : 0;
     },
     isMax() {
       return this.upgrade.cap !== null && this.upgrade.bought >= this.upgrade.cap;
@@ -321,7 +330,7 @@ export default {
           after: this.isMax ? null : elem.value(lvl + 1)
         };
       }).filter(elem => {
-        const isBool = ['unlock', 'farmSeed', 'keepUpgrade', 'findConsumable', 'galleryIdea'].includes(elem.type);
+        const isBool = ['unlock', 'keepUpgrade', 'villageCraft', 'farmSeed', 'findConsumable', 'galleryIdea', 'galleryShape'].includes(elem.type);
         return (isBool && !elem.before && elem.after) || (!isBool && elem.before !== elem.after);
       });
     },

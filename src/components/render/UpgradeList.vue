@@ -162,7 +162,6 @@
     </div>
     
     <module-queue-list :module-name="feature" :type="type"></module-queue-list>
-    
     <div v-if="items.length > 0">
       <v-row class="pa-1" no-gutters>
         <v-col class="pa-1" v-for="(item, key) in finalItems" :key="`${feature}-${type}-${key}`" :cols="cols">
@@ -366,15 +365,16 @@ export default {
         }
       });
       
-      // 计算每个材料的折叠状态
       const result = {};
       Object.keys(materialStatus).forEach(material => {
         const status = materialStatus[material];
-        // 如果所有升级项都已折叠且至少有一个升级项，则设置为true
         result[material] = status.totalUpgrades > 0 && status.totalUpgrades === status.collapsedUpgrades;
       });
       
       return result;
+    },
+    enabled() {
+      return this.$store.state.system.settings.experiment.items.enableUpgradeQueue.value;
     }
   },
   methods: {
