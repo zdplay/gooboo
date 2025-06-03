@@ -1311,6 +1311,10 @@ export default {
         warning: 'These settings are still experimental and may contain bugs, be incomplete, perform poorly or be confusing. You enable them at your own risk, and please leave feedback if you are using them! If this section is empty, it means that there are no experimental settings available at the moment, or you have not progressed far enough to see them',
         layoutSettings: 'Layout Settings',
         featureSettings: 'Feature Settings',
+        treasurePreview: {
+          name: 'Treasure Preview',
+          description: 'Show preview of future treasures when buying a treasure'
+        },
         currencyLabel: {
           name: 'Show Currency Labels',
           description: 'Show currency gains and time to reach capacity without hovering'

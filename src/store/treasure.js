@@ -155,6 +155,75 @@ export default {
                 return state.items.length;
             }
             return null;
+        },
+        previewNextTreasure: (state, getters, rootState, rootGetters) => (type, offset = 0) => {
+            // 创建一个临时的RNG状态，不影响实际游戏
+            const rngTierGen = rootGetters['system/getRng']('treasureTier_' + type, offset);
+            const rngGen = rootGetters['system/getRng']('treasure_' + type, offset);
+            
+            // 计算预期的宝藏层级
+            const tierChances = getters.tierChancesRaw;
+            let tier = null;
+            let totalChance = 0;
+            const nextChance = rngTierGen();
+            
+            tierChances.forEach(elem => {
+                totalChance += elem.chance;
+                if (tier === null && nextChance < totalChance) {
+                    tier = elem.tier;
+                }
+            });
+            
+            if (tier === null) {
+                return null;
+            }
+            
+            // 使用与generateItem相同的逻辑生成预览物品
+            let effectList = {};
+            for (const [key, elem] of Object.entries(state.effect)) {
+                if (key === 'mining' || rootState.unlock[`${key}Feature`].see) {
+                    for (const [subkey, subelem] of Object.entries(elem)) {
+                        if (subelem.unlock === null || rootState.unlock[subelem.unlock].see) {
+                            if (!effectList[subelem.type]) {
+                                effectList[subelem.type] = [];
+                            }
+                            effectList[subelem.type].push(subkey);
+                        }
+                    }
+                }
+            }
+            
+            let chosenEffect = [];
+            state.type[type].slots.forEach(slot => {
+                const arr = effectList[slot.type];
+                if (arr && arr.length > 0) {
+                    const chosenElem = arr[Math.floor(rngGen() * arr.length)];
+                    effectList[slot.type] = arr.filter(el => el !== chosenElem);
+                    chosenEffect.push(chosenElem);
+                }
+            });
+            
+            const icon = state.iconList[Math.floor(rngGen() * state.iconList.length)];
+            
+            // 计算效果值
+            const valueCache = chosenEffect.map((el, i) => {
+                const feature = state.effectToFeature[el];
+                const effectObj = state.effect[feature][el];
+                return getters.effectValue(
+                    effectObj.value * state.type[type].slots[i].power,
+                    tier,
+                    0,
+                    type
+                );
+            });
+            
+            return {
+                tier,
+                type,
+                icon,
+                effect: chosenEffect,
+                valueCache
+            };
         }
     },
     mutations: {

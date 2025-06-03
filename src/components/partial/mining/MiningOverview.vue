@@ -471,7 +471,7 @@ export default {
 <style scoped>
 .resource-chip {
   height: 20px !important;
-  font-size: 0.65rem !important;
+  font-size: 0.75rem !important;
 }
 
 .mining-table {

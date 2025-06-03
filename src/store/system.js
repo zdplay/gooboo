@@ -361,6 +361,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    treasurePreview: {
+                        unlock: 'treasureFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    }
                 }
             },
             automation: {

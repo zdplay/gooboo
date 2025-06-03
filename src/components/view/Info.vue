@@ -245,6 +245,7 @@ export default {
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏整理排序功能。', isCurrentUpdate: false },
+      { category: '宝藏', color: 'yellow', content: '增加宝藏购买预测功能，可以预览未来10次随机效果。', isCurrentUpdate: true },
       { category: '事件', color: 'blue', content: '增加每日签到奖励。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加宾果游戏预测功能，可以预测下一个可能出现的数字。', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加宾果撤销功能，可以撤销倍率单元格（有可能吃掉）。', isCurrentUpdate: false },
