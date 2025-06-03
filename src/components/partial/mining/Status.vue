@@ -139,6 +139,22 @@
           <div v-else>{{ $vuetify.lang.t('$vuetify.mining.gainSummary', $formatNum(item, true), $formatNum(item * rareEarthBreakMult, true), rareEarthBreakMult, $formatNum(item * (rareEarthMultPerSecond !== null ? rareEarthMultPerSecond : 0), true)) }}</div>
           <alert-text v-if="key === 'coal' || key === 'niter'" type="info">{{ $vuetify.lang.t('$vuetify.mining.rareEarthNotAffected') }}</alert-text>
         </gb-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn 
+              icon 
+              color="primary" 
+              class="ma-1" 
+              v-bind="attrs" 
+              v-on="on"
+              @click="showMiningOverview = true"
+            >
+              <v-icon>mdi-chart-box-outline</v-icon>
+            </v-btn>
+          </template>
+          <span>矿层总览</span>
+        </v-tooltip>
+        <mining-overview ref="miningOverview" v-model="showMiningOverview"></mining-overview>
       </template>
       <template v-else-if="subfeature === 1">
         <v-chip v-if="smoke > 0" label class="balloon-text-dynamic ma-1" :class="$vuetify.theme.dark ? 'darken-2' : 'lighten-2'" :color="currency.mining_smoke.color">
@@ -344,6 +360,7 @@ import StatBreakdown from '../../render/StatBreakdown.vue';
 import AlertText from '../render/AlertText.vue';
 import DisplayRow from '../upgrade/DisplayRow.vue';
 import BeaconSector from './BeaconSector.vue';
+import MiningOverview from './MiningOverview.vue'; // 导入矿层总览组件
 
 export default {
   components: { 
@@ -351,7 +368,8 @@ export default {
     CurrencyIcon, 
     AlertText, 
     DisplayRow, 
-    BeaconSector
+    BeaconSector,
+    MiningOverview // 注册组件
   },
   data: () => ({
     rareEarthType: {
@@ -380,7 +398,8 @@ export default {
     niterAutoStartDepth: MINING_NITER_DEPTH,
     niterAutoTargetDepth: MINING_NITER_DEPTH + 20,
     niterAutoBreaksPerDepth: 10,
-    niterAutoStoppingInProgress: false
+    niterAutoStoppingInProgress: false,
+    showMiningOverview: false // 添加控制矿层总览显示的数据
   }),
   computed: {
     ...mapState({
