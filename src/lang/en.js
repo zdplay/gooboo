@@ -1315,6 +1315,10 @@ export default {
           name: 'Treasure Preview',
           description: 'Show preview of future treasures when buying a treasure'
         },
+        cardPackPreview: {
+          name: 'Card Pack Preview',
+          description: 'Show preview of cards when buying a card pack'
+        },
         currencyLabel: {
           name: 'Show Currency Labels',
           description: 'Show currency gains and time to reach capacity without hovering'

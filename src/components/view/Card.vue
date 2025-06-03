@@ -21,8 +21,32 @@
         <template v-slot:selection="{ item }"><card-pack :item="item"></card-pack></template>
         <template v-slot:item="{ item }"><card-pack :item="item"></card-pack></template>
       </v-select>
-      <v-btn small class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-      <v-btn class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(false)">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+      <gb-tooltip v-if="showPreview">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn small class="ma-1" color="primary" :disabled="!canBuyPack" v-bind="attrs" v-on="on" @click="buyPack(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+        </template>
+        <div class="mt-0 text-center">最大购买预览</div>
+        <div v-if="maxPreviewCards.length > 0" class="mt-2">
+          <div v-for="(item, key) in maxPreviewSummary" :key="key">
+            <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
+            <span v-if="item.isNew">&nbsp;(新!)</span>
+            <span v-if="item.shinyCount">&nbsp;({{ item.shinyCount }}x 闪亮)</span>
+          </div>
+        </div>
+      </gb-tooltip>
+      <gb-tooltip v-if="showPreview">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="ma-1" color="primary" :disabled="!canBuyPack" v-bind="attrs" v-on="on" @click="buyPack(false)">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+        </template>
+        <div class="mt-0 text-center">单次购买预览</div>
+        <div v-if="singlePreviewCards.length > 0" class="mt-2">
+          <div v-for="(item, key) in singlePreviewSummary" :key="key">
+            <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
+            <span v-if="item.isNew">&nbsp;(新!)</span>
+            <span v-if="item.shinyCount">&nbsp;({{ item.shinyCount }}x 闪亮)</span>
+          </div>
+        </div>
+      </gb-tooltip>
     </div>
     <div class="d-flex flex-wrap align-center ma-1">
       <currency class="ma-1" name="card_shinyDust"></currency>
@@ -174,6 +198,37 @@ export default {
     },
     isCard1NewLabelEnabled() {
       return this.$store.state.system.settings.experiment.items.card1newLabel.value || false;
+    },
+    showPreview() {
+      return this.$store.state.system.settings.experiment?.items?.cardPackPreview?.value || false;
+    },
+    singlePreviewCards() {
+      if (!this.selectedPack) return [];
+      
+      const pack = this.packList[this.selectedPack];
+      if (!pack) return [];
+
+      return this.generatePreviewCards(pack, 1);
+    },
+    maxPreviewCards() {
+      if (!this.selectedPack) return [];
+      
+      const pack = this.packList[this.selectedPack];
+      if (!pack) return [];
+      
+      const maxAfford = Math.floor(this.$store.state.currency.gem_emerald.value / pack.price);
+      if (maxAfford <= 0) return [];
+      
+      return this.generatePreviewCards(pack, maxAfford);
+    },
+    singlePreviewSummary() {
+      return this.summarizePreviewCards(this.singlePreviewCards);
+    },
+    maxPreviewSummary() {
+      return this.summarizePreviewCards(this.maxPreviewCards);
+    },
+    allCards() {
+      return this.$store.state.card.card;
     }
   },
   methods: {
@@ -191,7 +246,6 @@ export default {
       }
     },
     getMissingCardSourcePacks(collectionData) {
-      console.log(collectionData);
       if (!collectionData || !collectionData.cards) {
         return [];
       }
@@ -215,6 +269,73 @@ export default {
         }
       }
       return Array.from(relevantPackNames);
+    },
+    generatePreviewCards(pack, packCount) {
+      const cards = [];
+      const packAmount = pack.amount || 1;
+      
+      const rngKey = 'cardPack_' + this.selectedPack;
+      const rngShinyKey = 'cardPackShiny_' + this.selectedPack;
+
+      try {
+        for (let p = 0; p < packCount; p++) {
+          const rngGen = this.$store.getters['system/getRng'](rngKey, p);
+          const rngGenShiny = this.$store.getters['system/getRng'](rngShinyKey, p);
+          
+          for (let i = 0; i < packAmount; i++) {
+            const cardChosen = pack.cacheContent[this.weightSelect(pack.cacheWeight, rngGen())];
+
+            const shinyChance = this.$store.getters['mult/get']('cardShinyChance');
+            const isShiny = this.$store.state.unlock.cardShiny.use && rngGenShiny() < shinyChance;
+            
+            cards.push({
+              id: cardChosen,
+              shiny: isShiny
+            });
+          }
+        }
+        
+        return cards;
+      } finally {
+        // null
+      }
+    },
+    weightSelect(weights, rng) {
+      let totalWeight = weights.reduce((a, b) => a + b, 0);
+      const r = rng * totalWeight;
+      let currentWeight = 0;
+      
+      for (let i = 0; i < weights.length; i++) {
+        currentWeight += weights[i];
+        if (r <= currentWeight) {
+          return i;
+        }
+      }
+      
+      return 0;
+    },
+    summarizePreviewCards(cards) {
+      const summary = {};
+      
+      cards.forEach(card => {
+        if (!summary[card.id]) {
+          const cardState = this.$store.state.card.card[card.id];
+          const isNew = cardState.amount <= 0;
+          
+          summary[card.id] = {
+            amount: 0,
+            shinyCount: 0,
+            isNew: isNew
+          };
+        }
+        
+        summary[card.id].amount++;
+        if (card.shiny) {
+          summary[card.id].shinyCount++;
+        }
+      });
+      
+      return summary;
     }
   }
 }

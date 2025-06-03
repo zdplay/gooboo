@@ -1347,6 +1347,10 @@ export default {
           name: '宝藏预测',
           description: '显示购买宝藏时可能获得的未来宝藏效果预览'
         },
+        cardPackPreview: {
+          name: '卡包购买预览',
+          description: '显示购买卡包时可能获得的卡片预览'
+        },
         currencyLabel: {
           name: '显示货币标签',
           description: '显示货币收益和达到容量所需的时间，无需悬停'

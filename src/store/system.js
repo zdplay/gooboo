@@ -367,6 +367,13 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
+                    },
+                    cardPackPreview: {
+                        unlock: 'cardFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     }
                 }
             },

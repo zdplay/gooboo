@@ -1347,6 +1347,10 @@ export default {
         name: 'Schatzvorschau',
         description: 'Zeigt eine Vorschau der zukünftigen Schätze an, wenn ein Schatz gekauft wird'
       },
+      cardPackPreview: {
+        name: 'Kartenpaket-Vorschau',
+        description: 'Zeigt eine Vorschau der Karten an, die du bekommst, wenn du ein Kartenpaket kaufst'
+      },
       currencyLabel: {
         name: 'Zeige Währungsschilder',
         description: 'Währungseinkommen und Zeit bis zur Kapazität werden ohne Herüberfahren mit der Maus angezeigt'
