@@ -34,6 +34,14 @@
   padding: 4px 0;
   line-height: 1;
 }
+.queue-delete-btn {
+  margin-left: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.queue-delete-btn:hover {
+  opacity: 1;
+}
 </style>
 
 <template>
@@ -60,6 +68,15 @@
             <div class="queue-number">{{ key + 1 }}</div>
             <span v-if="item.amount > 1" class="mr-2">×{{ item.amount }}</span>
             <span class="upgrade-name">{{ getUpgradeName(item.name) }}</span>
+            <v-btn
+              icon
+              x-small
+              class="queue-delete-btn"
+              @click.stop="removeQueueItem(item.name)"
+              :disabled="disabled"
+            >
+              <v-icon small>mdi-close</v-icon>
+            </v-btn>
           </div>
         </div>
         <v-spacer></v-spacer>
@@ -185,6 +202,12 @@ export default {
         const parts = fullName.split('_');
         return parts.length >= 2 ? parts[1] : fullName;
       }
+    },
+    removeQueueItem(itemName) {
+      this.$store.commit('upgrade/removeFromModuleQueue', {
+        module: this.queueKey,
+        item: itemName
+      });
     }
   }
 }

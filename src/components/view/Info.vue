@@ -223,7 +223,7 @@ export default {
       { category: '设置', color: 'teal', content: '增加手机菜单栏移动到底部，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '增加【显示科学记数法】选项，在【设置】-【实验性】设置。', isCurrentUpdate: false },
-      { category: '设置', color: 'teal', content: '增加升级队列功能。可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '设置', color: 'teal', content: '增加升级队列功能。可在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: true },
       { category: '挖矿', color: 'pink', content: '修改冶炼最大按钮为指定数量按钮。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加自动采矿功能，在深度切换右侧机器人按钮，支持离线。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加矿物总览功能。', isCurrentUpdate: true },

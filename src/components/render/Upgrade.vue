@@ -12,20 +12,14 @@
 .reduced-height {
   height: 28px;
 }
-.upgrade-name {
-  max-width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: clip;
-  cursor: pointer;
+.queue-button-default {
+  background-color: #757575 !important;
+  border-color: #757575 !important;
 }
-.queued-name {
-  color: var(--v-primary-base);
-  text-decoration: underline;
-}
-.flex-nowrap {
-  flex-wrap: nowrap !important;
-  overflow-x: auto;
+.queue-button-active {
+  background-color: #81C784 !important;
+  border-color: #81C784 !important;
+  color: #000 !important;
 }
 .progress-button-wrap {
   position: relative;
@@ -50,27 +44,28 @@
 </style>
 
 <template>
-  <v-card class="d-flex align-center pa-1 flex-nowrap" v-if="upgrade.collapse">
-    <gb-tooltip :min-width="120" content-class="text-center">
-      <template v-slot:activator="{ on, attrs }">
-        <v-icon v-if="upgrade.icon" class="ma-1" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'primary--text': isInModuleQueue && showUpgradeQueue}">{{ upgrade.icon }}</v-icon>
-        <div v-else class="upgrade-name text-truncate" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
-          {{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}
-        </div>
-      </template>
-      <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
-      <v-divider class="my-1"></v-divider>
-      <div v-if="showUpgradeQueue">{{ isInModuleQueue ? '点击取消队列' : '点击加入队列' }}</div>
-    </gb-tooltip>
+  <v-card class="d-flex align-center pa-1" v-if="upgrade.collapse">
+    <v-icon v-if="upgrade.icon" class="ma-1">{{ upgrade.icon }}</v-icon>
+    <div v-else class="ma-1">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
     <gb-tooltip key="upgrade-bought-collapse" v-if="upgrade.bought || (upgrade.cap !== null && !upgrade.hideCap)" :min-width="0">
       <template v-slot:activator="{ on, attrs }">
-        <v-chip label small class="ma-1 px-2" v-bind="attrs" v-on="on">
+        <v-chip
+          label
+          small
+          class="ma-1 px-2"
+          :class="showUpgradeQueue ? queueButtonColor : ''"
+          v-bind="attrs"
+          v-on="on"
+          @click="showUpgradeQueue ? toggleModuleQueue() : null"
+          :style="showUpgradeQueue ? 'cursor: pointer;' : ''"
+        >
           <v-icon class="mr-1">mdi-chevron-double-up</v-icon>
           <span>{{ upgrade.level }}{{ upgrade.level !== upgrade.bought ? (' (+' + Math.round(upgrade.bought - upgrade.level) + ')') : '' }}</span>
           <span v-if="upgrade.cap !== null && !upgrade.hideCap">&nbsp;/ {{ upgrade.cap }}</span>
         </v-chip>
       </template>
       <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.bought`) }}</div>
+      <div v-if="showUpgradeQueue" class="mt-1">{{ isInModuleQueue ? '点击删除自动升级队列' : '点击添加自动升级队列' }}</div>
     </gb-tooltip>
     <v-chip key="upgrade-time-collapse" label small class="ma-1 px-2" v-if="isTimed && isUpgrading">
       <v-icon class="mr-1">mdi-timer</v-icon>
@@ -80,7 +75,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="ma-1" small v-bind="attrs" v-on="on">mdi-lock</v-icon>
       </template>
-      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
+      <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
     <v-spacer></v-spacer>
     <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
@@ -88,7 +83,7 @@
       <template v-slot:activator="{ on, attrs }">
         <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
           <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-          <v-btn v-if="!isMax" class="px-2" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+          <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
         </div>
       </template>
       <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
@@ -99,16 +94,7 @@
   <v-card v-else>
     <v-card-title class="pa-2 justify-center">
       <v-icon v-if="upgrade.icon" class="mr-2">{{ upgrade.icon }}</v-icon>
-      <gb-tooltip :min-width="120" content-class="text-center">
-        <template v-slot:activator="{ on, attrs }">
-          <div class="upgrade-name" v-bind="attrs" v-on="on" @click="toggleModuleQueue" :class="{'queued-name': isInModuleQueue && showUpgradeQueue}">
-            {{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}
-          </div>
-        </template>
-        <div class="text-center">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
-        <v-divider class="my-1"></v-divider>
-        <div v-if="showUpgradeQueue">{{ isInModuleQueue ? '点击取消队列' : '点击加入队列' }}</div>
-      </gb-tooltip>
+      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.${ name }`) }}</div>
     </v-card-title>
     <v-card-text class="pb-0">
       <display-row v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
@@ -157,9 +143,14 @@
               :small="$vuetify.breakpoint.xsOnly"
               :label="$vuetify.breakpoint.xsOnly"
               class="ma-1"
-              :class="{'px-2': $vuetify.breakpoint.xsOnly, 'reduced-height': $vuetify.breakpoint.smAndUp}"
+              :class="[
+                {'px-2': $vuetify.breakpoint.xsOnly, 'reduced-height': $vuetify.breakpoint.smAndUp},
+                showUpgradeQueue ? queueButtonColor : ''
+              ]"
               v-bind="attrs"
               v-on="on"
+              @click="showUpgradeQueue ? toggleModuleQueue() : null"
+              :style="showUpgradeQueue ? 'cursor: pointer;' : ''"
             >
               <v-icon class="mr-1">mdi-chevron-double-up</v-icon>
               <span>{{ upgrade.level }}{{ upgrade.level !== upgrade.bought ? (' (+' + Math.round(upgrade.bought - upgrade.level) + ')') : '' }}</span>
@@ -167,6 +158,7 @@
             </v-chip>
           </template>
           <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.bought`) }}</div>
+          <div v-if="showUpgradeQueue" class="mt-1">{{ isInModuleQueue ? '点击删除自动升级队列' : '点击添加自动升级队列' }}</div>
         </gb-tooltip>
       </div>
       <v-chip
@@ -208,7 +200,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="upgrade-persistent" small v-bind="attrs" v-on="on">mdi-lock</v-icon>
       </template>
-      <div>{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
+      <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
   </v-card>
 </template>
@@ -437,6 +429,10 @@ export default {
     },
     showUpgradeQueue() {
       return this.$store.state.system.settings.experiment.items.enableUpgradeQueue.value;
+    },
+    queueButtonColor() {
+      if (!this.showUpgradeQueue) return '';
+      return this.isInModuleQueue ? 'queue-button-active' : 'queue-button-default';
     }
   },
   methods: {

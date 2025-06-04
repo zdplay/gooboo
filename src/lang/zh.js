@@ -1415,7 +1415,7 @@ export default {
         },
         enableUpgradeQueue: {
           name: '启用升级队列',
-          description: '启用升级队列功能，自动处理队列中的升级'
+          description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加'
         },
         enablePlayerName: {
           name: '显示玩家名称',
