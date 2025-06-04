@@ -162,8 +162,8 @@
             </v-chip>
           </template>
           <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.farm.gene.dnaDescription`, $formatNum(dnaNext)) }}</div>
-          <div>{{ $vuetify.lang.t(`$vuetify.farm.gene.dnaDuplicate`) }}</div>
-          <div v-if="crop.genesBlocked.length > 0">
+          <div v-if="!noGeneBlockEnabled">{{ $vuetify.lang.t(`$vuetify.farm.gene.dnaDuplicate`) }}</div>
+          <div v-if="crop.genesBlocked.length > 0 && !noGeneBlockEnabled">
             <span>{{ $vuetify.lang.t(`$vuetify.farm.gene.dnaBlocked`) }}:&nbsp;</span>
             <span v-for="(blocked, index) in crop.genesBlocked" :key="`gene-blocked-${ blocked }`">
               <span v-if="index > 0">,&nbsp;</span>
@@ -325,6 +325,9 @@ export default {
     },
     cropCount() {
       return this.$store.state.farm.field.reduce((a, b) => a + b.reduce((c, d) => c + ((d !== null && d.crop === this.name) ? 1 : 0), 0), 0);
+    },
+    noGeneBlockEnabled() {
+      return this.$store.state.system.settings.experiment.items.farmNoGeneBlock.value;
     }
   },
   methods: {
