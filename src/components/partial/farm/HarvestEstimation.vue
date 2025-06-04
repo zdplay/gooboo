@@ -57,28 +57,14 @@
     <template v-if="readyHarvests && Object.keys(readyHarvests).length > 0">
       <div class="harvest-subtitle">可收获的作物</div>
       <div class="harvest-items">
-        <template v-for="(item, itemName) in readyHarvests">
-          <gb-tooltip :key="itemName" :title-text="getTranslatedName(itemName)">
-            <template v-slot:activator="{ on, attrs }">
-              <div class="harvest-item v-chip v-chip--label v-size--small" 
-                  :class="[$vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', getItemColor(itemName)]"
-                  v-bind="attrs" v-on="on">
-                <v-icon small :color="getItemColor(itemName)" class="harvest-item-icon">{{ getItemIcon(itemName) }}</v-icon>
-                <span class="harvest-item-text">{{ formatItemAmount(item) }}</span>
-              </div>
-            </template>
-            <div>
-              <div>{{ getTranslatedName(itemName) }}</div>
-              <div class="text-center mt-2">
-                <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
-                <template v-if="$store.state.currency[itemName]?.cap !== null && $store.state.currency[itemName]?.cap !== undefined">
-                  <span> / </span>
-                  <span>{{ $formatNum($store.state.currency[itemName]?.cap, true) }}</span>
-                </template>
-              </div>
-            </div>
-          </gb-tooltip>
-        </template>
+        <price-tag
+          v-for="(item, itemName) in readyHarvests"
+          :key="itemName"
+          class="ma-1"
+          :currency="itemName"
+          :amount="item"
+          add
+        />
       </div>
     </template>
     
@@ -86,34 +72,20 @@
       <div v-for="(harvest, index) in futureHarvests" :key="index" class="harvest-group">
         <div class="harvest-time">{{ harvest.timeLabel }}</div>
         <div class="harvest-items">
-          <template v-for="(item, itemName) in harvest.items">
-            <gb-tooltip :key="itemName" :title-text="getTranslatedName(itemName)">
-              <template v-slot:activator="{ on, attrs }">
-                <div class="harvest-item v-chip v-chip--label v-size--small" 
-                    :class="[$vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', getItemColor(itemName)]"
-                    v-bind="attrs" v-on="on">
-                  <v-icon small :color="getItemColor(itemName)" class="harvest-item-icon">{{ getItemIcon(itemName) }}</v-icon>
-                  <span class="harvest-item-text">{{ formatItemAmount(item) }}</span>
-                </div>
-              </template>
-              <div>
-                <div>{{ getTranslatedName(itemName) }}</div>
-                <div class="text-center mt-2">
-                  <span>当前拥有: {{ $formatNum($store.state.currency[itemName]?.value || 0, true) }}</span>
-                  <template v-if="$store.state.currency[itemName]?.cap !== null && $store.state.currency[itemName]?.cap !== undefined">
-                    <span> / </span>
-                    <span>{{ $formatNum($store.state.currency[itemName]?.cap, true) }}</span>
-                  </template>
-                </div>
-              </div>
-            </gb-tooltip>
-          </template>
+          <price-tag
+            v-for="(item, itemName) in harvest.items"
+            :key="itemName"
+            class="ma-1"
+            :currency="itemName"
+            :amount="item"
+            add
+          />
         </div>
       </div>
     </template>
     
     <div v-if="(!readyHarvests || Object.keys(readyHarvests).length === 0) && (!futureHarvests || futureHarvests.length === 0)" class="text-center">
-      空
+      
     </div>
   </div>
 </template>
@@ -121,8 +93,10 @@
 <script>
 import { capitalize } from '../../../js/utils/format';
 import { chance, randomRound } from '../../../js/utils/random';
+import PriceTag from '../../render/PriceTag.vue';
 
 export default {
+  components: { PriceTag },
   data: () => ({
     readyHarvests: null,
     futureHarvests: []
@@ -163,8 +137,8 @@ export default {
       if (timeGroups['ready'] && timeGroups['ready'].length > 0) {
         const readyItems = {};
         
-        timeGroups['ready'].forEach(({ x, y, cell }) => {
-          const estimatedItems = this.estimateHarvest(x, y, cell);
+        timeGroups['ready'].forEach(({ cell }) => {
+          const estimatedItems = this.estimateHarvest(cell);
 
           Object.keys(estimatedItems).forEach(itemName => {
             if (!readyItems[itemName]) {
@@ -189,8 +163,8 @@ export default {
         const cells = timeGroups[time];
         const harvestItems = {};
         
-        cells.forEach(({ x, y, cell }) => {
-          const estimatedItems = this.estimateHarvest(x, y, cell, true);
+        cells.forEach(({ cell }) => {
+          const estimatedItems = this.estimateHarvest(cell, true);
 
           Object.keys(estimatedItems).forEach(itemName => {
             if (!harvestItems[itemName]) {
@@ -233,7 +207,7 @@ export default {
       
       if (Object.keys(beyond3HoursItems).length > 0) {
         this.futureHarvests.push({
-          timeLabel: `3小时以后可获取`,
+          timeLabel: `未来可获取`,
           items: this.sortHarvestItems(beyond3HoursItems)
         });
       }
@@ -258,7 +232,7 @@ export default {
       return sortedItems;
     },
     
-    estimateHarvest(x, y, cell, isFuture = false) {
+    estimateHarvest(cell, isFuture = false) {
       const harvestItems = {};
       if (isFuture) {
         cell = { ...cell, grow: 1 };
@@ -380,49 +354,7 @@ export default {
       // 注意：这里只是为了消耗随机数，保持与原始代码一致
 
       return harvestItems;
-    },
-
-
-    
-    getItemIcon(itemName) {
-      const currency = this.$store.state.currency[itemName];
-      return currency ? currency.icon : 'mdi-help-circle';
-    },
-    
-    getItemColor(itemName) {
-      const currency = this.$store.state.currency[itemName];
-      return currency ? currency.color : 'grey';
-    },
-    
-    getTranslatedName(itemName) {
-      if (!itemName || typeof itemName !== 'string') {
-        return 'Unknown';
-      }
-      
-      if (itemName.startsWith('farm_')) {
-
-        if (this.$store.state.currency[itemName]) {
-          return this.$vuetify.lang.t(`$vuetify.currency.${itemName}.name`);
-        } 
-
-        else if (this.$store.state.consumable[itemName]) {
-          return this.$vuetify.lang.t(`$vuetify.consumable.${itemName}.name`);
-        }
-      } else {
-
-        if (this.$store.state.consumable[itemName]) {
-          return this.$vuetify.lang.t(`$vuetify.consumable.${itemName}.name`);
-        }
-      }
-
-      return itemName.replace('farm_', '');
-    },
-    
-    formatItemAmount(item) {
-      // 现在我们返回精确值，所以直接格式化数字
-      const value = isNaN(item) ? 0 : item;
-      return this.$formatNum(value);
-    },
+    }
 
 
 
