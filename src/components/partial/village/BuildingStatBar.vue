@@ -32,7 +32,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-chip small class="ma-1 balloon-text-dynamic" :color="pollutionColor" v-bind="attrs" v-on="on">
           <v-icon class="mr-1">mdi-smoke</v-icon>
-          {{ $formatNum(pollution) }}
+          {{ $formatNum(pollution) }} / {{ $formatNum(pollutionTolerance) }}
         </v-chip>
       </template>
       <div>{{ $vuetify.lang.t('$vuetify.village.pollutionDescription', $formatNum(nextPollutionPenalty)) }}</div>
@@ -59,6 +59,9 @@ export default {
     },
     pollution() {
       return this.$store.getters['mult/get']('villagePollution');
+    },
+    pollutionTolerance() {
+      return this.$store.getters['mult/get']('villagePollutionTolerance');
     },
     pollutionColor() {
       if (this.pollution <= 0) {
