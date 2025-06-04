@@ -169,18 +169,18 @@
           'render-currency-mobile': $vuetify.breakpoint.xsOnly,
           'mb-2': $vuetify.breakpoint.xsOnly && hasLabels,
           'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
-          'render-currency-small': !large && (!hasNewLabels || !useNewStyle),
-          'render-currency-large': large && (!hasNewLabels || !useNewStyle),
-          'render-currency-small-new': !large && hasNewLabels && useNewStyle,
-          'render-currency-large-new': large && hasNewLabels && useNewStyle,
-          'currency-container-new': hasNewLabels && useNewStyle,
-          'mt-3': hasNewLabels && useNewStyle
+          'render-currency-small': !large && (!hasNewLabels || !hasNewLabels2),
+          'render-currency-large': large && (!hasNewLabels || !hasNewLabels2),
+          'render-currency-small-new': !large && hasNewLabels && hasNewLabels2,
+          'render-currency-large-new': large && hasNewLabels && hasNewLabels2,
+          'currency-container-new': hasNewLabels && hasNewLabels2,
+          'mt-3': hasNewLabels && hasNewLabels2
         }]"
         v-bind="attrs"
         v-on="{...$listeners, ...on}"
         @mouseover="handleHover"
       >
-        <template v-if="!hasNewLabels || !useNewStyle">
+        <template v-if="!hasNewLabels || !hasNewLabels2">
           <!-- 原有样式 -->
           <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
           <div class="currency-border rounded" :class="{'mt-n1 mb-1': hasOldLabels}">
@@ -199,7 +199,7 @@
               </template>
             </v-progress-linear>
           </div>
-          <div v-if="hasOldLabels" class="currency-labels d-flex justify-center">
+          <div v-if="hasOldLabels || (customTimeNeeded !== null && name === 'gallery_inspiration')" class="currency-labels d-flex justify-center">
             <div
               v-if="!currency.hideGainTag && gainTimerAmount > 0"
               class="currency-label balloon-text-dynamic rounded mx-1 px-1"
@@ -210,6 +210,12 @@
               class="currency-label balloon-text-dynamic rounded mx-1 px-1"
               :style="`background-color: var(--v-${ currency.color }-base);`"
             >{{ $formatTime(capTimerNeeded) }}</div>
+            <!-- 添加灵感剩余时间标签 -->
+            <div
+              v-if="customTimeNeeded !== null && name === 'gallery_inspiration'"
+              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+              :style="`background-color: var(--v-${ currency.color }-base);`"
+            >{{ $formatTime(customTimeNeeded) }}</div>
           </div>
         </template>
         
@@ -249,6 +255,11 @@
                 v-if="isOvercap && currency.overcapMult > 0"
                 class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
               >{{ $formatNum(overcapMult * 100, true) }}%</div>
+              <!-- 添加灵感剩余时间标签 -->
+              <div
+                v-if="customTimeNeeded !== null && name === 'gallery_inspiration'"
+                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+              >{{ $formatTime(customTimeNeeded) }}</div>
             </div>
           </div>
         </template>
@@ -325,6 +336,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    // 添加新的prop用于接收灵感剩余时间
+    customTimeNeeded: {
+      type: Number,
+      required: false,
+      default: null
     }
   },
   data: (() => ({
@@ -427,7 +444,7 @@ export default {
     hasNewLabels() {
       return !this.hideLabels && this.$store.state.system.settings.experiment.items.currencyLabel.value;
     },
-    useNewStyle() {
+    hasNewLabels2() {
       return this.$store.state.system.settings.experiment.items.currencynewLabel.value;
     }
   },

@@ -2456,8 +2456,8 @@ export default {
       buildBlueReservoir: '建造蓝色储备',
     },
     nextInspiration: {
-      0: '下一个 ',
-      1: ' 还有 '
+      0: '获得下一个 ',
+      1: ' 还要 '
     },
     shapes: {
       name: '形状',

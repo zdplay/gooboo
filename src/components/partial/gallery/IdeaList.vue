@@ -8,7 +8,7 @@
 <template>
   <div v-if="canSee">
     <div class="d-flex justify-center ma-2">
-      <currency name="gallery_inspiration" :customPercent="inspirationPercent">
+      <currency name="gallery_inspiration" :customPercent="inspirationPercent" :customTimeNeeded="nextInspirationTime">
         <span>{{ $vuetify.lang.t(`$vuetify.gallery.nextInspiration.0`) }}</span>
         <currency-icon name="gallery_inspiration"></currency-icon>
         <span>{{ $vuetify.lang.t(`$vuetify.gallery.nextInspiration.1`) }}</span>

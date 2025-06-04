@@ -9,15 +9,15 @@
             :class="[beautyCurrency.color, {
               'darken-2': $vuetify.theme.dark,
               'render-currency-mobile': $vuetify.breakpoint.xsOnly,
-              'render-currency-large': !useNewStyle,
-              'render-currency-large-new': useNewStyle,
-              'currency-container-new': useNewStyle,
-              'mt-3': useNewStyle
+              'render-currency-large': !hasNewLabels2,
+              'render-currency-large-new': hasNewLabels2,
+              'currency-container-new': hasNewLabels2,
+              'mt-3': hasNewLabels2
             }]"
             v-bind="attrs"
             v-on="on"
           >
-            <template v-if="!useNewStyle">
+            <template v-if="!hasNewLabels2">
               <div class="d-flex align-center w-100">
                 <v-icon :color="transparent ? beautyCurrency.color : undefined" class="mr-2">{{ beautyCurrency.icon }}</v-icon>
                 <div class="currency-border rounded flex-grow-1">
@@ -166,7 +166,7 @@ export default {
       const gainAmount = this.beautyCurrency.showGainTimer ? this.beautyGainAmount : this.beautyTimerFunction;
       return Math.ceil((this.nextTotalBeauty - this.totalBeauty) / gainAmount);
     },
-    useNewStyle() {
+    hasNewLabels2() {
       return this.$store.state.system.settings.experiment.items.currencynewLabel && 
              this.$store.state.system.settings.experiment.items.currencynewLabel.value;
     }
