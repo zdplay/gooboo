@@ -3,7 +3,15 @@
   width: 120px;
   height: 52px;
   font-weight: 700;
-  font-size: 48px;
+  font-size: 24px;
+}
+
+@media (max-width: 600px) {
+  .grade-text {
+    font-size: 18px;
+    width: 90px;
+    height: 42px;
+  }
 }
 .subject-help {
   position: absolute;

@@ -56,8 +56,11 @@
 }
 .grade-text {
   font-weight: 700;
-  font-size: 48px;
-  line-height: 48px;
+  font-size: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
 }
 .scrollable-table {
   width: fit-content;
@@ -85,6 +88,16 @@
   position: absolute;
   right: 4px;
   top: 4px;
+}
+@media (max-width: 600px) {
+  .grade-container {
+    padding: 2px 4px;
+    min-width: 50px;
+  }
+  
+  .grade-text {
+    font-size: 18px;
+  }
 }
 </style>
 
