@@ -120,6 +120,7 @@
 
 <script>
 import { capitalize } from '../../../js/utils/format';
+import { chance, randomRound } from '../../../js/utils/random';
 
 export default {
   data: () => ({
@@ -164,12 +165,12 @@ export default {
         
         timeGroups['ready'].forEach(({ x, y, cell }) => {
           const estimatedItems = this.estimateHarvest(x, y, cell);
-          
+
           Object.keys(estimatedItems).forEach(itemName => {
             if (!readyItems[itemName]) {
-              readyItems[itemName] = { min: 0, max: 0 };
+              readyItems[itemName] = 0;
             }
-            this.mergeItemsWithCap(readyItems, estimatedItems[itemName], itemName);
+            readyItems[itemName] += estimatedItems[itemName];
           });
         });
         
@@ -190,12 +191,12 @@ export default {
         
         cells.forEach(({ x, y, cell }) => {
           const estimatedItems = this.estimateHarvest(x, y, cell, true);
-          
+
           Object.keys(estimatedItems).forEach(itemName => {
             if (!harvestItems[itemName]) {
-              harvestItems[itemName] = { min: 0, max: 0 };
+              harvestItems[itemName] = 0;
             }
-            this.mergeItemsWithCap(harvestItems, estimatedItems[itemName], itemName);
+            harvestItems[itemName] += estimatedItems[itemName];
           });
         });
         
@@ -213,10 +214,9 @@ export default {
           } else {
             Object.keys(sortedItems).forEach(itemName => {
               if (!beyond3HoursItems[itemName]) {
-                beyond3HoursItems[itemName] = { min: 0, max: 0 };
+                beyond3HoursItems[itemName] = 0;
               }
-              beyond3HoursItems[itemName].min += sortedItems[itemName].min;
-              beyond3HoursItems[itemName].max += sortedItems[itemName].max;
+              beyond3HoursItems[itemName] += sortedItems[itemName];
             });
           }
         }
@@ -265,174 +265,124 @@ export default {
       } else if (cell.type !== 'crop' || cell.grow < 1) {
         return harvestItems;
       }
-      
+
       const crop = this.$store.state.farm.crop[cell.crop];
       if (!crop) {
         return harvestItems;
       }
-      
-      const geneStats = this.$store.getters['farm/cropGeneStats'](cell.crop, cell.fertilizer);
 
-      const gnomeBoostBase = 0.04 * ((cell.buildingEffect?.gnomeBoost ?? 0) / cell.time) + 1;
+      // 完全按照原始 harvestCrop 函数的逻辑
+      const field = cell; // 在原始代码中是 field，这里是 cell
+      // 注意：原始代码中 o.crop 在 harvestAll 调用时是 undefined！
+      const rngGen = this.$store.getters['system/getRngById'](`farmCrop_undefined`, field.rng);
+      const geneStats = this.$store.getters['farm/cropGeneStats'](field.crop, field.fertilizer);
 
-      const luckyHarvestChance = geneStats.tag.includes('farmLuckyHarvest') ? 0.01 : 0;
-      const luckyHarvestMult = this.$store.getters['mult/get']('farmLuckyHarvestMult', geneStats.mult.farmLuckyHarvestMult.baseValue);
+      const allGainBoost =
+          (0.04 * (field.buildingEffect.gnomeBoost ?? 0) / field.time + 1) *
+          ((geneStats.tag.includes('farmLuckyHarvest') && chance(0.01, rngGen())) ? this.$store.getters['mult/get']('farmLuckyHarvestMult', geneStats.mult.farmLuckyHarvestMult.baseValue) : 1);
 
-      const allGainBoostMin = isNaN(gnomeBoostBase) ? 1 : gnomeBoostBase;
-      const allGainBoostMax = isNaN(gnomeBoostBase) ? 1 : (gnomeBoostBase * (luckyHarvestChance > 0 ? luckyHarvestMult : 1));
+      // Gain currency based on crop value and all bonuses
+      if (this.$store.state.unlock && this.$store.state.unlock.farmCurrency && this.$store.state.unlock.farmCurrency.use) {
+          const currencies = crop.currencyGain || {};
+          for (const [key, elem] of Object.entries(currencies)) {
+              const gainAmount = randomRound(elem * this.$store.getters['mult/get'](
+                  'farmCropGain',
+                  geneStats.mult.farmCropGain.baseValue,
+                  ((field.buildingEffect.scarecrow ?? 0) * 0.1 / field.time + 1) * geneStats.mult.farmCropGain.multValue
+              ) * allGainBoost * field.grow, rngGen());
 
-      const goldChanceBase = this.$store.getters['farm/baseGoldChance'](cell.crop) + geneStats.mult.farmGoldChance.baseValue;
-      const goldChanceMult = ((cell.buildingEffect?.gardenGnome ?? 0) / cell.time) * geneStats.mult.farmGoldChance.multValue;
-      const goldChance = this.$store.getters['mult/get']('farmGoldChance', goldChanceBase, goldChanceMult);
-
-      if (goldChance > 0) {
-        const goldMin = Math.floor(goldChance * allGainBoostMin * cell.grow);
-        const goldMax = Math.ceil(goldChance * allGainBoostMax * cell.grow);
-        
-        if (goldMin === goldMax) {
-          harvestItems['farm_gold'] = isNaN(goldMin) ? 0 : goldMin;
-        } else {
-          harvestItems['farm_gold'] = { 
-            min: isNaN(goldMin) ? 0 : goldMin, 
-            max: isNaN(goldMax) ? 0 : goldMax 
-          };
-        }
+              if (gainAmount > 0) {
+                  harvestItems[`farm_${key}`] = (harvestItems[`farm_${key}`] || 0) + gainAmount;
+              }
+          }
       }
 
-      const yieldMultName = 'currencyFarm' + capitalize(crop.type) + 'Gain';
-      const flagBoost = (((cell.buildingEffect?.flag ?? 0) / cell.time) * 0.5 + 1);
-      const cropGainBase = (crop.yield || 0) + geneStats.mult.farmCropGain.baseValue;
-      const cropGainMult = flagBoost * geneStats.mult.farmCropGain.multValue;
-      
-      const cropGainValue = this.$store.getters['mult/get'](yieldMultName, cropGainBase, cropGainMult);
-      
-      const cropGainMin = Math.floor(cropGainValue * allGainBoostMin * cell.grow);
-      const cropGainMax = Math.ceil(cropGainValue * allGainBoostMax * cell.grow);
-      
-      if (cropGainMin === cropGainMax) {
-        harvestItems[`farm_${crop.type}`] = isNaN(cropGainMin) ? 0 : cropGainMin;
-      } else {
-        harvestItems[`farm_${crop.type}`] = { 
-          min: isNaN(cropGainMin) ? 0 : cropGainMin, 
-          max: isNaN(cropGainMax) ? 0 : cropGainMax 
-        };
+      // Gold gain
+      const goldAmount = randomRound(
+          this.$store.getters['mult/get'](
+              'farmGoldChance',
+              this.$store.getters['farm/baseGoldChance'](field.crop) + geneStats.mult.farmGoldChance.baseValue,
+              ((field.buildingEffect.gardenGnome ?? 0) / field.time) * geneStats.mult.farmGoldChance.multValue
+          ) * allGainBoost * field.grow,
+          rngGen()
+      );
+      if (goldAmount) {
+          harvestItems['farm_gold'] = (harvestItems['farm_gold'] || 0) + goldAmount;
       }
+
+      // Gain currency based on crop type
+      const gainAmount = this.$store.getters['mult/get'](
+          'currencyFarm' + capitalize(crop.type) + 'Gain',
+          (crop.yield || 0) + geneStats.mult.farmCropGain.baseValue,
+          (((field.buildingEffect.flag ?? 0) / field.time) * 0.5 + 1) * geneStats.mult.farmCropGain.multValue
+      ) * allGainBoost * field.grow;
+      harvestItems[`farm_${crop.type}`] = (harvestItems[`farm_${crop.type}`] || 0) + gainAmount;
 
       if (geneStats.tag.includes('farmYieldConversion')) {
-        ['vegetable', 'berry', 'grain', 'flower'].forEach(croptype => {
-          if (crop.type !== croptype) {
-            const conversionMultName = 'currencyFarm' + capitalize(croptype) + 'Gain';
-            const conversionValue = this.$store.getters['mult/get'](
-              conversionMultName, 
-              cropGainBase,
-              cropGainMult
-            );
-            
-            const conversionMin = Math.floor(conversionValue * allGainBoostMin * cell.grow * 0.05);
-            const conversionMax = Math.ceil(conversionValue * allGainBoostMax * cell.grow * 0.05);
-            
-            if (conversionMin === conversionMax) {
-              harvestItems[`farm_${croptype}`] = isNaN(conversionMin) ? 0 : conversionMin;
-            } else {
-              harvestItems[`farm_${croptype}`] = { 
-                min: isNaN(conversionMin) ? 0 : conversionMin, 
-                max: isNaN(conversionMax) ? 0 : conversionMax 
-              };
-            }
-          }
-        });
+          ['vegetable', 'berry', 'grain', 'flower'].forEach(croptype => {
+              if (crop.type !== croptype) {
+                  const conversionAmount = this.$store.getters['mult/get'](
+                      'currencyFarm' + capitalize(croptype) + 'Gain',
+                      (crop.yield || 0) + geneStats.mult.farmCropGain.baseValue,
+                      (((field.buildingEffect.flag ?? 0) / field.time) * 0.5 + 1) * geneStats.mult.farmCropGain.multValue
+                  ) * allGainBoost * field.grow;
+                  harvestItems[`farm_${croptype}`] = (harvestItems[`farm_${croptype}`] || 0) + conversionAmount * 0.05;
+              }
+          });
       }
 
-      const rareDrops = [...(crop.rareDrop || []), ...(geneStats.rareDrop || [])];
-
-      const findGeneRareDrop = (dropName) => {
-        for (const geneName in this.$store.state.farm.gene) {
-          const gene = this.$store.state.farm.gene[geneName];
-          if (!gene.active) continue;
-
-          if (gene.effect) {
-            for (const effect of gene.effect) {
-              if (effect.type === 'addRareDrop' && effect.name === dropName) {
-                return effect;
-              }
-            }
-          }
-        }
-        return null;
-      };
-      
-      rareDrops.forEach(drop => {
-        if (!drop || drop.chance === undefined) return;
-
-        if (drop.name === 'farm_grass' && drop.value === undefined) {
-          const geneEffect = findGeneRareDrop(drop.name);
-          if (geneEffect) {
-            drop.value = geneEffect.value;
-          }
-        }
-
-        let effectiveChance = drop.chance;
-        if (effectiveChance <= 0) {
-
-          const rareDropChance = this.$store.getters['mult/get']('farmRareDropChance', effectiveChance);
-          if (rareDropChance <= 0) return;
-          effectiveChance = rareDropChance;
-        }
-        
-        const pinwheelMult = (((cell.buildingEffect?.pinwheel ?? 0) / cell.time) * 0.015) + 1;
-        const dropChance = effectiveChance * pinwheelMult;
-        
-        if (dropChance > 0) {
-          let dropValue = drop.value;
-
-          if (drop.name === 'farm_grass' && (dropValue === undefined || dropValue === 0)) {
-
-            const grassGene = this.$store.state.farm.gene.grass;
-            if (grassGene && grassGene.active) {
-              dropValue = 8;
-
-              if (grassGene.level > 0) {
-                dropValue += grassGene.level;
-              }
-            } else {
-              dropValue = 40;
-            }
-          }
-          
-          const finalDropValue = dropValue * (drop.mult || 1);
-          const safeDropValue = isNaN(finalDropValue) ? 0 : finalDropValue;
-
-          if (drop.name === 'farm_grass') {
-
-            const grassCap = this.$store.state.currency['farm_grass']?.cap || 200;
-            const grassMin = 0;
-            const grassMax = Math.min(safeDropValue, grassCap);
-            
-            harvestItems[drop.name] = { 
-              min: grassMin, 
-              max: grassMax 
-            };
-          } else {
-            harvestItems[drop.name] = { min: 0, max: safeDropValue };
-          }
-        }
+      // Chance to gain rare drops
+      let geneDrops = geneStats.rareDrop.map(elem => {
+          return {
+              name: elem.name,
+              type: 'currency',
+              chance: elem.chance,
+              mult: elem.mult,
+              value: elem.amount,
+              found: true
+          };
       });
-      
+      const pinwheelMult = (((field.buildingEffect.pinwheel ?? 0) / field.time) * 0.015) + 1;
+      [...crop.rareDrop, ...geneDrops].forEach((elem) => {
+          const times = randomRound(this.$store.getters['mult/get'](
+              'farmRareDropChance',
+              elem.chance + geneStats.mult.farmRareDropChance.baseValue,
+              geneStats.mult.farmRareDropChance.multValue * pinwheelMult * elem.mult
+          ) * allGainBoost * field.grow, rngGen());
+          if (times > 0) {
+              switch (elem.type) {
+                  case 'consumable':
+                      harvestItems[elem.name] = (harvestItems[elem.name] || 0) + elem.value * times;
+                      break;
+                  case 'currency':
+                      harvestItems[elem.name] = (harvestItems[elem.name] || 0) + elem.value * times;
+                      break;
+              }
+          }
+      });
 
-      if (cell.crop === 'corn') {
-
-        const grassCap = this.$store.state.currency['farm_grass']?.cap || 200;
-
-        if (!harvestItems['farm_grass']) {
-          const cornGrassMin = 0;
-          const cornGrassMax = Math.min(40, grassCap);
-          
-          harvestItems['farm_grass'] = { min: cornGrassMin, max: cornGrassMax };
-        }
+      // Chance to gain hunted rare drops
+      if (geneStats.tag.includes('farmHunter')) {
+          crop.rareDrop.forEach((elem) => {
+              chance(this.$store.getters['mult/get'](
+                  'farmHuntChance',
+                  elem.chance + geneStats.mult.farmRareDropChance.baseValue + geneStats.mult.farmHuntChance.baseValue - elem.hunter * 0.05,
+                  geneStats.mult.farmRareDropChance.multValue * geneStats.mult.farmHuntChance.multValue * pinwheelMult * elem.mult
+              ) * allGainBoost * field.grow, rngGen());
+              // 注意：这里只是为了消耗随机数，保持与原始代码一致
+          });
       }
-      
+
+      // Clear field - 免费重植检查
+      if (geneStats.tag.includes('farmUnyielding')) {
+          chance(0.4, rngGen());
+      }
+      // 注意：这里只是为了消耗随机数，保持与原始代码一致
+
       return harvestItems;
     },
+
+
     
     getItemIcon(itemName) {
       const currency = this.$store.state.currency[itemName];
@@ -469,110 +419,13 @@ export default {
     },
     
     formatItemAmount(item) {
-      if (typeof item === 'object' && item.min !== undefined && item.max !== undefined) {
-
-        const min = isNaN(item.min) ? 0 : item.min;
-        const max = isNaN(item.max) ? 0 : item.max;
-
-        if (min === max) {
-          return this.$formatNum(min);
-        }
-        
-        const formattedMin = this.$formatNum(min);
-        const formattedMax = this.$formatNum(max);
-
-        if (formattedMin === formattedMax) {
-          return formattedMin;
-        }
-
-        if (min === 0 && max > 0) {
-          return `0~${formattedMax}`;
-        }
-
-        return `${formattedMin}~${formattedMax}`;
-      }
-
+      // 现在我们返回精确值，所以直接格式化数字
       const value = isNaN(item) ? 0 : item;
-
       return this.$formatNum(value);
     },
 
-    getCurrencyCap(currencyName) {
-      if (!currencyName || !this.$store.state.currency[currencyName]) {
-        return Infinity;
-      }
-      
-      const currency = this.$store.state.currency[currencyName];
-      return (currency && currency.cap !== undefined && currency.cap !== null) ? currency.cap : Infinity;
-    },
-    
 
-    mergeItemsWithCap(items, newItem, itemName) {
 
-      const cap = this.getCurrencyCap(itemName);
-      
-      if (!items[itemName]) {
-        // 如果是对象类型，确保不超过上限
-        if (typeof newItem === 'object' && newItem.min !== undefined && newItem.max !== undefined) {
-          items[itemName] = {
-            min: Math.min(newItem.min, cap),
-            max: Math.min(newItem.max, cap)
-          };
-        } else {
-          // 如果是数值，确保不超过上限
-          items[itemName] = Math.min(newItem, cap);
-        }
-      } else {
-
-        if (typeof items[itemName] === 'object' && typeof newItem === 'object') {
-
-          const newMin = Math.min(items[itemName].min + newItem.min, cap);
-          const newMax = Math.min(items[itemName].max + newItem.max, cap);
-          
-          items[itemName].min = newMin;
-          items[itemName].max = newMax;
-        } 
-
-        else if (typeof items[itemName] === 'object' && typeof newItem === 'number') {
-
-          const newMin = Math.min(items[itemName].min + newItem, cap);
-          const newMax = Math.min(items[itemName].max + newItem, cap);
-          
-          items[itemName].min = newMin;
-          items[itemName].max = newMax;
-        }
-
-        else if (typeof items[itemName] === 'number' && typeof newItem === 'object') {
-
-          const newMin = Math.min(items[itemName] + newItem.min, cap);
-          const newMax = Math.min(items[itemName] + newItem.max, cap);
-          
-          items[itemName] = {
-            min: newMin,
-            max: newMax
-          };
-        }
-
-        else {
-
-          const newValue = Math.min(items[itemName] + newItem, cap);
-          
-          items[itemName] = newValue;
-        }
-      }
-      
-      // 特殊处理farm_grass，始终确保显示为范围形式
-      if (itemName === 'farm_grass') {
-        // 如果是单个值，转换为范围形式
-        if (typeof items[itemName] === 'number') {
-          const value = items[itemName];
-          items[itemName] = {
-            min: 0,
-            max: value
-          };
-        }
-      }
-    }
   },
   watch: {
     '$store.state.farm.field': {
