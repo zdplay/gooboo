@@ -1319,6 +1319,10 @@ export default {
           name: 'Card Pack Preview',
           description: 'Show preview of cards when buying a card pack'
         },
+        mobileHordeLoadoutLayout: {
+          name: 'Mobile Horde Loadout Layout',
+          description: 'On mobile and medium screens, show loadout button next to player name in horde, click to expand loadout container above player container'
+        },
         currencyLabel: {
           name: 'Show Currency Labels',
           description: 'Show currency gains and time to reach capacity without hovering'

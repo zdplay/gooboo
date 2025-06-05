@@ -374,6 +374,13 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
+                    },
+                    mobileHordeLoadoutLayout: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
                     }
                 }
             },

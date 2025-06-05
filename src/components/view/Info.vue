@@ -232,6 +232,7 @@ export default {
       { category: '部落', color: 'red', content: '增加显示玩家名称功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加装备最大化升级按钮，只能非折叠状态显示。', isCurrentUpdate: true },
       { category: '部落', color: 'red', content: '增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，完善自动升级、装备、技能。', isCurrentUpdate: false },
+      { category: '部落', color: 'red', content: '增加手机装备布局功能，在【设置】-【实验性】设置，只有小屏幕和手机才会显示。', isCurrentUpdate: true },
       { category: '画廊', color: 'orange', content: '增加画廊的形状游戏显示各个形状的个数。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊形状【清管】功能，一键清空动力值。', isCurrentUpdate: false },

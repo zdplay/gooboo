@@ -192,7 +192,8 @@ export default {
       // UI相关的设置项
       const uiRelatedKeys = [
         'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
-        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation'
+        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
+        'mobileHordeLoadoutLayout'
       ];
       
       let obj = {};
@@ -209,7 +210,8 @@ export default {
       // 功能相关的设置项
       const uiRelatedKeys = [
         'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
-        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation' 
+        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
+        'mobileHordeLoadoutLayout'
       ];
       
       let obj = {};

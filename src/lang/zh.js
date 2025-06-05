@@ -1351,6 +1351,10 @@ export default {
           name: '卡包购买预览',
           description: '显示购买卡包时可能获得的卡片预览'
         },
+        mobileHordeLoadoutLayout: {
+          name: '手机部落预载新布局',
+          description: '在手机和中屏幕下，在部落玩家状态右边显示预载按钮，点击可在玩家容器上方展开预载功能'
+        },
         currencyLabel: {
           name: '显示货币标签',
           description: '显示货币收益和达到容量所需的时间，无需悬停'

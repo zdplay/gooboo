@@ -1351,6 +1351,10 @@ export default {
         name: 'Kartenpaket-Vorschau',
         description: 'Zeigt eine Vorschau der Karten an, die du bekommst, wenn du ein Kartenpaket kaufst'
       },
+      mobileHordeLoadoutLayout: {
+        name: 'Mobile Horde Ausrüstungs-Layout',
+        description: 'Auf mobilen und mittleren Bildschirmen wird neben dem Spielernamen in der Horde ein Ausrüstungsknopf angezeigt. Klicken Sie darauf, um den Ausrüstungscontainer über dem Spielercontainer zu erweitern'
+      },
       currencyLabel: {
         name: 'Zeige Währungsschilder',
         description: 'Währungseinkommen und Zeit bis zur Kapazität werden ohne Herüberfahren mit der Maus angezeigt'
