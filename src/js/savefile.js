@@ -557,24 +557,20 @@ function loadFile(file) {
         }
     }
 
-    // 特殊处理dailyCheckIn数据
-    // 如果存档中没有dailyCheckIn数据（如从原版导入），创建一个"今日已签到"的状态
     if (!save.dailyCheckIn) {
-        //console.log("导入的存档缺少dailyCheckIn数据，初始化为今日已签到状态");
         const now = Math.floor(Date.now() / 1000);
-        const currentPlayerId = store.state.system.playerId; // 使用当前设置的玩家ID
-        
+        const currentPlayerId = store.state.system.playerId;
+
         store.commit('system/updateKey', {
             key: 'dailyCheckIn',
             value: {
-                available: 0, // 设置为0表示今日已签到
-                timestamp: now, // 使用当前时间作为签到时间
-                history: [], // 空历史记录
-                playerId: currentPlayerId // 使用当前玩家ID
+                available: 0,
+                timestamp: now,
+                history: [],
+                playerId: currentPlayerId
             }
         });
     } else {
-        // 正常加载dailyCheckIn数据
         store.commit('system/updateKey', {key: 'dailyCheckIn', value: save.dailyCheckIn});
     }
 
