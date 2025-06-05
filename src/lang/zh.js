@@ -1355,6 +1355,10 @@ export default {
           name: '手机部落预载新布局',
           description: '在手机和中屏幕下，在部落玩家状态右边显示预载按钮，点击可在玩家容器上方展开预载功能'
         },
+        dailyCheckIn: {
+          name: '每日签到',
+          description: '显示每日签到按钮，每天可以签到一次获得随机奖励'
+        },
         currencyLabel: {
           name: '显示货币标签',
           description: '显示货币收益和达到容量所需的时间，无需悬停'

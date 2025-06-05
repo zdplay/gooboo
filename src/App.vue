@@ -532,7 +532,7 @@
           <currency name="gem_amethyst"></currency>
         </div>
       </gb-tooltip>
-      <daily-check-in></daily-check-in>
+      <daily-check-in v-if="$store.state.system.settings.experiment.items.dailyCheckIn.value"></daily-check-in>
       <gb-tooltip v-if="featureIsFrozen" key="frozen-feature" :title-text="$vuetify.lang.t('$vuetify.cryolab.frozenFeature.title')">
         <template v-slot:activator="{ on, attrs }">
           <v-icon class="mx-2" v-bind="attrs" v-on="on">mdi-snowflake</v-icon>

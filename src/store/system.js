@@ -381,6 +381,13 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
+                    },
+                    dailyCheckIn: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
                     }
                 }
             },

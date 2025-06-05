@@ -6,9 +6,9 @@ const dailyCheckIn = {
   poolProbabilities: [
     { name: 'wheelOfFortune0', chance: 50, color: 'white', animation: null },
     { name: 'wheelOfFortune1', chance: 30, color: 'blue', animation: null },
-    { name: 'wheelOfFortune2', chance: 10, color: 'orange', animation: null },
-    { name: 'wheelOfFortune3', chance: 8, color: 'purple', animation: 'small-confetti' },
-    { name: 'wheelOfFortune4', chance: 2, color: 'red', animation: 'large-confetti' }
+    { name: 'wheelOfFortune2', chance: 15, color: 'orange', animation: null },
+    { name: 'wheelOfFortune3', chance: 4, color: 'purple', animation: 'small-confetti' },
+    { name: 'wheelOfFortune4', chance: 1, color: 'red', animation: 'large-confetti' }
   ],
   
   initData() {

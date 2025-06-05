@@ -1323,6 +1323,10 @@ export default {
           name: 'Mobile Horde Loadout Layout',
           description: 'On mobile and medium screens, show loadout button next to player name in horde, click to expand loadout container above player container'
         },
+        dailyCheckIn: {
+          name: 'Daily Check-in',
+          description: 'Show daily check-in button, allows checking in once per day to receive random rewards'
+        },
         currencyLabel: {
           name: 'Show Currency Labels',
           description: 'Show currency gains and time to reach capacity without hovering'
