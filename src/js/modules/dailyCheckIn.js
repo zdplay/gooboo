@@ -2,7 +2,7 @@ import store from '../../store';
 import dailyCheckInPrize from './dailyCheckIn/prize';
 
 const dailyCheckIn = {
-  debug: true,
+  debug: false,
 
   poolProbabilities: [
     { name: 'dailyCheckIn0', chance: 50, color: 'white', animation: null },
