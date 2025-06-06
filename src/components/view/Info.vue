@@ -81,7 +81,7 @@
 
     <v-card class="ma-2">
       <v-card-title class="justify-center">改动声明</v-card-title>
-      <v-card-text>本版修改属于改善对自己游戏体验需求，如感不适可玩官服。</v-card-text>
+      <v-card-text>本版修改属于改善自己游戏的体验，如感不适可玩官服。</v-card-text>
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
         <v-expansion-panels>
