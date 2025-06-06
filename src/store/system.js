@@ -388,7 +388,21 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
-                    }
+                    },
+                    autoUseExamPass: {
+                        unlock: 'schoolFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
+                    qutickSchoolExam: {
+                        unlock: 'schoolFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                 }
             },
             automation: {

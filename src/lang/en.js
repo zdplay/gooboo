@@ -1319,6 +1319,14 @@ export default {
           name: 'Card Pack Preview',
           description: 'Show preview of cards when buying a card pack'
         },
+        autoUseExamPass: {
+          name: 'Auto Use Exam Pass',
+          description: 'Automatically use exam pass when available'
+        },
+        qutickSchoolExam: {
+          name: 'QutickSchoolExam',
+          description: 'Rapid exam with no waiting time for the exam'
+        },
         mobileHordeLoadoutLayout: {
           name: 'Mobile Horde Loadout Layout',
           description: 'On mobile and medium screens, show loadout button next to player name in horde, click to expand loadout container above player container'
