@@ -1,17 +1,17 @@
 export default {
-  owned: '拥有',
+  owned: '已拥有',
 
   gem_prestigeStone: {
     name: '声望石',
-    description: '获得与您的最佳周期相等的声望货币'
+    description: '获得等同于你最佳周期的声望货币'
   },
   mining_goldenHammer: {
     name: '金锤',
-    description: '为这门手艺找到最好的镐'
+    description: '获得此制作可能的最佳镐'
   },
   village_ingredientBox: {
-    name: '配料箱',
-    description: '含有只有在这些盒子里才能找到的特殊成分'
+    name: '配料盒',
+    description: '包含随机配料的盒子，可以用于制作特殊物品'
   },
   horde_manaPotion: {
     name: '法力药水',
@@ -19,31 +19,31 @@ export default {
   },
   farm_basic: {
     name: '基础肥料',
-    description: ''
+    description: '提供基础的营养，适合所有作物'
   },
   farm_flower: {
     name: '花肥',
-    description: ''
+    description: '专为花卉设计的特殊肥料，能促进花朵更好地生长'
   },
   farm_speedGrow: {
-    name: '快速生长',
-    description: ''
+    name: '快速生长剂',
+    description: '加速作物生长进程，减少收获等待时间'
   },
   farm_richSoil: {
-    name: '肥沃的土壤',
-    description: ''
+    name: '肥沃土壤',
+    description: '极其肥沃的土壤，能显著提高作物产量'
   },
   farm_shiny: {
     name: '闪亮肥料',
-    description: ''
+    description: '使作物闪闪发光，增加稀有掉落几率'
   },
   farm_juicy: {
     name: '多汁肥料',
-    description: ''
+    description: '使作物更加多汁，增加产量'
   },
   farm_dissolving: {
     name: '作物溶解剂',
-    description: ''
+    description: '快速溶解作物，立即收获但可能减少产量'
   },
   farm_potatoWater: {
     name: '土豆水',

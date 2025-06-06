@@ -2,8 +2,8 @@ export default {
   maxLevel: '{0} 最高等级',
   queueEmpty: '队列为空',
   nextLevels: '下一级',
-  bookNotFound: '通过达到某些升级的最高级别来找到此功能的书籍升级',
-  bookNotFoundVillage: '通过达到某些升级或建筑物的最高级别来找到此功能的书籍升级',
+  bookNotFound: '通过达到某些升级的最高级别来解锁此功能的书籍升级',
+  bookNotFoundVillage: '通过达到某些升级或建筑物的最高级别来解锁此功能的书籍升级',
 
   keyset: {
     default: {
@@ -28,13 +28,13 @@ export default {
 
   description: {
     mining_craftingStation: '制作站可以让你消耗矿石来提高你的镐的力量，这对于增加你的伤害至关重要',
-    mining_compressor: '压缩机允许您增加每个槽的矿石量以获得更高的纯度',
-    mining_depthDweller: '这可以让您获得矿山的声望选项',
-    mining_smeltery: '这允许您熔炼矿石和稀土来制造金属锭',
-    mining_enhancingStation: '这允许您在独特的镐修改器上花费金属锭',
-    mining_emberForge: '灰烬可以提高声望并提高你的冶炼速度',
-    mining_stickyJar: '使用树脂可以获得更好的制作效果，但需要很长时间才能生成',
-    mining_premiumCraftingSlots: '将您的一个制作槽升级为高级，将 x1 以上的杂质减半并使纯度加倍',
+    mining_compressor: '压缩机允许你增加每个槽位的矿石量以获得更高的纯度',
+    mining_depthDweller: '这可以让你获得矿井的声望选项',
+    mining_smeltery: '这允许你熔炼矿石和稀土来制造金属锭',
+    mining_enhancingStation: '这允许你在独特的镐修改器上花费金属锭',
+    mining_emberForge: '声望时获得余烬，余烬可以提高你的冶炼速度',
+    mining_stickyJar: '树脂可以用于获得更好的制作效果，但需要很长时间才能生成',
+    mining_premiumCraftingSlots: '将你的一个制作槽位升级为高级，将 x1 以上的杂质减半并使纯度加倍',
 
     village_treasury: '税率导致您的劳动村民消费食物并缴纳税款作为回报',
     village_church: '这使您可以享受村庄的声望选项',
@@ -372,10 +372,10 @@ export default {
   village_holyCrane: '圣鹤',
   village_monk: '僧侣',
   village_holyPiggyBank: '神圣的存钱罐',
-  village_deepWorship: '深深的崇拜',
+  village_deepWorship: '深度崇拜',
   village_cityPlanning: '城市规划',
-  village_managers: '经理人',
-  village_warehouse: '仓库',
+  village_managers: '管理者',
+  village_warehouse: '大型仓库',
   village_sandstone: '砂岩',
   village_holyForest: '神圣森林',
   village_holyGem: '神圣宝石',
@@ -384,7 +384,7 @@ export default {
   village_charity: '慈善机构',
   village_holyOil: '圣油',
   village_holyMarble: '神圣大理石',
-  village_calmingSpeech: '平静的演讲',
+  village_calmingSpeech: '安抚演讲',
   village_holyLoot: '神圣战利品',
   village_holyChisel: '神圣凿子',
 
@@ -460,8 +460,8 @@ export default {
   horde_collector: '收集器',
   horde_prepareTheSacrifice: '准备牺牲',
 
-  horde_transfusion: '输血',
-  horde_darkAttack: '黑暗攻击',
+  horde_transfusion: '血能注入',
+  horde_darkAttack: '暗影攻击',
   horde_darkHealth: '黑暗生命值',
   horde_harvest: '收割',
   horde_protectiveShell: '保护壳',

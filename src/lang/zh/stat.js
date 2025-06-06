@@ -29,7 +29,7 @@ export default {
     description: '单次最大伤害'
   },
   mining_craftingCount: {
-    description: '制作的镐子数量'
+    description: '制作的镐数量'
   },
   mining_scrap: {
     achievement: '废料堆',
@@ -37,7 +37,7 @@ export default {
   },
   mining_oreTotal: {
     achievement: '矿石丰富',
-    description: '获得的矿石'
+    description: '获得的矿石总量'
   },
   mining_oreVariety: {
     achievement: '多样矿藏',
@@ -45,18 +45,18 @@ export default {
   },
   mining_coal: {
     achievement: '漆黑一片',
-    description: '获得的煤炭'
+    description: '获得的煤炭量'
   },
   mining_coalMax: {
     description: '最高煤炭数量'
   },
   mining_resin: {
     achievement: '黏滞困境',
-    description: '获得的树脂'
+    description: '获得的树脂量'
   },
   mining_craftingWasted: {
     achievement: '徒劳无功',
-    description: '制作一把不如当前镐子好的镐子'
+    description: '制作了一把不如当前镐好的镐'
   },
   mining_dwellerCapHit: {
     achievement: '触底反弹',
@@ -64,13 +64,13 @@ export default {
   },
   mining_craftingLuck: {
     achievement: '百万分之一',
-    description: '获得属性排名前0.0001%的镐子'
+    description: '获得属性排名前0.0001%的镐'
   },
   mining_timeSpent: {
     description: '花费的时间'
   },
   mining_bestPrestige0: {
-    description: '最佳声望（矿山）'
+    description: '最佳声望（矿井）'
   },
   mining_bestPrestige1: {
     description: '最佳声望（气态巨行星）'

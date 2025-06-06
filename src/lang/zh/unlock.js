@@ -2,7 +2,7 @@ export default {
   miningPickaxeCrafting: '镐制作',
   miningDepthDweller: '深度居民',
   miningSmeltery: '冶炼厂',
-  miningEnhancement: '增强',
+  miningEnhancement: '强化',
   miningResin: '树脂',
   miningSmoke: '烟雾',
   miningCompressAluminium: '铝压缩',

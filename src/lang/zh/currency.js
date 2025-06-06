@@ -448,20 +448,20 @@ export default {
     description: '通过向村民出售手工制作的物品赚取的金币'
   },
   village_wood: {
-    name: '木头',
-    description: '从附近树木采伐的原木'
+    name: '木材',
+    description: '从树木中获取的木材，是建造和制作的基础材料'
   },
   village_plantFiber: {
     name: '植物纤维',
-    description: '草，小植物，树叶，都没关系。 它们都很有用'
+    description: '从植物中提取的纤维，可用于制作简单的物品'
   },
   village_stone: {
     name: '石头',
-    description: '你的生物收集的小石头'
+    description: '坚硬的石块，可用于建造和制作'
   },
   village_metal: {
     name: '金属',
-    description: '你的生物通过挖掘地下发现了这种金属。 看来这个村庄的地下并没有充满废料'
+    description: '从矿石中提炼的金属，用于制作更高级的物品'
   },
   village_gem: {
     name: '宝石',
@@ -469,7 +469,7 @@ export default {
   },
   village_water: {
     name: '水',
-    description: '只是简单的水'
+    description: '清澈的水，用于灌溉和制作'
   },
   village_vegetable: {
     name: '蔬菜',
@@ -489,11 +489,11 @@ export default {
   },
   village_knowledge: {
     name: '知识',
-    description: '观察和学习'
+    description: '村民通过学习和研究获得的知识，用于解锁新技术'
   },
   village_science: {
     name: '科学',
-    description: '通过在科学标准下进行实验，您可以收集数据，让您更好地了解这个世界'
+    description: '通过研究和实验获得的科学知识，用于解锁高级技术'
   },
   village_joy: {
     name: '快乐',
@@ -501,11 +501,11 @@ export default {
   },
   village_glass: {
     name: '玻璃',
-    description: '小心点，别掉下来!'
+    description: '从沙子中熔炼而成的透明材料，用于制作高级物品'
   },
   village_faith: {
     name: '信仰',
-    description: '你的村民确信未来情况会更好'
+    description: '村民对更高存在的信仰，可以用来获得祝福'
   },
   village_blessing: {
     name: '祝福',
@@ -524,32 +524,32 @@ export default {
     description: '这些原木是从需要几个世纪才能生长的巨树中获得的。 他们的木材很硬，但仍然有弹性'
   },
   village_oil: {
-    name: '油',
-    description: '灵活而宝贵的资源'
+    name: '石油',
+    description: '从地下开采的黑色液体，是一种重要的能源和制作材料'
   },
   village_marble: {
     name: '大理石',
-    description: '这块美丽的石头是更豪华建筑的常见选择'
+    description: '高级建筑材料，用于建造豪华建筑'
   },
   village_meat: {
     name: '肉',
     description: '这些牛肯定过着美好的生活......对吧？'
   },
   village_loot0: {
-    name: '常见战利品',
-    description: '暂时必须做的事...'
+    name: '普通战利品',
+    description: '探险家带回的普通物品，可以出售获得铜币'
   },
   village_loot1: {
-    name: '罕见的战利品',
-    description: '稍微好一点，但我们可以做得更多!'
+    name: '稀有战利品',
+    description: '探险家带回的稀有物品，可以出售获得更多铜币'
   },
   village_loot2: {
-    name: '稀有战利品',
-    description: '终于有像样的东西了'
+    name: '史诗战利品',
+    description: '探险家带回的史诗物品，可以出售获得大量铜币'
   },
   village_loot3: {
-    name: '史诗战利品',
-    description: '现在情况正在好转'
+    name: '传说战利品',
+    description: '探险家带回的传说物品，可以出售获得巨额铜币'
   },
   village_loot4: {
     name: '传说战利品',

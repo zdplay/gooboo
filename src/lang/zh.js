@@ -19,16 +19,16 @@ export default {
     craft: '制作',
     feature: '功能',
     features: '功能',
-    cantAfford: '买不起',
-    capTooLow: '容量太低',
+    cantAfford: '无法购买',
+    capTooLow: '容量不足',
     equip: '装备',
-    unequip: '脱下',
-    unequipAll: '全部脱下',
+    unequip: '卸下',
+    unequipAll: '全部卸下',
     select: '选择',
     deselect: '取消选择',
-    take: '拿走',
+    take: '拿取',
     max: '最大',
-    maxed: '最大',
+    maxed: '已满',
     free: '免费',
     capacity: '容量',
     multCapacity: '{0} 容量',
@@ -45,14 +45,14 @@ export default {
     upgradeVerb: '升级',
     upgradesPrestige: '声望升级',
     prestige: '声望',
-    prestigeDescription: '重置此功能以换取声望货币',
-    prestigeTime: '此声望周期花费的时间',
+    prestigeDescription: '重置此功能以获得声望货币',
+    prestigeTime: '本次声望周期已用时间',
     saveManual: '保存',
-    saveExport: '导出到文件',
-    saveImport: '从文件加载',
-    cloudsave: '【云存档】',
-    cloudloadlatest: '【云加载最新】',
-    cloudloadlist: '【云存档列表】',
+    saveExport: '导出存档',
+    saveImport: '导入存档',
+    cloudsave: '云存档',
+    cloudloadlatest: '加载最新云存档',
+    cloudloadlist: '云存档列表',
     resetProgress: '重置进度',
     closeAll: '全部关闭',
     draw: '画画',
@@ -172,12 +172,12 @@ export default {
     deleteButton: '删除保存文件'
   },
   prestigeDescription: {
-    mining_ember: '获得相当于当前居住者深度百分比的余烬',
+    mining_ember: '获得相当于当前居民深度百分比的余烬',
     village_blessing: '信仰会转化为祝福',
-    village_shares: '获得相当于你当前铜币数量0.1%的股票',
-    horde_soulEmpowered: '堕落的灵魂将被转化为强大的灵魂',
-    horde_courage: '当你达到10级时获得勇气，之后每升一级获得更多勇气',
-    gallery_cash: '根据你获得的美丽的总数量获得现金',
+    village_shares: '获得相当于当前铜币数量0.1%的股票',
+    horde_soulEmpowered: '堕落的灵魂将转化为强大的灵魂',
+    horde_courage: '达到10级时获得勇气，之后每升一级获得更多勇气',
+    gallery_cash: '根据获得的美丽总量获得现金',
   },
   confirm: {
     title: '确认操作',
@@ -264,7 +264,7 @@ export default {
     },
     horde: {
       0: '装备',
-      1: 'Classes',
+      1: '职业',
     },
     farm: {
       0: '花园',
@@ -281,17 +281,17 @@ export default {
     hordeBattlePassUpgrade: '新的升级',
     hordeBattlePassPrestigeUpgrade: '新的声望升级',
     farmUnlockDna: '解锁 1 级基因的所有 DNA 升级',
-    farmGnomeBoost: '增加附近每个花园侏儒的收获收益4%。高级花园侏儒算作2',
-    farmLonelyGrow: '如果田间没有其他此类作物，生长速度会加快两倍',
-    farmFertileBoost: '每消耗1块蓝宝石肥料，产量提升30%',
-    farmYieldConversion: '将 5% 的收益转换为其他收益类型',
-    farmFastPrestige: '声望将作物等级降低 5，而不是重置为 0',
-    farmLuckyHarvest: '1%的几率获得8倍的收获增益',
-    farmSelfless: '所有作物增产5%',
-    farmUnyielding: '收割后有40%的几率免费重新种植',
-    farmTeamwork: '每一种作物都有这种基因，所有作物的产量都会翻倍',
-    farmHunter: '资源稀有滴原生植物被猎杀。狩猎几率等于你稀有掉落几率的1%。每次狩猎成功，资源容量增加基础值的10%，基础狩猎几率降低5%',
-    farmPatient: '自选择该基因以来，每天增产+3%，60天增产+180%',
+    farmGnomeBoost: '每个附近的花园侏儒都会增加收获产量4%，高级花园侏儒效果翻倍',
+    farmLonelyGrow: '当田地中没有其他同类作物时，生长速度翻倍',
+    farmFertileBoost: '每消耗1单位蓝宝石肥料，产量提升30%',
+    farmYieldConversion: '将5%的产量转化为其他类型的资源',
+    farmFastPrestige: '声望时作物等级只降低5级，而不是重置为0级',
+    farmLuckyHarvest: '有1%的几率获得8倍收获奖励',
+    farmSelfless: '所有作物产量提升5%',
+    farmUnyielding: '收割后有40%的几率自动免费重新种植',
+    farmTeamwork: '每种拥有此基因的作物都会使所有作物的产量翻倍',
+    farmHunter: '猎杀稀有资源的原生植物。狩猎几率等于你稀有掉落几率的1%。每次狩猎成功，资源容量增加基础值的10%，基础狩猎几率降低5%',
+    farmPatient: '选择该基因后，每天产量增加3%，最多持续60天（总计+180%）'
   },
   upgrade,
   currency,
@@ -300,27 +300,27 @@ export default {
   patchnote,
   info: {
     title: 'Gooboo',
-    subtitle: '开发者是 Tendsty',
-    testing: '测试',
-    text: 'Gooboo 是一款放置/增量游戏，您可以在神秘、未知的世界中管理多个功能。 收集不同的资源来购买各种各样的升级，以增加你的资源收益。 取得主要功能的进展以解锁新内容并了解有关这个世界的更多信息。 当进展开始放缓时，声望个人功能可以将您的收获提升到一个新的等级。',
+    subtitle: '开发者：Tendsty',
+    testing: '测试版',
+    text: 'Gooboo 是一款放置/增量游戏，你将在神秘未知的世界中管理多种功能。收集各种资源购买升级，提升资源获取速度。推进主要功能以解锁新内容，了解更多世界信息。当进度放缓时，可以对单个功能进行声望重置，将你的收益提升到新高度。',
     updates: {
-      web: '您使用的是网页版。 游戏会定期检查更新，自动使用最新版本，并在有可用更新时通知您。',
+      web: '你正在使用网页版。游戏会定期检查更新，自动使用最新版本，并在有更新时通知你。',
       desktop: {
-        0: '您正在使用桌面版本。 您需要手动检查更新在 ',
-        1: '正式版',
-        2: ' 页面.'
+        0: '你正在使用桌面版。你需要在',
+        1: '发布页面',
+        2: '手动检查更新。'
       },
       offline: {
-        0: '您使用的是离线版本。 您需要手动检查更新在 ',
-        1: '发布版',
-        2: ' 页面.'
+        0: '你正在使用离线版。你需要在',
+        1: '发布页面',
+        2: '手动检查更新。'
       },
-      steam: '您使用的是steam版本。 更新是通过 steam 处理的。'
+      steam: '你正在使用Steam版本。更新通过Steam自动处理。'
     },
     testingDescription: {
-      0: '您正在玩测试版本。 功能可能未完成或有错误，游戏机制可能随时改变。 你可以玩发布版在 ',
+      0: '你正在玩测试版。功能可能未完成或存在错误，游戏机制可能随时变化。你可以在',
       1: '这里',
-      2: ' (测试版本中的保存文件无法在游戏的发布版本中使用)'
+      2: '玩正式版（测试版存档无法在正式版中使用）'
     },
     viewPatchnotes: '查看更新日志',
     numberFormatting: '数字格式',
@@ -405,9 +405,9 @@ export default {
       vuejs: 'Vue.js',
       javascript: 'Javascript'
     },
-    title: '{0} error',
-    source: 'Source: {0}',
-    position: 'Line {0}, column {1}',
+    title: '{0} 错误',
+    source: '来源: {0}',
+    position: '第 {0} 行，第 {1} 列',
     reportBug: '报告错误'
   },
   note,
@@ -535,7 +535,7 @@ export default {
         chandelier: '吊灯',
         duration: '持续 {0}',
         sootGain: {
-          0: '产生 ',
+          0: '燃烧后产生 ',
           1: ' ',
           2: ' 在燃烧后'
         }
@@ -1126,7 +1126,7 @@ export default {
     keybinds: {
       name: '键盘绑定',
       prevMainFeature: {
-        name: '以前的主要功能'
+        name: '上一个主要功能'
       },
       nextMainFeature: {
         name: '下一个主要功能'
@@ -1191,7 +1191,7 @@ export default {
       prevTab: {
         name: '上一个标签页'
       },
-      fixedKeys: '注意：快捷键1-0固定用在部落技能释放。'
+      fixedKeys: '注意：快捷键1-0固定用于部落技能释放。'
     },
     theme: {
       name: '主题'
@@ -1214,20 +1214,20 @@ export default {
         de: '德文'
       },
       tabDisplayDesktop: {
-        name: '选项卡显示',
-        icon: '只显示图标',
-        text: '只显示文字',
-        both: '显示图标和文字'
+        name: '标签显示方式',
+        icon: '仅图标',
+        text: '仅文字',
+        both: '图标和文字'
       },
       tabDisplayMobile: {
-        name: '选项卡显示',
-        icon: '只显示图标',
-        text: '只显示文字',
-        both: '显示图标和文字'
+        name: '标签显示方式',
+        icon: '仅图标',
+        text: '仅文字',
+        both: '图标和文字'
       },
       relativeUpgradeStats: {
-        name: '相对升级统计',
-        description: '显示差异而不是之前/之后的值'
+        name: '相对升级数据',
+        description: '显示变化值而非前/后值'
       },
       useLegacyFarmSelect: {
         name: '旧农场选择',
@@ -1479,27 +1479,27 @@ export default {
   // Feature specific translations
   mining: {
     mine: '矿井',
-    gainSummary: '获得 {0} 当击中时, {1} (x{2}) 当挖碎时, {3} 每秒',
-    gainSummaryHit: '获得 {0} 当击中时',
-    gainSummaryBreak: '获得 {0} 当挖碎时',
+    gainSummary: '击打获得 {0}，破碎获得 {1} (x{2})，每秒自动获得 {3}',
+    gainSummaryHit: '击打获得 {0}',
+    gainSummaryBreak: '破碎获得 {0}',
     depthDweller: '深度居民',
     dweller: {
-      title: '当前 / 最高可能的居住深度',
-      description1: '居民开始时速度很快，越接近极限，速度就越慢。',
-      description2: '当前居民深度每完成半米，你的声望奖励就会增加。',
-      description3: '居民的最大可能深度是矿井中最大深度的 {0}%。',
+      title: '当前/最高可能的居民深度',
+      description1: '居民初始移动速度较快，越接近极限速度越慢。',
+      description2: '当前居民每深入半米，你的声望奖励就会增加。',
+      description3: '最高可能的居民深度是矿井最大深度的 {0}%。',
       description4: '最大居民深度',
-      descriptionOvercap: '居民在达到可能的最高深度后可以获得奖励深度，从而使你的声望奖励线性增加。 居民速度降低至 {0}%，达到最高可能深度后每 10% 速度就会再次降低至 {0}%',
-      nextTime: '你达到 {0}米 在 {1}'
+      descriptionOvercap: '居民达到最高可能深度后可获得额外奖励深度，使声望奖励线性增加。居民速度会降至 {0}%，之后每超过最高可能深度10%，速度再次降至 {0}%',
+      nextTime: '预计 {1} 后达到 {0}米'
     },
-    pickaxePower: '这是你的镐的力量和基础伤害。 通过制作更好的镐来增加它。',
+    pickaxePower: '这是你镐的力量和基础伤害。通过制作更好的镐来提升它。',
     damage: '伤害',
-    timeToBreak: '击碎目前石头需要时间',
-    durability: '耐用性',
-    durabilityDescription: '击碎这块岩石所需的伤害量',
+    timeToBreak: '破碎当前岩石所需时间',
+    durability: '耐久度',
+    durabilityDescription: '破碎这块岩石所需的伤害总量',
     durabilityBreaks: {
-      s: '这块石头被打破了 {0} 次',
-      p: '这块石头被打破了 {0} 次'
+      s: '这块岩石已被破碎 {0} 次',
+      p: '这块岩石已被破碎 {0} 次'
     },
     toughness: '韧性',
     toughnessDescription: '将受到的伤害减少固定数量',
@@ -1524,37 +1524,37 @@ export default {
       glowshard: '可以在{0}m或以下找到，每米低于限值0.1%的几率。获得一个需要你挖1米深，这个限制每天减少10%',
     },
     rareEarthNotAffected: '该资源不受稀土增益影响',
-    scrapGainHint: '当撞击您以前从未破碎过的岩石时，您不会产生废料。 有时，留在当前深度收集更多废料比立即向下挖掘更明智。',
+    scrapGainHint: '当击打从未破碎过的岩石时，不会产生废料。有时候在当前深度收集更多废料比立即向下挖掘更明智。',
     oreCrafting: '点击矿石将其添加到制作槽中',
     crafting: {
       power: '力量',
       purity: '纯度',
       impurity: '杂质',
-      oreQuality: '制作镐所需的矿石量除以矿石质量',
-      craftPickaxe: '制作镐子',
-      purityDescription: '要达到 50% 的最低质量，您的纯度需要与杂质相匹配。',
-      premiumSlot: '这是一个高级制作槽。 高于 x1 的杂质减半，纯度加倍。',
-      minPurity: '制作镐需要至少 0.1% 的最低质量'
+      oreQuality: '制作镐所需的矿石量除以矿石品质',
+      craftPickaxe: '制作镐',
+      purityDescription: '要达到50%的最低品质，你的纯度需要与杂质相匹配。',
+      premiumSlot: '这是高级制作槽。高于x1的杂质减半，纯度加倍。',
+      minPurity: '制作镐需要至少0.1%的最低品质'
     },
-    craftingDescription: '消耗选定的矿石并创建具有随机力量值的新镐。 如果它比您当前的镐（{0} 功率）更好，请更换它。',
-    resinDescription: '每一块树脂增加 30% 的力量和 25% 的纯度。 每个镐工艺最多可以使用 {0} 个树脂。',
+    craftingDescription: '消耗选定的矿石并创建具有随机力量值的新镐。如果它比你当前的镐（{0}力量）更好，就替换它。',
+    resinDescription: '每块树脂增加30%的力量和25%的纯度。每个镐制作最多可使用{0}块树脂。',
     smokeDescription: '消耗所有烟雾以创建具有固定力量值的新镐',
     smeltery: '冶炼厂',
-    smelteryTemperatureDescription: '达到一定温度即可解锁更多冶炼厂。 冶炼厂的速度也比要求高出每度 +{0}%',
-    smelteryTemperatureDescription2: '由于温度原因，该冶炼厂的速度增加了 +{0}%',
-    smelterySpeedDescription: '该冶炼厂的基准时间为 {0}',
+    smelteryTemperatureDescription: '达到一定温度可解锁更多冶炼厂。冶炼厂的速度也会随温度每度提升+{0}%',
+    smelteryTemperatureDescription2: '由于温度原因，该冶炼厂的速度提升了+{0}%',
+    smelterySpeedDescription: '该冶炼厂的基准时间为{0}',
     smelt: '冶炼',
-    enhance: '增强',
+    enhance: '强化',
     enhancement: {
-      title: '增强',
-      description: '使用金属锭来增强你的镐。 每个金属锭都有自己独特的增强功能，可以多次应用。 但要小心，每一次成功的增强都会使下一个变得更加困难，所以请考虑一下你在镐上放置了哪些增强',
-      barsDescription: '增强功能首先需要任何类型的金属锭。 此数量随着每次增强而增加',
-      enhancementDescription: '然后，您需要特定类型的金属锭来确定增强类型。 此数量也会随着该金属锭类型的每次增强而增加',
-      barAluminium: '轻量',
+      title: '强化',
+      description: '使用金属锭强化你的镐。每种金属锭都有独特的强化效果，可多次应用。但要注意，每次成功强化都会使下一次变得更困难，所以要慎重考虑放置哪些强化。',
+      barsDescription: '强化首先需要任意类型的金属锭。这个数量会随每次强化增加。',
+      enhancementDescription: '然后，你需要特定类型的金属锭来决定强化类型。这个数量也会随该金属锭类型的每次强化而增加。',
+      barAluminium: '轻量化',
       barBronze: '坚固',
       barSteel: '锋利',
       barTitanium: '挖掘机',
-      barShiny: '丰富',
+      barShiny: '丰产',
       barIridium: '熔岩',
       barDarkIron: '虚空'
     },
@@ -1584,14 +1584,14 @@ export default {
   },
   village: {
     job: {
-      name: '工作',
+      name: '职业',
       collector: '收集者',
       farmer: '农夫',
       harvester: '收割机',
       miner: '矿工',
       wellWorker: '井工',
       librarian: '图书管理员',
-      glassblower: '玻璃吹制工',
+      glassblower: '玻璃工匠',
       entertainer: '艺人',
       lumberjack: '伐木工',
       blastMiner: '爆破矿工',
@@ -1611,15 +1611,15 @@ export default {
       scanning: '扫描',
     },
     crafting: {
-      unlockNew: '新制作配方: ',
-      owned: '{0} 已拥有',
+      unlockNew: '新解锁配方: ',
+      owned: '已拥有 {0}',
       changeStat: {
-        value: '将值增加到 {0}',
-        timeNeeded: '减少制作时间至 {0}'
+        value: '将数值提升至 {0}',
+        timeNeeded: '将制作时间减少至 {0}'
       },
       nextEffect: '下一个制作效果',
       special: {
-        description: '特殊工艺品在制作时提供永久加成，其进度不会因声望而重置。它们的成本随着每一艘飞船而增加，而且它们没有里程碑'
+        description: '特殊工艺品在制作时提供永久加成，其进度不会因声望而重置。每制作一件，成本会增加，且没有里程碑奖励'
       },
       crafts: '{0} / {1} 制作',
       sellEvery: '出售 1 每个 ~{0}',
@@ -1659,20 +1659,20 @@ export default {
     village: '村庄',
     pray: '祈祷',
     unemployed: '未分配',
-    unemployedDescription: '未分配的村民不生产资源。 将他们分配给以下工作',
+    unemployedDescription: '未分配的村民不生产资源。请将他们分配到以下职业',
     taxpayers: '纳税人',
-    taxpayersDescription1: '所有工作的村民每秒消耗每种食物最多 {0}，并缴纳相当于 {1} 的税款 ',
-    taxpayersDescription2: ' 每个消耗的食物物品.',
-    happinessDescription: '幸福感会修改所有资源增益（金币和信仰除外）',
-    powerDescription: '每个力量的所有材料和食物增益增加+20%。 您当前的力量将物质和食物增益乘以 x{0}',
-    pollutionDescription: '每污染一点，幸福感就会降低 1%。 如果你的污染程度超过了你的容忍度，那么每污染一次超过你的容忍度，幸福感惩罚就会增加 1%。 您的下一个污染点将使幸福感降低 {0}%',
-    lootDescription: '每次进度条填满时都会找到新的战利品',
+    taxpayersDescription1: '所有工作的村民每秒最多消耗每种食物 {0} 单位，并缴纳相当于 {1} 的税款',
+    taxpayersDescription2: '每消耗一单位食物。',
+    happinessDescription: '幸福度会影响所有资源获取（金币和信仰除外）',
+    powerDescription: '每点力量使所有材料和食物获取增加20%。你当前的力量使材料和食物获取乘以 x{0}',
+    pollutionDescription: '每点污染会降低幸福度1%。如果污染超过你的容忍度，每超出一点会额外降低幸福度1%。下一点污染将使幸福度降低 {0}%',
+    lootDescription: '每当进度条填满时，会发现新的战利品',
     lootRarity: '战利品质量决定了战利品的稀有度分布:',
     lootNeedQuality: '需要超过 {0} 的质量',
-    buildingStat: '已建成建筑物总数',
-    housingStat: '已建成住房总数（每栋建筑前 25 栋）',
-    coinNotAffected: '金币不受"所有资源增益"的影响',
-    faithNotAffected: '信仰不受"所有资源增益"和"精神资源增益"影响',
+    buildingStat: '已建成建筑总数',
+    housingStat: '已建成住房总数（每种建筑前25栋）',
+    coinNotAffected: '金币不受"所有资源获取"的影响',
+    faithNotAffected: '信仰不受"所有资源获取"和"精神资源获取"影响',
     artisanDescription: '工匠可以被指派为你制作物品',
     counterDescription: '柜台可以用来向你的村民出售精心制作的物品',
     offering: {
@@ -1699,11 +1699,11 @@ export default {
     zone: '区域',
     player: '玩家',
     enemy: '敌人',
-    loadoutName: '预载名称',
-    newLoadout: '新预载',
-    noLoadouts: '无预载',
-    monsterPartHint: '前往 10+ 区并找到敌人 #101 来发现新货币！ 这种货币对于进一步进度至关重要，因为它可以帮助您提高骨头容量。',
-    enemyDescription: '与前一个敌人相比，同一区域中的每个敌人都有 x{0} 攻击力、x{1} 生命值和 +{2}% 骨头。 这是敌人 #{3}，具有 x{4} 攻击力、x{5} 生命值和 +{6}% 骨头。 当你死后，所有这些效果都会重置。',
+    loadoutName: '配装名称',
+    newLoadout: '新配装',
+    noLoadouts: '无配装',
+    monsterPartHint: '前往10+区域并击败第101个敌人来解锁新资源！这种资源对于后续进度至关重要，它能帮助你提升骨骼容量。',
+    enemyDescription: '同一区域中，每个敌人相比前一个敌人拥有{0}倍攻击力、{1}倍生命值和+{2}%骨骼。当前是第{3}个敌人，拥有{4}倍攻击力、{5}倍生命值和+{6}%骨骼。这些加成效果会在你死亡后重置。',
     enemyDescriptionClasses: '与前一个敌人相比，同一区域的每个敌人都有x{0}攻击，x{1}生命值和+{2}%血值。这是敌人#{3}，攻击力x{4}，生命值x{5}，生命值+{6}%。所有这些效果都会在你死亡时重置。',
     enemySigil1: {
       s: '该区域内的敌人有 {0} 印记',
@@ -2275,18 +2275,18 @@ export default {
     farm: '农场',
     unlockSeed: '解锁种子',
     experience: '经验值',
-    expToLevelUp: '你还需要 {0} 次收获以达到下一等级',
-    yield: '生产',
+    expToLevelUp: '还需收获{0}次才能升级',
+    yield: '产量',
     rareDrops: '稀有掉落',
-    huntedRareDrops: 'Hunted rare drops',
+    huntedRareDrops: '已猎获的稀有资源',
     addRareDrop: '增加稀有掉落 ({0})',
     addRareDropAmount: '{0} 数量',
     prestige: {
-      description: '您可以对已达到 4 级的农作物进行声望，将其声望等级提高到当前等级以获得奖励。 这将重置该作物的所有经验、等级和基因。 每个声望等级将所有作物增益乘以 x1.04。',
-      current: '您当前的声望等级为 {0}，将所有农作物收益乘以 x{1}。',
-      next: '声望此农作物可将您的声望等级提高 {0}。 这会将您的总声望等级提高到 {1}，将您的农作物收益增加到 x{2}。',
-      nextNoEffect: '您的等级不高于该作物的声望等级。 声望不会增加你的声望等级，但仍会重置等级和基因。',
-      cropOnField: '你现在无法声望，因为这种作物已经在田里了',
+      description: '当作物达到4级时，你可以对其进行声望，将声望等级提高到当前等级以获得奖励。这会重置该作物的所有经验、等级和基因。每个声望等级会使所有作物增益乘以1.04倍。',
+      current: '你当前的声望等级为{0}，使所有农作物收益乘以{1}倍。',
+      next: '对此作物进行声望可将你的声望等级提高{0}级。这会将你的总声望等级提高到{1}，使你的农作物收益增加到{2}倍。',
+      nextNoEffect: '你的等级不高于该作物的声望等级。声望不会增加你的声望等级，但仍会重置等级和基因。',
+      cropOnField: '你现在无法进行声望，因为这种作物已经在田地中种植',
       increasedGLRequirement: '升到10级后，农作物每升1级才会增加全局等级',
     },
     button: {
@@ -2411,13 +2411,13 @@ export default {
   },
   gallery: {
     gallery: '画廊',
-    auction: '拍卖',
+    auction: '拍卖会',
     colorSuffix: '颜色',
-    openPackage: '打开',
-    colorGainReduced: '100 种颜色后额外增益减少为平方根',
-    drumCompounding: '为了能够找到这个鼓，你还必须找到所有以前的颜色的鼓在同一包装。这降低了找到鼓的有效机会',
-    allConverterInfo: '转换颜色总是消耗所有转换器',
-    converterOverload: '对于这种转换，您有比颜色更多的转换器，从而产生x{0}转换增益',
+    openPackage: '开启',
+    colorGainReduced: '超过100种颜色后，额外增益将降低为平方根',
+    drumCompounding: '要找到这个鼓，你必须在同一包装中找到所有前置颜色的鼓。这会降低找到该鼓的实际概率',
+    allConverterInfo: '转换颜色时会消耗所有转换器',
+    converterOverload: '你的转换器数量远超颜色数量，获得{0}倍转换收益',
     idea: {
       tier: '层 {0} 创意',
       unlock: '解锁创意',
@@ -2426,17 +2426,17 @@ export default {
       stompBerries: '踩碎浆果',
       carvePumpkins: '雕刻南瓜',
       sortWaste: '垃圾分类',
-      advertise: '广告',
+      advertise: '广告宣传',
       beImpatient: '缺乏耐心',
       beExcited: '感到兴奋',
 
       makeLemonade: '制作柠檬水',
-      growATree: '种一棵树',
+      growATree: '种植一棵树',
       buildComposter: '建造堆肥机',
       observeRainbow: '观察彩虹',
       buildRedReservoir: '建造红色储备',
-      orderMassiveSafe: '订购大量保险箱',
-      buyPen: 'Buy pen',
+      orderMassiveSafe: '订购大型保险箱',
+      buyPen: '购买钢笔',
 
       drawOcean: '画海洋',
       makeWine: '酿酒',
@@ -2444,7 +2444,7 @@ export default {
       buildOrangeReservoir: '建造橙色储备',
       thinkHarder: '更加努力地思考',
       paintFaster: '涂得更快',
-      buyBrush: '购买刷子',
+      buyBrush: '购买画刷',
 
       harvestOranges: '收获橙子',
       pulverizeGold: '粉碎黄金',
@@ -2452,7 +2452,7 @@ export default {
       paintForFun: '为了乐趣而作画',
       printNewspaper: '印刷报纸',
       expandCanvas: '扩大画布',
-      hyperfocus: '高度关注',
+      hyperfocus: '高度专注',
 
       cutGrass: '割草',
       shapeClay: '形状粘土',
