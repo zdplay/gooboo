@@ -16,7 +16,6 @@
   font-size: 66%;
 }
 </style>
-
 <template>
   <div :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container' : ''">
     <v-card class="ma-2">
@@ -53,47 +52,69 @@
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/Tendsty/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.viewCode') }}</v-btn>
       </v-card-actions>
     </v-card>
-
-    <!-- 本次更新醒目展示区域 -->
-    <v-card v-if="currentUpdates.length > 0" class="ma-2" color="primary" dark>
+    
+    <v-card v-if="currentUpdates.length > 0" class="ma-2">
       <v-card-title class="justify-center">
-        <v-icon left>mdi-star</v-icon>
+        <v-icon left color="amber">mdi-star</v-icon>
         本次更新
-        <v-icon right>mdi-star</v-icon>
+        <v-icon right color="amber">mdi-star</v-icon>
       </v-card-title>
       <v-card-text>
-        <div 
-          v-for="(update, index) in currentUpdates" 
-          :key="`current-update-${index}`"
-          class="d-flex mt-2 ml-4"
-          :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}"
-        >
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" :color="update.color">{{ update.category }}</v-chip>
-          <span class="font-weight-medium">{{ update.content }}</span>
-        </div>
+        <v-row>
+          <v-col cols="12" md="6" v-for="(update, index) in currentUpdates" :key="`current-update-${index}`" 
+                 :class="{'py-1': $vuetify.breakpoint.mdAndUp}">
+            <v-list-item dense class="rounded">
+              <v-list-item-icon class="mr-2">
+                <v-icon :color="update.color">{{ getCategoryIcon(update.category) }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <span :class="`${update.color}--text font-weight-medium`">【{{ update.category }}】</span> 
+                  {{ update.content }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
 
     <v-card class="ma-2">
       <v-card-title class="justify-center">改动声明</v-card-title>
+      <v-card-text>本版修改属于改善对自己游戏体验需求，如感不适可玩官服。</v-card-text>
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
-        <div 
-          v-for="(update, index) in allUpdates" 
-          :key="`update-${index}`"
-          class="d-flex mt-2 ml-4"
-          :class="{'flex-wrap': $vuetify.breakpoint.xsOnly}"
-        >
-          <v-chip label small class="flex-shrink-0 mr-2 px-2" :color="update.color">{{ update.category }}</v-chip>
-          <span>{{ update.content }}</span>
-        </div>
-      </v-card-text>
-      <v-card-text class="text-center">
-        部分功能借鉴了
-        <a href="https://github.com/gityxs/gooboo" target="_blank"><b class="text-lg">gityx</b></a>,
-        <a href="https://github.com/baicy/gooboo" target="_blank"><b class="text-lg">baicy</b></a>,
-        <a href="https://github.com/pzgme/gooboo-zhHans" target="_blank"><b class="text-lg">pzgme</b></a>
-        感谢大佬们的支持。
+        <v-expansion-panels>
+          <v-expansion-panel 
+            v-for="category in updateCategories" 
+            :key="category"
+          >
+            <v-expansion-panel-header>
+              <div class="d-flex align-center">
+                <v-icon :color="getCategoryColor(category)" class="mr-2">{{ getCategoryIcon(category) }}</v-icon>
+                <span :class="`${getCategoryColor(category)}--text`">{{ category }}</span>
+                <span class="ml-2 grey--text text--darken-1">
+                  ({{ getCategoryItems(category).length }} 项)
+                </span>
+              </div>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-list dense>
+                <v-list-item v-for="(update, index) in getCategoryItems(category)" :key="`update-${index}`">
+                  <v-list-item-icon class="mr-0">
+                    <v-icon small>mdi-circle</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ update.content }}
+                      <span v-if="update.isCurrentUpdate" class="amber--text font-weight-bold ml-2">(NEW)</span>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-card-text>
     </v-card>
     <v-card class="ma-2">
@@ -102,6 +123,7 @@
       <v-card-actions class="flex-wrap justify-end">
         <v-btn class="ma-1" color="#ff4500" target="_blank" href="https://www.reddit.com/r/GoobooGame"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.reddit') }}</v-btn>
         <v-btn class="ma-1" color="#404eed" target="_blank" href="https://discord.gg/SQ2zFfrxXT"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.discord') }}</v-btn>
+        <v-btn class="ma-1" color="#0099ff" target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=aHepMfL3oYYl0TIyUZJ6ikeF5DzMtweZ&jump_from=webapi&authKey=2LK48lJ5zp93sglq8hW4sDLBJr/cH2p68KOktFb/Go5uTff4KnNtAG4FupUlr/J6" ><v-icon class="mr-2">mdi-qqchat</v-icon>中文QQ群</v-btn>
       </v-card-actions>
     </v-card>
     <v-card v-if="canSeePatreon" class="ma-2">
@@ -211,10 +233,7 @@ export default {
     // 发布新更新时请同步修改：
     // 1. constants.js中的UPDATE_VERSION常量
     // 2. updateItems中相应项的isCurrentUpdate标记
-    // 更新内容数据结构
     updateItems: [
-      // 本次更新项（isCurrentUpdate: true 表示属于本次更新）
-      // 历史更新项（isCurrentUpdate: false 或不设置表示历史更新）
       { category: '设置', color: 'teal', content: '增加屏幕布局模式选项，可以手动选择界面布局大小。在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '增加云存档功能，在【设置】-【通用】设置。', isCurrentUpdate: false },
       { category: '设置', color: 'teal', content: '增加自定义壁纸功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
@@ -261,6 +280,19 @@ export default {
       { category: '其他', color: 'cyan', content: '在升级菜单中添加材料筛选功能。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false }
     ],
+    categoryIcons: {
+      '设置': 'mdi-cog',
+      '挖矿': 'mdi-pickaxe',
+      '村庄': 'mdi-home-city',
+      '部落': 'mdi-sword',
+      '画廊': 'mdi-palette',
+      '学校': 'mdi-school',
+      '农场': 'mdi-sprout',
+      '卡片': 'mdi-cards',
+      '宝藏': 'mdi-treasure-chest',
+      '事件': 'mdi-calendar-star',
+      '其他': 'mdi-dots-horizontal-circle'
+    },
     tech: {
       web: {
         vue: {github: 'https://github.com/vuejs/vue', website: 'https://vuejs.org'},
@@ -287,13 +319,14 @@ export default {
     ...mapState({
       version: state => state.system.version
     }),
-    // 本次更新内容（只显示标记为当前更新的项目）
     currentUpdates() {
       return this.updateItems.filter(item => item.isCurrentUpdate === true);
     },
-    // 所有更新内容（用于改动声明区域显示）
     allUpdates() {
       return this.updateItems;
+    },
+    updateCategories() {
+      return [...new Set(this.updateItems.map(item => item.category))];
     },
     bigNumbers() {
       return numFormatters.slice(1);
@@ -319,12 +352,20 @@ export default {
       this.$store.commit('system/updateKey', {key: 'screen', value: 'statOverview'});
     },
     markUpdateAsRead() {
-      // 使用data中定义的当前更新版本标识
       this.$store.commit('system/updateKey', {key: 'updateNoticeVersion', value: UPDATE_VERSION});
+    },
+    getCategoryColor(category) {
+      const item = this.updateItems.find(item => item.category === category);
+      return item ? item.color : 'grey';
+    },
+    getCategoryIcon(category) {
+      return this.categoryIcons[category] || 'mdi-circle';
+    },
+    getCategoryItems(category) {
+      return this.updateItems.filter(item => item.category === category);
     }
   },
   mounted() {
-    // 进入Info页面时自动标记更新已读
     this.markUpdateAsRead();
   }
 }
