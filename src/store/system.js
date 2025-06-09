@@ -340,6 +340,14 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    enableMenuShortcuts: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    }
+                    ,
                     showFarmOfflineSummary: {
                         unlock: 'farmFeature',
                         hasDescription: true,

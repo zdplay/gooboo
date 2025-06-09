@@ -1444,6 +1444,10 @@ export default {
       canvasPreview: {
         name: 'Leinwand-Vorschau',
         description: 'Zeigt eine Vorschau der zukünftigen Leinwand an, wenn du eine neue Leinwand kaufst'
+      },
+      enableMenuShortcuts: {
+        name: 'Menü-Tastenkombinationen',
+        description: 'Aktivieren Sie Tastenkombinationen für die obere Menüleiste'
       }
     }
   },

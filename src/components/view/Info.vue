@@ -297,7 +297,8 @@ export default {
       { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择和自动使用考试券功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '在升级菜单中添加材料筛选功能。', isCurrentUpdate: false },
-      { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false }
+      { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加菜单栏快捷键功能，在【设置】-【实验性】中开启。完美摘抄白神(>▽<)', isCurrentUpdate: true }
     ],
     categoryIcons: {
       '设置': 'mdi-cog',

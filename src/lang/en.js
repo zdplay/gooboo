@@ -1412,6 +1412,10 @@ export default {
         canvasPreview: {
           name: 'Canvas Preview',
           description: 'Show the preview of the canvas'
+        },
+        enableMenuShortcuts: {
+          name: 'Menu Shortcuts',
+          description: 'Enable shortcuts for the top menu bar'
         }
       }
   },

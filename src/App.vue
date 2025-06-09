@@ -460,6 +460,59 @@
     margin-bottom: 104px;
   }
 }
+
+.v-item-group.v-bottom-navigation {
+  box-shadow: none;
+}
+.v-item-group.v-bottom-navigation .v-btn {
+  background: transparent;
+  height: auto;
+}
+:deep(.v-item-group.v-bottom-navigation .v-btn .v-btn__content) {
+  height: 100%;
+}
+
+/* 底部导航增强样式 */
+.enhanced-bottom-nav {
+  transition: all 0.3s ease;
+}
+
+.enhanced-bottom-nav .v-btn {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  overflow: hidden;
+}
+
+.enhanced-bottom-nav .v-btn:hover {
+  transform: translateY(-2px);
+}
+
+.enhanced-bottom-nav .v-btn.v-btn--active {
+  position: relative;
+}
+
+.enhanced-bottom-nav .v-btn .v-icon {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.enhanced-bottom-nav .v-btn:hover .v-icon {
+  transform: scale(1.15);
+}
+
+.enhanced-bottom-nav .v-btn--active .v-icon {
+  animation: pulse-scale 3s infinite ease-in-out;
+}
+
+@keyframes pulse-scale {
+  0% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
 </style>
 
 <template>
@@ -557,6 +610,23 @@
         <div class="text-center">{{ $vuetify.lang.t('$vuetify.endOfContent.description') }}</div>
       </gb-tooltip>
       <v-spacer></v-spacer>
+      <v-bottom-navigation 
+        shift 
+        dark 
+        background-color="transparent" 
+        v-if="$vuetify.breakpoint.mdAndUp && menuShortcutsEnabled"
+        v-model="currentBigFeature"
+        class="enhanced-bottom-nav"
+      >
+        <v-btn 
+          v-for="feature in bigFeatures" 
+          :key="feature.name" 
+          :value="feature.name" 
+          @click="changeScreen(feature.name, true)"
+        >
+          <v-icon>{{ feature.icon }}</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
       <v-btn icon @click="changeScreen('info')">
         <v-badge :value="hasUpdateNotice" color="red" overlap dot>
           <v-icon>mdi-information</v-icon>
@@ -825,7 +895,8 @@ export default {
     selectedSavefile: null,
     intervalId: null,
     isSaving: false,
-    showCloudLoadConfirm: false
+    showCloudLoadConfirm: false,
+    currentBigFeature: null
   }),
   computed: {
     ...mapState({
@@ -953,6 +1024,20 @@ export default {
         backdropFilter: `blur(${blurAmount / 5}px)`,
       };
     },
+    bigFeatures() {
+      const features = {};
+      this.mainFeatures.filter(f => this.$store.state.cryolab[f.name] && !this.$store.state.cryolab[f.name].active).forEach(f => {
+        features[f.name] = {
+          name: f.name,
+          icon: f.icon,
+          title: this.$vuetify.lang.t(`$vuetify.feature.${f.name}`)
+        }
+      });
+      return features;
+    },
+    menuShortcutsEnabled() {
+      return this.$store.state.system.settings.experiment.items.enableMenuShortcuts.value;
+    }
   },
   created() {
     let that = this;
@@ -1135,6 +1220,12 @@ export default {
         }
       },
       immediate: false
+    },
+    screen: {
+      handler(newVal) {
+        this.currentBigFeature = Object.keys(this.bigFeatures).includes(newVal) ? newVal : undefined;
+      },
+      immediate: true
     }
   }
 }

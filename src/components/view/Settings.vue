@@ -188,18 +188,18 @@ export default {
       }
       return obj;
     },
-    uiExperimentSettings() {
-      // UI相关的设置项
-      const uiRelatedKeys = [
+    uiRelatedKeys() {
+      return [
         'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
         'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
-        'mobileHordeLoadoutLayout'
+        'mobileHordeLoadoutLayout', 'enableMenuShortcuts'
       ];
-      
+    },
+    uiExperimentSettings() {
       let obj = {};
       if (this.settings['experiment'] && this.settings['experiment'].items) {
         for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
-          if (uiRelatedKeys.includes(key)) {
+          if (this.uiRelatedKeys.includes(key)) {
             obj[key] = item;
           }
         }
@@ -207,17 +207,10 @@ export default {
       return obj;
     },
     featureExperimentSettings() {
-      // 功能相关的设置项
-      const uiRelatedKeys = [
-        'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
-        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
-        'mobileHordeLoadoutLayout'
-      ];
-      
       let obj = {};
       if (this.settings['experiment'] && this.settings['experiment'].items) {
         for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
-          if (!uiRelatedKeys.includes(key)) {
+          if (!this.uiRelatedKeys.includes(key)) {
             obj[key] = item;
           }
         }

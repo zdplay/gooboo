@@ -1444,6 +1444,10 @@ export default {
         canvasPreview: {
           name: '画布预览',
           description: '显示画布解锁预测时间'
+        },
+        enableMenuShortcuts: {
+          name: '菜单栏快捷键',
+          description: '启用顶部菜单栏的快捷键功能'
         }
       }
   },
