@@ -1405,6 +1405,14 @@ export default {
           name: 'Enable Player Name',
           description: 'Display custom player name in the Horde interface, or use default name when disabled'
         },
+        tierProgress: {
+          name: 'Idea Progress',
+          description: 'Show the progress of the current idea'
+        },
+        canvasPreview: {
+          name: 'Canvas Preview',
+          description: 'Show the preview of the canvas'
+        }
       }
   },
   statBreakdown: {

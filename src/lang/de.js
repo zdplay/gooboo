@@ -1436,6 +1436,14 @@ export default {
       enablePlayerName: {
         name: 'Spielername aktivieren',
         description: 'Zeigt einen benutzerdefinierten Spielernamen in der Horde-Oberfläche an, oder verwendet den Standardnamen, wenn diese Funktion deaktiviert ist'
+      },
+      tierProgress: {
+        name: 'Ideen-Stufen-Fortschritt',
+        description: 'Zeigt die Fortschrittsanzeige für die aktuelle Ideenstufe an'
+      },
+      canvasPreview: {
+        name: 'Leinwand-Vorschau',
+        description: 'Zeigt eine Vorschau der zukünftigen Leinwand an, wenn du eine neue Leinwand kaufst'
       }
     }
   },

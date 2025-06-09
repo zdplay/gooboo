@@ -3,6 +3,10 @@
   width: 48px;
   height: 48px;
 }
+.position-relative {
+  position: relative;
+  overflow: visible;
+}
 </style>
 
 <template>
@@ -19,8 +23,11 @@
         <stat-breakdown name="galleryInspirationIncrement"></stat-breakdown>
       </currency>
     </div>
-    <div v-for="(content, tier) in ideas" :key="tier" class="d-flex flex-wrap justify-center align-center bg-tile-default rounded ma-2 pa-1 elevation-2">
-      <idea-item v-for="(item, key) in content" :key="tier + '-' + key" class="ma-1" :name="item" :disabled="isFrozen"></idea-item>
+    <div v-for="(content, tier) in ideas" :key="tier" class="d-flex bg-tile-default rounded ma-2 pa-1 elevation-2 position-relative">
+      <div class="d-flex flex-wrap justify-center align-center flex-grow-1">
+        <idea-item v-for="(item, key) in content" :key="tier + '-' + key" class="ma-1" :name="item" :disabled="isFrozen"></idea-item>
+      </div>
+      <tier-progress v-if="Number(tier) + 1 > 1 && showTierProgress" :tier="Number(tier) + 1"></tier-progress>
     </div>
     <div v-if="canvasSpace.length > 0" class="d-flex flex-wrap grey mx-auto my-2 pa-2 rounded" :style="`width: ${ Math.ceil(Math.sqrt(canvasSpace.length)) * 48 + 16 }px;`">
       <div
@@ -39,9 +46,10 @@ import Currency from '../../render/Currency.vue';
 import CurrencyIcon from '../../render/CurrencyIcon.vue';
 import StatBreakdown from '../../render/StatBreakdown.vue';
 import IdeaItem from './IdeaItem.vue';
+import TierProgress from './TierProgress.vue';
 
 export default {
-  components: { Currency, IdeaItem, CurrencyIcon, StatBreakdown },
+  components: { Currency, IdeaItem, CurrencyIcon, StatBreakdown, TierProgress },
   computed: {
     ...mapState({
       isFrozen: state => state.cryolab.gallery.active,
@@ -67,6 +75,9 @@ export default {
     },
     nextInspirationTime() {
       return this.$store.getters['gallery/inspirationTimeNeeded'](this.$store.state.gallery.inspirationAmount) - this.$store.state.gallery.inspirationTime;
+    },
+    showTierProgress() {
+      return this.$store.state.system.settings.experiment.items.tierProgress.value;
     }
   }
 }

@@ -347,6 +347,20 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    tierProgress: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    canvasPreview: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                     farmNoGeneBlock: {
                         unlock: 'farmFeature',
                         hasDescription: true,

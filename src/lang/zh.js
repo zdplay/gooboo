@@ -1436,6 +1436,14 @@ export default {
         enablePlayerName: {
           name: '显示玩家名称',
           description: '在部落界面显示自定义玩家名称，或使用默认名称'
+        },
+        tierProgress: {
+          name: '创意进度条',
+          description: '显示创意层级的升级进度条'
+        },
+        canvasPreview: {
+          name: '画布预览',
+          description: '显示画布解锁预测时间'
         }
       }
   },

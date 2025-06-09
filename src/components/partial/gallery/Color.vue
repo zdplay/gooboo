@@ -86,9 +86,9 @@
         <template v-slot:activator="{ on, attrs }">
           <v-progress-circular rotate="270" :color="name" :value="canvasPercent * 100" v-bind="attrs" v-on="on">{{ canvasLevel }}</v-progress-circular>
         </template>
-        <div v-if="canvasUntilNext !== null" class="mb-2">{{ $vuetify.lang.t('$vuetify.gallery.canvas.untilNextLevel', $formatTime(canvasUntilNext)) }}</div>
+        <div v-if="canvasUntilNext !== null && showCanvasPreview" class="mb-2">{{ $vuetify.lang.t('$vuetify.gallery.canvas.untilNextLevel', $formatTime(canvasUntilNext)) }}</div>
 
-        <div v-if="canvasUntilNextMultiple.length > 0" class="canvas-prediction-container mb-2">
+        <div v-if="canvasUntilNextMultiple.length > 0 && showCanvasPreview" class="canvas-prediction-container mb-2">
           <div class="canvas-prediction-divider">画布预计</div>
           <div v-for="(item, index) in canvasUntilNextMultiple" :key="index" class="canvas-prediction-item">
             {{ item.spaces }}画布: {{ $formatTime(item.time) }}
@@ -289,6 +289,9 @@ export default {
       }
 
       return results.slice(Math.max(0, results.length - 3));
+    },
+    showCanvasPreview() {
+      return this.$store.state.system.settings.experiment.items.canvasPreview.value;
     }
   },
   methods: {
