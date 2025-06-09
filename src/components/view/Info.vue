@@ -15,6 +15,24 @@
   vertical-align: super;
   font-size: 66%;
 }
+.wrap-content .v-list-item__title {
+  white-space: normal !important;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
+  line-height: 1.4;
+}
+/* 添加自定义样式减小更新项间距 */
+.update-item {
+  padding: 0 8px !important;
+  min-height: 32px !important;
+}
+.update-col {
+  padding: 2px 12px !important;
+}
+.update-card-content {
+  padding: 8px 16px !important;
+}
 </style>
 <template>
   <div :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container' : ''">
@@ -56,14 +74,14 @@
     <v-card v-if="currentUpdates.length > 0" class="ma-2">
       <v-card-title class="justify-center">
         <v-icon left color="amber">mdi-star</v-icon>
-        本次更新
+        最近更新
         <v-icon right color="amber">mdi-star</v-icon>
       </v-card-title>
-      <v-card-text>
-        <v-row>
+      <v-card-text class="update-card-content">
+        <v-row dense>
           <v-col cols="12" md="6" v-for="(update, index) in currentUpdates" :key="`current-update-${index}`" 
-                 :class="{'py-1': $vuetify.breakpoint.mdAndUp}">
-            <v-list-item dense class="rounded">
+                 class="update-col">
+            <v-list-item dense class="rounded wrap-content update-item">
               <v-list-item-icon class="mr-2">
                 <v-icon :color="update.color">{{ getCategoryIcon(update.category) }}</v-icon>
               </v-list-item-icon>
@@ -100,7 +118,7 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-list dense>
-                <v-list-item v-for="(update, index) in getCategoryItems(category)" :key="`update-${index}`">
+                <v-list-item v-for="(update, index) in getCategoryItems(category)" :key="`update-${index}`" class="wrap-content">
                   <v-list-item-icon class="mr-0">
                     <v-icon small>mdi-circle</v-icon>
                   </v-list-item-icon>

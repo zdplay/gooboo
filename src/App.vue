@@ -10,7 +10,7 @@
 }
 .bottom-positioned ~ .v-main .scroll-container {
   max-height: calc(100vh - 64px);
-  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
+  padding-bottom: 72px;
 }
 .scroll-container-tab {
   overflow-y: auto;
@@ -18,7 +18,7 @@
 }
 .bottom-positioned ~ .v-main .scroll-container-tab {
   max-height: calc(100vh - 112px);
-  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
+  padding-bottom: 72px;
 }
 .mobile-tabs {
   position: sticky;
@@ -1040,12 +1040,8 @@ export default {
       if (finishTutorial) {
         this.$store.commit('system/updateTutorialKey', {name: 'viewFeature', key: 'completed', value: true});
       }
-      const scrollContainers = document.querySelectorAll('.scroll-container, .scroll-container-tab');
-      scrollContainers.forEach(container => {
-        if (container) {
-          container.scrollTop = 0;
-        }
-      });
+
+      window.scrollTo(0, 0);
     },
     closeAllMessages() {
       while (this.messages.length > 0) {
