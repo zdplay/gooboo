@@ -14,6 +14,27 @@
   position: absolute;
   right: 8px;
 }
+
+.bottom-menu-mode .upgrade-pagination {
+  position: fixed;
+  top: auto;
+  bottom: 104px;
+  left: 0;
+  right: 0;
+  z-index: 4;
+}
+.bottom-menu-mode .filter-section {
+  position: fixed;
+  top: auto;
+  bottom: 152px;
+  left: 0;
+  right: 0;
+  z-index: 4;
+}
+/* 为底部菜单模式添加底部间距 */
+.bottom-menu-mode {
+  padding-bottom: 100px;
+}
 .filter-container {
   display: flex;
   align-items: center;
@@ -71,7 +92,7 @@
 </style>
 
 <template>
-  <div>
+  <div :class="{'bottom-menu-mode': bottomPositioned}">
     <div class="d-flex upgrade-pagination justify-center align-center bg-tile-default rounded-b elevation-2 mx-2" :class="{'upgrade-pagination-mobile': $vuetify.breakpoint.smAndDown && !noTabs, 'upgrade-pagination-mobile-notabs': $vuetify.breakpoint.smAndDown && noTabs, 'pr-10': showQueueSpeed}" v-if="pages > 1 || requirementStat.length > 0">
       <v-pagination v-if="pages > 1" v-model="page" :length="pages" :total-visible="7"></v-pagination>
       <gb-tooltip v-for="item in requirementFiltered" :key="item.key" :min-width="0">
@@ -243,6 +264,9 @@ export default {
     }
   },
   computed: {
+    bottomPositioned() {
+      return this.$vuetify.breakpoint.smAndDown && this.$store.state.system.settings.experiment.items.mobileMenuAtBottom.value;
+    },
     showFilterFeature() {
       return this.$store.state.system.settings.experiment.items.upgradeFilterFeature.value || false;
     },

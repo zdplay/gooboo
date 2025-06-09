@@ -29,6 +29,20 @@
 .bottom-positioned ~ .v-main .mobile-tabs {
   top: 0;
 }
+
+/* 确保所有标签页在底部菜单模式下都移到底部 */
+.bottom-positioned ~ .v-main .mobile-tabs,
+.bottom-positioned ~ .v-main .v-tabs.theme--light,
+.bottom-positioned ~ .v-main .v-tabs.theme--dark {
+  position: fixed;
+  top: auto;
+  bottom: 56px; /* 主菜单栏的高度 */
+  left: 0;
+  right: 0;
+  z-index: 4; /* 确保在主菜单栏上方 */
+  background-color: var(--v-background-base, #ffffff); /* 确保有背景色 */
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.25); /* 添加阴影效果 */
+}
 .w-100 {
   width: 100%;
 }
@@ -426,28 +440,25 @@
 /* When menu is at bottom, adjust the content area */
 .bottom-positioned ~ .v-main {
   padding-top: 0 !important;
-  padding-bottom: 56px !important; /* 添加底部间距，防止内容被底部菜单遮挡 */
+  padding-bottom: 104px !important; /* 添加底部间距，防止内容被底部菜单遮挡 */
 }
 .bottom-positioned ~ .v-main .v-content__wrap {
   padding-top: 0;
-  padding-bottom: 56px; /* 确保内容区域有足够的底部间距 */
+  padding-bottom: 56px;
 }
-/* Fix for strategy view */
-.bottom-positioned ~ .v-main .scroll-container {
-  max-height: calc(100vh - 0px);
-  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
-}
-.bottom-positioned ~ .v-main .scroll-container-tab {
-  max-height: calc(100vh - 48px);
-  padding-bottom: 72px; /* 增加底部间距，从56px改为72px */
-}
-/* Additional fixes for mobile view content */
 .bottom-positioned ~ .v-main {
   min-height: 100vh;
 }
 /* Force components to use full available height */
 .bottom-positioned ~ .v-main > div {
   min-height: calc(100vh - 56px);
+  padding-bottom: 104px;
+}
+
+@media (max-width: 959px) {
+  .bottom-positioned ~ .v-main .mobile-tabs + * {
+    margin-bottom: 104px;
+  }
 }
 </style>
 
@@ -919,33 +930,27 @@ export default {
     wallpaperBackgroundStyle() {
       const wallpaperPath = this.$store.state.system.settings.experiment?.items?.wallpaperPath?.value || '';
       if (!wallpaperPath) {
-        // 如果壁纸路径为空，返回空对象，使用主题自带背景
         return {};
       }
-      // 返回壁纸样式，不包含 backdropFilter
       return {
         backgroundImage: `url(${wallpaperPath})`,
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center center',
         backgroundAttachment: 'fixed',
         backgroundSize: 'cover',
-        // 背景颜色作为图片加载失败或透明时的后备
         backgroundColor: this.$vuetify.theme.dark ? '#000000' : '#FFFFFF',
       };
     },
     frostedGlassStyle() {
       const wallpaperPath = this.$store.state.system.settings.experiment?.items?.wallpaperPath?.value || '';
       const blurAmount = this.$store.state.system.settings.experiment?.items?.wallpaperBlur?.value || 0;
-      // 只有当设置了壁纸并且模糊量大于0时才应用毛玻璃效果
       if (!wallpaperPath || blurAmount === 0) {
         return {};
       }
-      // 根据主题选择一个半透明的背景颜色
-      const overlayColor = this.$vuetify.theme.dark ? 'rgba(18, 18, 18, 0)' : 'rgba(255, 255, 255, 0)'; // 0.7 是透明度，您可以根据需要调整
+      const overlayColor = this.$vuetify.theme.dark ? 'rgba(18, 18, 18, 0)' : 'rgba(255, 255, 255, 0)';
       return {
-        backgroundColor: overlayColor, // 半透明背景色
-        backdropFilter: `blur(${blurAmount / 5}px)`, // 毛玻璃效果
-        // 确保 v-main 的内容位于这个模糊层之上，通常 v-main 默认层级足够
+        backgroundColor: overlayColor,
+        backdropFilter: `blur(${blurAmount / 5}px)`,
       };
     },
   },
@@ -956,7 +961,6 @@ export default {
     });
   },
   mounted() {
-    // 初始化每日签到数据
     this.initDailyCheckIn();
     
     // Workaround to show notifications
@@ -1084,7 +1088,6 @@ export default {
     initDailyCheckIn() {
       const now = Math.floor(Date.now() / 1000);
       
-      // 如果每日签到数据不存在，初始化它
       if (!this.$store.state.system.dailyCheckIn) {
         this.$store.commit('system/updateKey', {
           key: 'dailyCheckIn',
@@ -1095,7 +1098,6 @@ export default {
           }
         });
       } else {
-        // 检查是否需要重置（新的一天）
         const lastTime = this.$store.state.system.dailyCheckIn.timestamp;
         const isNewDay = new Date(now * 1000).toDateString() !== new Date(lastTime * 1000).toDateString();
         
