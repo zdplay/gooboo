@@ -10,6 +10,33 @@
 .compounded-drum-chance {
   font-size: 12px;
 }
+.canvas-prediction-container {
+  width: 100%;
+  text-align: center;
+}
+.canvas-prediction-divider {
+  position: relative;
+  text-align: center;
+  margin: 8px 0;
+}
+.canvas-prediction-divider::before,
+.canvas-prediction-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 50px);
+  border-top: 2px solid rgb(255, 255, 255);
+}
+.canvas-prediction-divider::before {
+  left: 0;
+}
+.canvas-prediction-divider::after {
+  right: 0;
+}
+.canvas-prediction-item {
+  text-align: center;
+  margin: 4px 0;
+}
 </style>
 
 <template>
@@ -60,6 +87,15 @@
           <v-progress-circular rotate="270" :color="name" :value="canvasPercent * 100" v-bind="attrs" v-on="on">{{ canvasLevel }}</v-progress-circular>
         </template>
         <div v-if="canvasUntilNext !== null" class="mb-2">{{ $vuetify.lang.t('$vuetify.gallery.canvas.untilNextLevel', $formatTime(canvasUntilNext)) }}</div>
+
+        <div v-if="canvasUntilNextMultiple.length > 0" class="canvas-prediction-container mb-2">
+          <div class="canvas-prediction-divider">画布预计</div>
+          <div v-for="(item, index) in canvasUntilNextMultiple" :key="index" class="canvas-prediction-item">
+            {{ item.spaces }}画布: {{ $formatTime(item.time) }}
+          </div>
+          <div class="canvas-prediction-divider"></div>
+        </div>
+        
         <display-row class="mt-0" v-for="(item, key) in canvasDisplay" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
         <h3 class="text-center">{{ $vuetify.lang.t('$vuetify.mult.galleryCanvasSpeed') }}</h3>
         <stat-breakdown name="galleryCanvasSpeed" :base="canvasSpeedBase" :mult-array="canvasSpeedMult"></stat-breakdown>
@@ -226,6 +262,33 @@ export default {
         chance *= this.$store.getters['mult/get'](`gallery${ capitalize(elem) }DrumChance`);
       });
       return chance;
+    },
+    canvasUntilNextMultiple() {
+      if (this.name === 'beauty') return [];
+      
+      const difficulty = this.$store.getters['gallery/canvasDifficulty'](this.name, this.canvasLevel);
+      const results = [];
+
+      let startSpace = 1;
+      if (this.canvasSpace > 0) {
+        startSpace = this.canvasSpace + 1;
+      }
+
+      const maxCanvasSpaces = this.canvasSpaceMax;
+
+      for (let i = startSpace; i <= maxCanvasSpaces; i++) {
+        const spaceBase = getSequence(10, i) * 0.1;
+        const speed = this.$store.getters['mult/get']('galleryCanvasSpeed', spaceBase, this.canvasSpeedMultAmount);
+        
+        if (speed > 0) {
+          results.push({
+            spaces: i,
+            time: (1 - this.canvasPercent) * difficulty / speed
+          });
+        }
+      }
+
+      return results.slice(Math.max(0, results.length - 3));
     }
   },
   methods: {
