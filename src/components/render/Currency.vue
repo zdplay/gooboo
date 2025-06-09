@@ -48,6 +48,9 @@
 .currency-clickable {
   cursor: pointer;
 }
+.currency-clickable:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 .currency-labels {
   position: absolute;
   font-size: 12px;
@@ -159,123 +162,131 @@
 </style>
 
 <template>
-  <gb-tooltip v-if="alwaysShow || stat > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ name }.name`)">
-    <template v-slot:activator="{ on, attrs }">
-      <div
-        class="currency-container rounded d-flex flex-nowrap pa-2"
-        :class="[transparent ? 'transparent' : currency.color, $vnode.data.class, $vnode.data.staticClass, {
-          'elevation-0': transparent,
-          'darken-2': $vuetify.theme.dark,
-          'render-currency-mobile': $vuetify.breakpoint.xsOnly,
-          'mb-2': $vuetify.breakpoint.xsOnly && hasLabels,
-          'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
-          'render-currency-small': !large && (!hasNewLabels || !hasNewLabels2),
-          'render-currency-large': large && (!hasNewLabels || !hasNewLabels2),
-          'render-currency-small-new': !large && hasNewLabels && hasNewLabels2,
-          'render-currency-large-new': large && hasNewLabels && hasNewLabels2,
-          'currency-container-new': hasNewLabels && hasNewLabels2,
-          'mt-3': hasNewLabels && hasNewLabels2
-        }]"
-        v-bind="attrs"
-        v-on="{...$listeners, ...on}"
-        @mouseover="handleHover"
-      >
-        <template v-if="!hasNewLabels || !hasNewLabels2">
-          <!-- 原有样式 -->
-          <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
-          <div class="currency-border rounded" :class="{'mt-n1 mb-1': hasOldLabels}">
-            <v-progress-linear
-              :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
-              :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
-              :value="percent"
-              :height="$vuetify.breakpoint.xsOnly ? 20 : 24"
-              style="overflow: visible;"
-            >
-              <span class="balloon-text-dynamic currency-text text-center">{{ $formatNum(currency.value) }}{{ finalCap !== null ? (' / ' + $formatNum(finalCap)) : '' }}</span>
-              <template v-if="finalCap !== null">
-                <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
-                <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
-                <div class="currency-line currency-line--large"></div>
-              </template>
-            </v-progress-linear>
-          </div>
-          <div v-if="hasOldLabels || (customTimeNeeded !== null && name === 'gallery_inspiration')" class="currency-labels d-flex justify-center">
-            <div
-              v-if="!currency.hideGainTag && gainTimerAmount > 0"
-              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
-              :style="`background-color: var(--v-${ currency.color }-base);`"
-            >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
-            <div
-              v-if="capTimerNeeded !== null"
-              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
-              :style="`background-color: var(--v-${ currency.color }-base);`"
-            >{{ $formatTime(capTimerNeeded) }}</div>
-            <!-- 添加灵感剩余时间标签 -->
-            <div
-              v-if="customTimeNeeded !== null && name === 'gallery_inspiration'"
-              class="currency-label balloon-text-dynamic rounded mx-1 px-1"
-              :style="`background-color: var(--v-${ currency.color }-base);`"
-            >{{ $formatTime(customTimeNeeded) }}</div>
-          </div>
-        </template>
-        
-        <template v-else>
-          <!-- 新样式 -->
-          <div class="w-100">
-            <div class="custom-progress-wrapper">
-              <div class="currency-border rounded">
-                <v-progress-linear
-                  :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
-                  :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
-                  :value="percent"
-                  height="24"
-                  style="overflow: visible;"
-                >
-                  <span class="balloon-text-dynamic custom-progress-text-left">{{ $formatNum(currency.value) }}</span>
-                  <v-icon class="custom-progress-icon" :color="transparent ? currency.color : undefined">{{ icon }}</v-icon>
-                  <span class="balloon-text-dynamic custom-progress-text-right" v-if="finalCap !== null">{{ $formatNum(finalCap) }}</span>
-                  <template v-if="finalCap !== null">
-                    <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
-                    <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
-                    <div class="currency-line currency-line--large"></div>
-                  </template>
-                </v-progress-linear>
-              </div>
+  <div>
+    <gb-tooltip v-if="alwaysShow || stat > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ name }.name`)">
+      <template v-slot:activator="{ on, attrs }">
+        <div
+          class="currency-container rounded d-flex flex-nowrap pa-2"
+          :class="[transparent ? 'transparent' : currency.color, $vnode.data.class, $vnode.data.staticClass, {
+            'elevation-0': transparent,
+            'darken-2': $vuetify.theme.dark,
+            'render-currency-mobile': $vuetify.breakpoint.xsOnly,
+            'mb-2': $vuetify.breakpoint.xsOnly && hasLabels,
+            'mb-3': $vuetify.breakpoint.smAndUp && hasLabels,
+            'render-currency-small': !large && (!hasNewLabels || !hasNewLabels2),
+            'render-currency-large': large && (!hasNewLabels || !hasNewLabels2),
+            'render-currency-small-new': !large && hasNewLabels && hasNewLabels2,
+            'render-currency-large-new': large && hasNewLabels && hasNewLabels2,
+            'currency-container-new': hasNewLabels && hasNewLabels2,
+            'mt-3': hasNewLabels && hasNewLabels2,
+            'currency-clickable': isSnakeGameEnabled
+          }]"
+          v-bind="attrs"
+          v-on="{...$listeners, ...on}"
+          @mouseover="handleHover"
+          @click="handleCurrencyClick"
+        >
+          <template v-if="!hasNewLabels || !hasNewLabels2">
+            <!-- 原有样式 -->
+            <v-icon :color="transparent ? currency.color : undefined" class="mr-2">{{ icon }}</v-icon>
+            <div class="currency-border rounded" :class="{'mt-n1 mb-1': hasOldLabels}">
+              <v-progress-linear
+                :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
+                :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
+                :value="percent"
+                :height="$vuetify.breakpoint.xsOnly ? 20 : 24"
+                style="overflow: visible;"
+              >
+                <span class="balloon-text-dynamic currency-text text-center">{{ $formatNum(currency.value) }}{{ finalCap !== null ? (' / ' + $formatNum(finalCap)) : '' }}</span>
+                <template v-if="finalCap !== null">
+                  <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
+                  <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
+                  <div class="currency-line currency-line--large"></div>
+                </template>
+              </v-progress-linear>
             </div>
-            <div class="currency-labels d-flex justify-space-between">
+            <div v-if="hasOldLabels || (customTimeNeeded !== null && name === 'gallery_inspiration')" class="currency-labels d-flex justify-center">
               <div
                 v-if="!currency.hideGainTag && gainTimerAmount > 0"
-                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+                :style="`background-color: var(--v-${ currency.color }-base);`"
               >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
               <div
                 v-if="capTimerNeeded !== null"
-                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+                :style="`background-color: var(--v-${ currency.color }-base);`"
               >{{ $formatTime(capTimerNeeded) }}</div>
-              <div
-                v-if="isOvercap && currency.overcapMult > 0"
-                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
-              >{{ $formatNum(overcapMult * 100, true) }}%</div>
               <!-- 添加灵感剩余时间标签 -->
               <div
                 v-if="customTimeNeeded !== null && name === 'gallery_inspiration'"
-                class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                class="currency-label balloon-text-dynamic rounded mx-1 px-1"
+                :style="`background-color: var(--v-${ currency.color }-base);`"
               >{{ $formatTime(customTimeNeeded) }}</div>
             </div>
-          </div>
-        </template>
-      </div>
-    </template>
-    <currency-tooltip :name="name" :gain-base="gainBase" :base-array="baseArray" :mult-array="multArray" :bonus-array="bonusArray">
-      <slot></slot>
-    </currency-tooltip>
-  </gb-tooltip>
+          </template>
+          
+          <template v-else>
+            <!-- 新样式 -->
+            <div class="w-100">
+              <div class="custom-progress-wrapper">
+                <div class="currency-border rounded">
+                  <v-progress-linear
+                    :background-color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? ' darken-4' : ' darken-2'))"
+                    :color="transparent ? undefined : (currency.color + ($vuetify.theme.dark ? '' : ' lighten-2'))"
+                    :value="percent"
+                    height="24"
+                    style="overflow: visible;"
+                  >
+                    <span class="balloon-text-dynamic custom-progress-text-left">{{ $formatNum(currency.value) }}</span>
+                    <v-icon class="custom-progress-icon" :color="transparent ? currency.color : undefined">{{ icon }}</v-icon>
+                    <span class="balloon-text-dynamic custom-progress-text-right" v-if="finalCap !== null">{{ $formatNum(finalCap) }}</span>
+                    <template v-if="finalCap !== null">
+                      <div v-for="i in (large ? largeLinesSmall : smallLinesSmall)" :key="i" class="currency-line currency-line--small" :style="'left: ' + i + '%;'"></div>
+                      <div v-for="i in (large ? largeLinesMedium : smallLinesMedium)" :key="i" class="currency-line currency-line--medium" :style="'left: ' + i + '%;'"></div>
+                      <div class="currency-line currency-line--large"></div>
+                    </template>
+                  </v-progress-linear>
+                </div>
+              </div>
+              <div class="currency-labels d-flex justify-space-between">
+                <div
+                  v-if="!currency.hideGainTag && gainTimerAmount > 0"
+                  class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                >+{{ $formatNum(gainTimerAmount, true) }}{{ gainUnit }}</div>
+                <div
+                  v-if="capTimerNeeded !== null"
+                  class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                >{{ $formatTime(capTimerNeeded) }}</div>
+                <div
+                  v-if="isOvercap && currency.overcapMult > 0"
+                  class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                >{{ $formatNum(overcapMult * 100, true) }}%</div>
+                <div
+                  v-if="customTimeNeeded !== null && name === 'gallery_inspiration'"
+                  class="currency-label balloon-text-dynamic mx-1 px-1 currency-label-adaptive"
+                >{{ $formatTime(customTimeNeeded) }}</div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+      <currency-tooltip :name="name" :gain-base="gainBase" :base-array="baseArray" :mult-array="multArray" :bonus-array="bonusArray">
+        <slot></slot>
+      </currency-tooltip>
+    </gb-tooltip>
+    <snake-game-dialog v-if="isSnakeGameEnabled" v-model="showSnakeGame" />
+  </div>
 </template>
 
 <script>
 import CurrencyTooltip from '../partial/render/CurrencyTooltip.vue';
+import SnakeGameDialog from '../partial/horde/SnakeGameDialog.vue';
 
 export default {
-  components: { CurrencyTooltip },
+  components: { 
+    CurrencyTooltip,
+    SnakeGameDialog 
+  },
   inheritAttrs: false,
   props: {
     name: {
@@ -348,7 +359,8 @@ export default {
     smallLinesMedium: [],
     largeLinesMedium: [25, 75],
     smallLinesSmall: [10, 20, 30, 40, 60, 70, 80, 90],
-    largeLinesSmall: [5, 10, 15, 20, 30, 35, 40, 45, 55, 60, 65, 70, 80, 85, 90, 95]
+    largeLinesSmall: [5, 10, 15, 20, 30, 35, 40, 45, 55, 60, 65, 70, 80, 85, 90, 95],
+    showSnakeGame: false
   })),
   computed: {
     currency() {
@@ -446,12 +458,21 @@ export default {
     },
     hasNewLabels2() {
       return this.$store.state.system.settings.experiment.items.currencynewLabel.value;
+    },
+    isSnakeGameEnabled() {
+      return this.name === 'horde_mysticalShard' && 
+             this.$store.state.system.settings.experiment.items.enableSnakeGame.value;
     }
   },
   methods: {
     handleHover() {
       if (this.$store.state.nightHunt.changedCurrency[this.name] !== undefined) {
         this.$store.dispatch('nightHunt/claimChangedCurrency', this.name);
+      }
+    },
+    handleCurrencyClick() {
+      if (this.isSnakeGameEnabled) {
+        this.showSnakeGame = true;
       }
     }
   }

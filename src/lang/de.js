@@ -1448,6 +1448,10 @@ export default {
       enableMenuShortcuts: {
         name: 'Menü-Tastenkombinationen',
         description: 'Aktivieren Sie Tastenkombinationen für die obere Menüleiste'
+      },
+      enableSnakeGame: {
+        name: 'Schlangen-Spiel für Scherben',
+        description: 'Fügt ein Easter-Egg-Schlangen-Spiel zu Horde Mystical Shards hinzu'
       }
     }
   },

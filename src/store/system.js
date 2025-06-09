@@ -298,6 +298,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    enableSnakeGame: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                     showScientificNotation: {
                         unlock: null,
                         hasDescription: true,
@@ -1049,6 +1056,12 @@ export default {
             }
         },
         processKeyPress({ state, rootState, getters, commit, dispatch }, e) {
+            // 检查是否有贪吃蛇游戏对话框打开
+            const snakeGameOpen = document.querySelector('.snake-game-dialog');
+            if (snakeGameOpen) {
+                return; // 如果贪吃蛇游戏打开，不处理系统键盘事件
+            }
+            
             if (document.activeElement.tagName !== 'INPUT' && state.screen !== 'tab-duplicate') {
                 if (state.confirm !== null && e.code === 'Enter') {
                     dispatch('confirmAction');

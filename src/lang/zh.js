@@ -1446,8 +1446,12 @@ export default {
           description: '显示画布解锁预测时间'
         },
         enableMenuShortcuts: {
-          name: '菜单栏快捷键',
-          description: '启用顶部菜单栏的快捷键功能'
+          name: '菜单栏快捷按钮',
+          description: '启用顶部菜单栏的快捷按钮功能，Pc页面才能使用。完美摘抄白神(>▽<)'
+        },
+        enableSnakeGame: {
+          name: '贪吃神秘碎片',
+          description: '给部落的神秘碎片加上彩蛋游戏'
         }
       }
   },

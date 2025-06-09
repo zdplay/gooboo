@@ -1416,6 +1416,10 @@ export default {
         enableMenuShortcuts: {
           name: 'Menu Shortcuts',
           description: 'Enable shortcuts for the top menu bar'
+        },
+        enableSnakeGame: {
+          name: 'Snake Game for Shards',
+          description: 'Add an easter egg snake game to Horde Mystical Shards'
         }
       }
   },
