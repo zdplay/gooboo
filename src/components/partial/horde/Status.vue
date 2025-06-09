@@ -23,7 +23,7 @@
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext"><v-icon>mdi-step-forward</v-icon></v-btn>
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
       <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
-      <v-btn icon color="primary" v-if="canPrestige" @click="toggleAutomation" class="ml-2">
+      <v-btn icon color="primary" v-if="canPrestige" @click="toggleAutomation" class="ml-2" :class="{'amber lighten-1': isHordeAutoRunning}">
         <v-icon>mdi-robot</v-icon>
       </v-btn>
     </div>
@@ -372,6 +372,9 @@ export default {
     },
     canPrestige() {
       return this.$store.state.unlock.hordePrestige?.use || false;
+    },
+    isHordeAutoRunning() {
+      return this.$store.state.horde.hordeAutomation && this.$store.state.horde.hordeAutomation.isRunning;
     }
   },
   methods: {
@@ -491,3 +494,5 @@ export default {
   }
 }
 </script>
+
+

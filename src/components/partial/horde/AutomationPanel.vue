@@ -1,52 +1,63 @@
 <template>
-  <v-card class="ma-1 pa-2 position-relative">
-    <div class="d-flex flex-column">
-      <v-card-title class="text-h6 justify-center">
-        <v-icon class="mr-2">mdi-cogs</v-icon>
-        部落声望自动化
-      </v-card-title>
-      
-      <v-card-subtitle class="text-center">
-        可以切换到别的模块页面后台运行，但如果把网页切换到后台则会暂停，只能gooboo在网页前台使用。
-      </v-card-subtitle>
-    </div>
-
+  <v-card class="automation-panel">
+    <v-card-title class="justify-space-between">
+      <span>
+        <v-icon :color="isRunning ? 'success' : ''" class="mr-2">{{ isRunning ? 'mdi-cog-play' : 'mdi-cog' }}</v-icon>
+        部落自动声望
+      </span>
+      <v-btn icon small @click="close">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+    
     <v-card-text>
-      <v-alert v-if="!canPrestige" type="warning" dense>
-        必须解锁声望功能才能使用此功能
-      </v-alert>
-      
-      <div v-else>
+      <div>
         <v-text-field
-          v-model.number="targetZone"
+          v-model="targetZone"
+          label="目标区域"
           type="number"
           min="1"
-          max="9999"
-          label="目标区域"
+          :disabled="isRunning || stoppingInProgress"
+          hint="达到此区域后将执行声望"
+          persistent-hint
           outlined
           dense
-          :disabled="uiRunning || stoppingInProgress"
-          hint="达到此区域后将触发声望操作"
-          persistent-hint
-          class="hint-text"
         ></v-text-field>
-
+        
         <v-select
+          v-if="hasLoadouts"
           v-model="config.equipmentLoadout"
           :items="loadoutOptions"
-          :disabled="!hasLoadouts || uiRunning || stoppingInProgress"
           label="装备配置"
+          :disabled="isRunning || stoppingInProgress"
+          hint="自动使用此装备配置"
+          persistent-hint
           outlined
           dense
-          hint="将使用此装备配置进行战斗"
-          persistent-hint
-          class="hint-text"
-          :rules="[v => !!v || '必须选择装备配置']"
+          class="mt-3"
         ></v-select>
-
-        <v-alert v-if="!hasLoadouts" type="info" dense>
-          您需要先在装备页面创建装备配置
+        
+        <v-alert v-else type="warning" dense class="mt-3">
+          未找到装备配置，请先创建装备配置
         </v-alert>
+        
+        <v-switch
+          v-model="config.autoUseSkills"
+          label="自动使用技能"
+          :disabled="isRunning || stoppingInProgress"
+          hint="自动使用所有可用的主动技能"
+          persistent-hint
+          class="mt-3"
+        ></v-switch>
+
+        <v-switch
+          v-model="config.autoUpgradeItems"
+          label="自动升级项目"
+          :disabled="isRunning || stoppingInProgress"
+          hint="自动购买所有可用的升级项目"
+          persistent-hint
+          class="mt-3"
+        ></v-switch>
 
         <div class="d-flex justify-center mt-2">
           <v-btn
@@ -82,6 +93,8 @@ export default {
     targetZone: 100,
     config: {
       equipmentLoadout: null,
+      autoUseSkills: true,
+      autoUpgradeItems: true,
       stateTimer: null
     },
     stoppingInProgress: false,
@@ -91,6 +104,7 @@ export default {
     ...mapState({
       unlock: state => state.unlock,
       loadouts: state => state.horde.loadout || {},
+      hordeAutomation: state => state.horde.hordeAutomation
     }),
     canPrestige() {
       return this.unlock.hordePrestige?.use || false;
@@ -117,31 +131,34 @@ export default {
       return this.canPrestige && this.targetZone > 0;
     },
     isRunning() {
-      const status = hordeAutomation.getStatus();
-      return status.isRunning;
+      if (this.hordeAutomation) {
+        return this.hordeAutomation.isRunning;
+      }
+      return hordeAutomation.getStatus().isRunning;
+    },
+    niterAutoStatus() {
+      if (this.hordeAutomation) {
+        return this.hordeAutomation;
+      }
+      return hordeAutomation.getStatus();
     }
   },
   created() {
     this.syncStateFromAutomation();
-    
+
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+
     this.config.stateTimer = setInterval(() => {
       this.syncStateFromAutomation();
-    }, 300);
-    
-    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }, 1000);
   },
-  
-  activated() {
-    this.syncStateFromAutomation();
-  },
-  
   beforeDestroy() {
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    
     if (this.config.stateTimer) {
       clearInterval(this.config.stateTimer);
       this.config.stateTimer = null;
     }
-    
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   },
   methods: {
     handleVisibilityChange() {
@@ -150,17 +167,21 @@ export default {
       }
     },
     syncStateFromAutomation() {
-      const status = hordeAutomation.getStatus();
+      const status = this.hordeAutomation || hordeAutomation.getStatus();
       
       this.uiRunning = status.isRunning;
       
-      if (status.isRunning) {
+      if (status.isRunning && status.config) {
         if (status.config.targetZone) {
           this.targetZone = status.config.targetZone;
         }
         
         if (status.config.equipmentLoadout !== null) {
           this.config.equipmentLoadout = status.config.equipmentLoadout;
+        }
+        
+        if (status.config.autoUseSkills !== undefined) {
+          this.config.autoUseSkills = status.config.autoUseSkills;
         }
       } else {
         if (this.config.equipmentLoadout === null) {
@@ -170,22 +191,12 @@ export default {
       
       this.$forceUpdate();
     },
-    
     initLoadoutOptions() {
-      const loadouts = this.$store.state.horde.loadout;
-      
-      const status = hordeAutomation.getStatus();
-      if (status.isRunning && status.config.equipmentLoadout !== null) {
-        this.config.equipmentLoadout = status.config.equipmentLoadout;
-        return;
-      }
-      
-      if (loadouts && Object.keys(loadouts).length > 0) {
-        const firstKey = Object.keys(loadouts)[0];
+      if (this.hasLoadouts) {
+        const firstKey = Object.keys(this.$store.state.horde.loadout)[0];
         this.config.equipmentLoadout = firstKey;
       }
     },
-    
     startAutomation() {
       if (!this.config.equipmentLoadout && this.hasLoadouts) {
         const firstKey = Object.keys(this.$store.state.horde.loadout)[0];
@@ -197,6 +208,8 @@ export default {
       hordeAutomation.updateConfig({
         targetZone: this.targetZone,
         equipmentLoadout: this.config.equipmentLoadout,
+        autoUseSkills: this.config.autoUseSkills,
+        autoUpgradeItems: this.config.autoUpgradeItems,
         prestigeAfterReaching: true
       });
       
@@ -227,4 +240,12 @@ export default {
   border-radius: 2px;
   background-color: rgba(255, 255, 255, 0.05);
 }
+.automation-panel {
+  position: relative;
+}
 </style> 
+
+
+
+
+

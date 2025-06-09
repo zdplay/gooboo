@@ -7,6 +7,8 @@ class HordeAutomation {
       targetZone: 100,
       equipmentLoadout: null,
       prestigeAfterReaching: true,
+      autoUseSkills: true, // 添加自动使用技能选项，默认开启
+      autoUpgradeItems: true, // 添加自动升级项目选项，默认开启
     };
     this.currentState = 'idle';
     this.timerId = null;
@@ -16,25 +18,41 @@ class HordeAutomation {
     this._equipTimeout = null;
     this._prestigeTimeout = null;
     this._lastCheckTime = 0;
+    this._lastBossCheckTime = 0; // 添加上次检查 boss 的时间戳
+    
+    // 从 store 加载状态
+    this.loadStateFromStore();
   }
 
-  start() {
-    if (this.isRunning) {
-      return;
+  // 从 store 加载状态
+  loadStateFromStore() {
+    const savedState = store.state.horde.hordeAutomation;
+    if (savedState) {
+      this.isRunning = savedState.isRunning;
+      this.config = savedState.config || this.config;
+      this.currentState = savedState.currentState || 'idle';
+      
+      // 如果正在运行，重新启动定时器
+      if (this.isRunning) {
+        this.startTimer();
+      }
     }
-    
+  }
+
+  // 保存状态到 store
+  saveStateToStore() {
+    store.dispatch('horde/saveAutomationState', {
+      isRunning: this.isRunning,
+      config: this.config,
+      currentState: this.currentState,
+      startTime: Date.now(),
+    });
+  }
+
+  startTimer() {
     if (this.timerId) {
       clearInterval(this.timerId);
-      this.timerId = null;
     }
-    
-    this.equipmentInProgress = false;
-    this.prestigeInProgress = false;
-    
-    this.isRunning = true;
-    this.currentState = 'starting';
-    
-    store.dispatch('horde/unequipAll');
     
     this.timerId = setInterval(() => {
       try {
@@ -44,6 +62,22 @@ class HordeAutomation {
         this.stop();
       }
     }, 1000);
+  }
+
+  start() {
+    if (this.isRunning) {
+      return;
+    }
+    
+    this.isRunning = true;
+    this.currentState = 'starting';
+    this.equipmentInProgress = false;
+    this.prestigeInProgress = false;
+    this._lastBossCheckTime = Date.now();
+    store.dispatch('horde/unequipAll');
+    
+    this.startTimer();
+    this.saveStateToStore();
     
     try {
       this.tick();
@@ -55,7 +89,6 @@ class HordeAutomation {
 
   stop() {
     this.isRunning = false;
-    
     this.currentState = 'idle';
     this.equipmentInProgress = false;
     this.prestigeInProgress = false;
@@ -64,6 +97,8 @@ class HordeAutomation {
       clearInterval(this.timerId);
       this.timerId = null;
     }
+    
+    this.saveStateToStore();
     
     try {
       store.commit('game/updateState');
@@ -74,6 +109,7 @@ class HordeAutomation {
 
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig };
+    this.saveStateToStore();
   }
 
   performChecks() {
@@ -86,9 +122,14 @@ class HordeAutomation {
     this.checkUpgrades();
     this.checkSkills();
     this.checkEquipment();
+    this.checkBoss();
   }
 
   checkUpgrades() {
+    if (!this.config.autoUpgradeItems) {
+      return;
+    }
+    
     const upgradeItems = store.state.upgrade.item || {};
     
     const gemHordeUpgrades = [
@@ -176,6 +217,10 @@ class HordeAutomation {
   }
 
   checkSkills() {
+    if (!this.config.autoUseSkills) {
+      return;
+    }
+    
     const state = store.state;
     if (!state.horde) {
       return;
@@ -211,7 +256,7 @@ class HordeAutomation {
       try {
         store.dispatch('horde/useActive', skillKey);
       } catch (e) {
-        // 忽略错误，继续尝试下一个技能
+        // 忽略错误
       }
     }
   }
@@ -256,13 +301,27 @@ class HordeAutomation {
       this.equipmentInProgress = true;
       
       store.dispatch('horde/equipLoadout', loadoutName);
-      
-      // 设置超时，确保装备操作完成后重置标志
+
       this._equipTimeout = setTimeout(() => {
         console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 装备操作完成`);
         this.equipmentInProgress = false;
         this._equipTimeout = null;
       }, 2000);
+    }
+  }
+
+  checkBoss() {
+    const now = Date.now();
+    if (now - this._lastBossCheckTime < 60000) {
+      return;
+    }
+    
+    this._lastBossCheckTime = now;
+    
+    const state = store.state;
+    if (state.horde.bossAvailable && state.horde.bossFight === 0) {
+      console.log(`[HordeAuto] ${new Date().toLocaleString('zh-CN', {day: '2-digit', hour: '2-digit', minute: '2-digit'})} 检测到 boss 可用，开始战斗`);
+      store.dispatch('horde/fightBoss');
     }
   }
 
@@ -362,7 +421,7 @@ class HordeAutomation {
     return {
       isRunning: this.isRunning,
       currentState: this.currentState,
-      config: this.config
+      config: this.config,
     };
   }
 }

@@ -1067,6 +1067,10 @@ export default {
             enemyTimer: store.state.horde.enemyTimer
         };
 
+        if (store.state.horde.hordeAutomation) {
+            obj.hordeAutomation = store.state.horde.hordeAutomation;
+        }
+
         if (Object.keys(store.state.horde.playerBuff).length > 0) {
             obj.playerBuff = store.state.horde.playerBuff;
         }
@@ -1348,6 +1352,10 @@ export default {
                     store.dispatch('horde/applyTrinketEffects', name);
                 }
             }
+        }
+
+        if (data.hordeAutomation) {
+            store.commit('horde/updateAutomation', data.hordeAutomation);
         }
         store.dispatch('horde/checkZoneUnlocks');
         store.dispatch('mult/updateExternalCaches', 'hordeNostalgia');

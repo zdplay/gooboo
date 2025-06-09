@@ -94,6 +94,7 @@ export default {
         bossBonusDifficulty: 0,
         sacrificeLevel: 0,
         nextSacrificeLevel: 0,
+        hordeAutomation: null,
     },
     getters: {
         playerBaseStats: (state, getters, rootState) => {
@@ -551,7 +552,10 @@ export default {
         },
         deleteLoadout(state, index) {
             state.loadout.splice(index, 1);
-        }
+        },
+        updateAutomation(state, automation) {
+            state.hordeAutomation = automation;
+        },
     },
     actions: {
         cleanState({ state, commit }) {
@@ -1463,6 +1467,9 @@ export default {
             } else {
                 dispatch('updateMana');
             }
+        },
+        saveAutomationState({ commit }, config) {
+            commit('updateAutomation', config);
         },
         findHeirloom({ state, rootGetters, commit, dispatch }, o) {
             let eligibleHeirlooms = [];
