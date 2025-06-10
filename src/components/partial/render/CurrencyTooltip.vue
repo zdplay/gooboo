@@ -1,6 +1,7 @@
 <template>
   <div class="tooltip-text-container">
     <div v-if="!hideDetails">{{ $vuetify.lang.t(`$vuetify.currency.${name}.description`) }}</div>
+    <div v-if="isSnakeGameEnabled">草丛里，好像有些什么东西在动...</div>
     <slot></slot>
     <alert-text v-if="!hideDetails && isOvercap" type="error">{{
       currency.overcapMult > 0 ? ($vuetify.lang.t('$vuetify.currency.overcapGain', $formatNum(overcapMult * 100, true)) + (overcapStage > 1 ? ` (x${ overcapStage })` : '')) : $vuetify.lang.t('$vuetify.currency.overcapNoGain')
@@ -181,6 +182,10 @@ export default {
       }
       const gainAmount = this.currency.showGainTimer ? this.gainAmount : this.timerFunction;
       return Math.ceil((this.currency.cap * (this.overcapStage + 1) - this.currency.value) * this.gainTimeMult / (gainAmount * this.overcapMult));
+    },
+    isSnakeGameEnabled() {
+      return this.name === 'horde_mysticalShard' && 
+             this.$store.state.system.settings.experiment.items.enableSnakeGame.value;
     }
   }
 }

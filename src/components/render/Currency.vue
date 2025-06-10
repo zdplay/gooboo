@@ -162,7 +162,6 @@
 </style>
 
 <template>
-  <div>
     <gb-tooltip v-if="alwaysShow || stat > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ name }.name`)">
       <template v-slot:activator="{ on, attrs }">
         <div
@@ -268,14 +267,13 @@
               </div>
             </div>
           </template>
+          <snake-game-dialog v-if="isSnakeGameEnabled" v-model="showSnakeGame" />
         </div>
       </template>
       <currency-tooltip :name="name" :gain-base="gainBase" :base-array="baseArray" :mult-array="multArray" :bonus-array="bonusArray">
         <slot></slot>
       </currency-tooltip>
     </gb-tooltip>
-    <snake-game-dialog v-if="isSnakeGameEnabled" v-model="showSnakeGame" />
-  </div>
 </template>
 
 <script>
