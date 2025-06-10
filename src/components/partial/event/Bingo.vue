@@ -43,7 +43,7 @@
     </div>
     <div v-if="bingoCard !== null" class="d-flex flex-wrap mx-auto bingo-card-container" :class="{'bingo-card-mobile': $vuetify.breakpoint.xsOnly}">
       <div v-for="(column, y) in bingoCard" :key="y" class="bingo-card-column">
-        <bingo-cell v-for="(cell, x) in column" :key="y + '-' + x" :cell="cell" :drawn="bingoDraws.includes(cell.value)" :predicted="cell.value === nextDraw" @click="applyMultiplier(cell.value)"></bingo-cell>
+        <bingo-cell v-for="(cell, x) in column" :key="y + '-' + x" :cell="cell" :drawn="bingoDraws.includes(cell.value)" @click="applyMultiplier(cell.value)"></bingo-cell>
       </div>
     </div>
     <div class="d-flex flex-wrap justify-center">
@@ -82,8 +82,7 @@ export default {
       bingoPrize1: state => state.event.casino_bingo_prize_1,
       bingoPrize2: state => state.event.casino_bingo_prize_2,
       bingoPrize3: state => state.event.casino_bingo_prize_3,
-      isBought: state => state.event.casino_bingo_bought,
-      nextDraw: state => state.event.casino_bingo_next_draw
+      isBought: state => state.event.casino_bingo_bought
     }),
     ...mapGetters({
       multiplierNext: 'event/casinoMultiplierNext'

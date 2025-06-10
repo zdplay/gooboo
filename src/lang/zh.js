@@ -1433,6 +1433,10 @@ export default {
           name: '启用升级队列',
           description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加'
         },
+        bingoPrediction: {
+          name: '宾果预测（测试）',
+          description: '在宾果游戏中启用数字预测功能，预测最可能被抽中的数字'
+        },
         enablePlayerName: {
           name: '显示玩家名称',
           description: '在部落界面显示自定义玩家名称，或使用默认名称'
