@@ -320,6 +320,7 @@ export default {
                 'farm': 4,
                 'gallery': 5
             };
+            const nullCount = state.items.filter(item => item === null).length;
             const filteredItems = state.items.filter(item => item !== null);
             filteredItems.sort((a, b) => {
                 const featureA = state.effectToFeature[a.effect[0]];
@@ -337,7 +338,7 @@ export default {
             });
             const newItems = Array(state.items.length).fill(null);
             filteredItems.forEach((item, index) => {
-                newItems[index] = item;
+                newItems[nullCount + index] = item;
             });
             commit('updateKey', {key: 'items', value: newItems});
             dispatch('updateEffectCache');
