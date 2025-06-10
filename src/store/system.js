@@ -1056,10 +1056,12 @@ export default {
             }
         },
         processKeyPress({ state, rootState, getters, commit, dispatch }, e) {
-            // 检查是否有贪吃蛇游戏对话框打开
             const snakeGameOpen = document.querySelector('.snake-game-dialog');
             if (snakeGameOpen) {
-                return; // 如果贪吃蛇游戏打开，不处理系统键盘事件
+                const gameStarted = snakeGameOpen.__vue__?.gameStarted && !snakeGameOpen.__vue__?.showGameOverDialog && !snakeGameOpen.__vue__?.showPauseDialog;
+                if (gameStarted) {
+                    return;
+                }
             }
             
             if (document.activeElement.tagName !== 'INPUT' && state.screen !== 'tab-duplicate') {

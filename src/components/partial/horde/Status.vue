@@ -384,12 +384,33 @@ export default {
     updateShortcutMap() {
         this.activeShortcutMap = {};
         let index = 0;
-        for (const key of Object.keys(this.itemsActiveCombat)) {
+        const combatItems = {};
+        const utilityItems = {};
+        
+        for (const [key, elem] of Object.entries(this.itemsActiveBase)) {
+            if (elem.activeType !== 'utility') {
+                combatItems[key] = elem;
+            } else {
+                utilityItems[key] = elem;
+            }
+        }
+        
+        // 先为战斗技能分配快捷键
+        for (const key of Object.keys(combatItems)) {
             const shortcut = this.getShortcut(index);
             if (shortcut) {
                 this.activeShortcutMap[shortcut] = key;
+                index++;
             }
-            index++;
+        }
+        
+        // 再为非战斗技能分配快捷键
+        for (const key of Object.keys(utilityItems)) {
+            const shortcut = this.getShortcut(index);
+            if (shortcut) {
+                this.activeShortcutMap[shortcut] = key;
+                index++;
+            }
         }
     },
 

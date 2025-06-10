@@ -472,47 +472,7 @@
   height: 100%;
 }
 
-/* 底部导航增强样式 */
-.enhanced-bottom-nav {
-  transition: all 0.3s ease;
-}
 
-.enhanced-bottom-nav .v-btn {
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  overflow: hidden;
-}
-
-.enhanced-bottom-nav .v-btn:hover {
-  transform: translateY(-2px);
-}
-
-.enhanced-bottom-nav .v-btn.v-btn--active {
-  position: relative;
-}
-
-.enhanced-bottom-nav .v-btn .v-icon {
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.enhanced-bottom-nav .v-btn:hover .v-icon {
-  transform: scale(1.15);
-}
-
-.enhanced-bottom-nav .v-btn--active .v-icon {
-  animation: pulse-scale 3s infinite ease-in-out;
-}
-
-@keyframes pulse-scale {
-  0% {
-    transform: scale(1.1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1.1);
-  }
-}
 </style>
 
 <template>
@@ -610,23 +570,13 @@
         <div class="text-center">{{ $vuetify.lang.t('$vuetify.endOfContent.description') }}</div>
       </gb-tooltip>
       <v-spacer></v-spacer>
-      <v-bottom-navigation 
-        shift 
-        dark 
-        background-color="transparent" 
-        v-if="$vuetify.breakpoint.mdAndUp && menuShortcutsEnabled"
-        v-model="currentBigFeature"
-        class="enhanced-bottom-nav"
-      >
-        <v-btn 
-          v-for="feature in bigFeatures" 
-          :key="feature.name" 
-          :value="feature.name" 
-          @click="changeScreen(feature.name, true)"
-        >
+      <v-bottom-navigation shift dark background-color="transparent" v-if="$vuetify.breakpoint.mdAndUp" v-model="currentBigFeature">
+        <v-btn v-for="feature in bigFeatures" :key="feature.name" :value="feature.name" @click="changeScreen(feature.name, true)">
+          <span>{{ feature.title }}</span>
           <v-icon>{{ feature.icon }}</v-icon>
         </v-btn>
       </v-bottom-navigation>
+      <v-spacer></v-spacer>
       <v-btn icon @click="changeScreen('info')">
         <v-badge :value="hasUpdateNotice" color="red" overlap dot>
           <v-icon>mdi-information</v-icon>
@@ -1197,6 +1147,13 @@ export default {
           });
         }
       }
+    },
+    getActiveIndex() {
+      if (!this.currentBigFeature) return 0;
+      
+      const featureNames = Object.keys(this.bigFeatures);
+      const index = featureNames.indexOf(this.currentBigFeature);
+      return index === -1 ? 0 : index;
     },
   },
   watch: {

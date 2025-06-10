@@ -128,6 +128,10 @@
               </v-btn>
               <v-spacer></v-spacer>
             </div>
+            <div class="text-center mt-2 caption" v-if="gameStarted && !showGameOverDialog && !showPauseDialog">
+              <v-icon small color="warning">mdi-information</v-icon>
+              游戏开始后需要鼠标点击游戏区域才能使用键盘快捷键操作(方向键/WASD/QE)
+            </div>
           </div>
         </div>
       </v-card-text>
@@ -234,7 +238,6 @@ export default {
     dialog(newVal) {
       if (newVal) {
         this.checkGameAvailability();
-        this.forceFocus();
       } else {
         if (this.focusInterval) {
           clearInterval(this.focusInterval);
@@ -265,11 +268,11 @@ export default {
   },
   mounted() {
     this.checkGameAvailability();
-    this.forceFocus();
   },
   beforeDestroy() {
     if (this.focusInterval) {
       clearInterval(this.focusInterval);
+      this.focusInterval = null;
     }
     this.resetGame();
   },
@@ -280,43 +283,6 @@ export default {
         this.showErrorDialog = true;
       }
     },
-    forceFocus() {
-      this.$nextTick(() => {
-        this.trySetFocus();
-      });
-
-      this.focusInterval = setInterval(() => {
-        this.trySetFocus();
-      }, 100);
-      
-      // 5秒后清除定时器
-      setTimeout(() => {
-        if (this.focusInterval) {
-          clearInterval(this.focusInterval);
-          this.focusInterval = null;
-        }
-      }, 5000);
-    },
-    
-    // 尝试设置焦点的方法
-    trySetFocus() {
-      const dialogElement = document.querySelector('.snake-game-dialog .v-card');
-      if (dialogElement) {
-        try {
-          dialogElement.focus({preventScroll: true});
-
-          if (document.activeElement === dialogElement) {
-            if (this.focusInterval) {
-              clearInterval(this.focusInterval);
-              this.focusInterval = null;
-            }
-          }
-        } catch (e) {
-          console.log('无法设置焦点:', e);
-        }
-      }
-    },
-    
     startGame() {
       if (!this.canPlayGame) {
         this.errorMessage = "当前神秘碎片上限为空，无法进行游戏";
@@ -328,16 +294,6 @@ export default {
       this.gameEngine.init(this.selectedMode === 'hard');
       this.gameEngine.start();
       
-      this.$nextTick(() => {
-        const dialogElement = document.querySelector('.snake-game-dialog .v-card');
-        if (dialogElement) {
-          try {
-            dialogElement.focus();
-          } catch (e) {
-            console.log('无法设置焦点:', e);
-          }
-        }
-      });
     },
     resetGame() {
       if (this.gameEngine) {
@@ -414,14 +370,20 @@ export default {
       }
     },
     handleDialogKeyDown(e) {
-      e.stopPropagation();
-
-      if (this.gameStarted && !this.showGameOverDialog) {
+      const gameRunning = this.gameStarted && !this.showGameOverDialog && !this.showPauseDialog;
+      
+      if (gameRunning) {
+        e.stopPropagation();
+        
         const keyMap = {
           'ArrowUp': 'up',
           'ArrowDown': 'down',
           'ArrowLeft': 'left',
           'ArrowRight': 'right',
+          'w': 'up',  
+          's': 'down',
+          'a': 'left', 
+          'd': 'right', 
           'q': 'turnLeft',
           'e': 'turnRight',
           ' ': 'pause'
@@ -579,6 +541,15 @@ export default {
   z-index: 1;
 }
 </style>
+
+
+
+
+
+
+
+
+
 
 
 
