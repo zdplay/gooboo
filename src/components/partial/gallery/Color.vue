@@ -14,28 +14,12 @@
   width: 100%;
   text-align: center;
 }
-.canvas-prediction-divider {
-  position: relative;
-  text-align: center;
-  margin: 8px 0;
-}
-.canvas-prediction-divider::before,
-.canvas-prediction-divider::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: calc(50% - 50px);
-  border-top: 2px solid rgb(255, 255, 255);
-}
-.canvas-prediction-divider::before {
-  left: 0;
-}
-.canvas-prediction-divider::after {
-  right: 0;
-}
 .canvas-prediction-item {
   text-align: center;
   margin: 4px 0;
+}
+.canvas-prediction-box {
+  background-color: rgba(105, 227, 243, 0.1);
 }
 </style>
 
@@ -88,13 +72,11 @@
         </template>
         <div v-if="canvasUntilNext !== null && showCanvasPreview" class="mb-2">{{ $vuetify.lang.t('$vuetify.gallery.canvas.untilNextLevel', $formatTime(canvasUntilNext)) }}</div>
 
-        <div v-if="canvasUntilNextMultiple.length > 0 && showCanvasPreview" class="canvas-prediction-container mb-2">
-          <div class="canvas-prediction-divider">画布预计</div>
+        <v-col cols="12" v-if="canvasUntilNextMultiple.length > 0 && showCanvasPreview" class="canvas-prediction-box rounded px-1 darken-4">
           <div v-for="(item, index) in canvasUntilNextMultiple" :key="index" class="canvas-prediction-item">
-            {{ item.spaces }}画布: {{ $formatTime(item.time) }}
+            {{ item.spaces }}画布预计需要: {{ $formatTime(item.time) }}
           </div>
-          <div class="canvas-prediction-divider"></div>
-        </div>
+        </v-col>
         
         <display-row class="mt-0" v-for="(item, key) in canvasDisplay" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
         <h3 class="text-center">{{ $vuetify.lang.t('$vuetify.mult.galleryCanvasSpeed') }}</h3>
