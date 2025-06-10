@@ -37,44 +37,6 @@
         </v-col>
       </v-row>
     </div>
-  <div v-else-if="isCustomLgOnly">
-    <v-tabs v-model="tab" grow show-arrows>
-      <v-tab href="#horde"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.horde')" icon="mdi-account-group"></tab-icon-text></v-tab>
-      <v-tab href="#battlepass" v-if="canSeeBattlePass"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.battlePass.name')" icon="mdi-passport"></tab-icon-text></v-tab>
-      <v-tab href="#souls" v-if="canPrestige"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.souls')" icon="mdi-ghost"></tab-icon-text></v-tab>
-    </v-tabs>
-    <v-row v-if="tab === 'horde'" no-gutters>
-      <v-col class="scroll-container-tab" cols="6">
-        <status></status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <item-list v-if="canUseItems"></item-list>
-        <skill-tree v-if="subfeature === 1"></skill-tree>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="horde" :subfeature="subfeature" :requirementStat="upgradeStat" key="horde-regular"></upgrade-list>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="tab === 'battlepass'" no-gutters>
-      <v-col class="scroll-container-tab" cols="4">
-        <trinket-list></trinket-list>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="8">
-        <battle-pass></battle-pass>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="tab === 'souls'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <prestige-status></prestige-status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <prestige-inventory></prestige-inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="horde" type="prestige" :requirementStat="['horde_maxZone']" key="horde-prestige"></upgrade-list>
-      </v-col>
-    </v-row>
-  </div>
   <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#horde"><tab-icon-text :text="$vuetify.lang.t('$vuetify.horde.horde')" icon="mdi-account-group"></tab-icon-text></v-tab>

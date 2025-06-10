@@ -36,43 +36,6 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="isCustomLgOnly">
-    <v-tabs v-model="tab" grow show-arrows>
-      <v-tab href="#gallery"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.gallery')" icon="mdi-image-frame"></tab-icon-text></v-tab>
-      <v-tab href="#shapes" v-if="canSeeShapes"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.shapes.name')" icon="mdi-shape-plus"></tab-icon-text></v-tab>
-      <v-tab href="#auction" v-if="canPrestige"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.auction')" icon="mdi-gavel"></tab-icon-text></v-tab>
-    </v-tabs>
-    <v-row v-if="tab === 'gallery'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <idea-list></idea-list>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <inventory></inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="gallery" :requirementCustom="upgradeNextRequired" key="gallery-regular"></upgrade-list>
-      </v-col>
-    </v-row>
-    <v-row v-if="tab === 'shapes'" no-gutters>
-      <v-col class="scroll-container-tab" cols="9">
-        <shape-minigame></shape-minigame>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="gallery" type="shape" key="gallery-shape"></upgrade-list>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="tab === 'auction'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <prestige-status></prestige-status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <prestige-inventory></prestige-inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="gallery" type="prestige" :requirementCustom="upgradeNextRequired" key="gallery-prestige"></upgrade-list>
-      </v-col>
-    </v-row>
-  </div>
   <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#gallery"><tab-icon-text :text="$vuetify.lang.t('$vuetify.gallery.gallery')" icon="mdi-image-frame"></tab-icon-text></v-tab>

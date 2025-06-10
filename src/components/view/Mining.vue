@@ -27,34 +27,6 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="isCustomLgOnly">
-    <v-tabs v-model="tab" grow show-arrows>
-      <v-tab href="#mine"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.mine')" icon="mdi-pickaxe"></tab-icon-text></v-tab>
-      <v-tab href="#dweller" v-if="unlock.miningDepthDweller.see"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.depthDweller')" icon="mdi-elevator-down"></tab-icon-text></v-tab>
-    </v-tabs>
-    <v-row v-if="tab === 'mine'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <status></status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <inventory></inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="mining" :subfeature="subfeature" :requirementStat="upgradeStat" key="mining-regular"></upgrade-list>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="tab === 'dweller'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <prestige-status></prestige-status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <prestige-inventory></prestige-inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="mining" type="prestige" :requirementStat="upgradePrestigeStat" key="mining-prestige"></upgrade-list>
-      </v-col>
-    </v-row>
-  </div>
   <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#mine"><tab-icon-text :text="$vuetify.lang.t('$vuetify.mining.mine')" icon="mdi-pickaxe"></tab-icon-text></v-tab>

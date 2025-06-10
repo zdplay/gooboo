@@ -46,53 +46,6 @@
       </v-col>
     </v-row>
   </div>
-  <div v-else-if="isCustomLgOnly">
-    <v-tabs v-model="tab" grow show-arrows>
-      <v-tab href="#village"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.village')" icon="mdi-home-group"></tab-icon-text></v-tab>
-      <v-tab href="#offering" v-if="canSeeOffering"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.offering.name')" icon="mdi-candle"></tab-icon-text></v-tab>
-      <v-tab href="#policies" v-if="canSeePolicies"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.policy.name')" icon="mdi-script-text"></tab-icon-text></v-tab>
-      <v-tab href="#pray" v-if="canPrestige"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.pray')" icon="mdi-hands-pray"></tab-icon-text></v-tab>
-    </v-tabs>
-    <v-row v-if="tab === 'village'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <resources></resources>
-      </v-col>
-      <v-col v-if="subfeature === 0" class="scroll-container-tab" cols="3">
-        <job-list></job-list>
-      </v-col>
-      <v-col v-if="subfeature === 1" class="scroll-container-tab" cols="6">
-        <crafting-list></crafting-list>
-      </v-col>
-      <v-col v-if="subfeature === 0" class="scroll-container-tab" cols="3">
-        <upgrade-queue feature="village" type="building" :disabled="isFrozen"></upgrade-queue>
-        <building-stat-bar></building-stat-bar>
-        <upgrade-list feature="village" type="building" key="village-building"></upgrade-list>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="village" key="village-regular" :subfeature="subfeature"></upgrade-list>
-      </v-col>
-    </v-row>
-    <v-row v-else-if="tab === 'offering'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <offering-inventory></offering-inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="9">
-        <offering-list :cols="4"></offering-list>
-      </v-col>
-    </v-row>
-    <policy-list v-else-if="tab === 'policies'"></policy-list>
-    <v-row v-else-if="tab === 'pray'" no-gutters>
-      <v-col class="scroll-container-tab" cols="3">
-        <prestige-status></prestige-status>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="6">
-        <prestige-inventory></prestige-inventory>
-      </v-col>
-      <v-col class="scroll-container-tab" cols="3">
-        <upgrade-list feature="village" type="prestige" :requirementCustom="upgradeNextRequired" key="village-prestige"></upgrade-list>
-      </v-col>
-    </v-row>
-  </div>
   <div v-else-if="isCustomMdAndUp">
     <v-tabs v-model="tab" grow show-arrows>
       <v-tab href="#village"><tab-icon-text :text="$vuetify.lang.t('$vuetify.village.village')" icon="mdi-home-group"></tab-icon-text></v-tab>
