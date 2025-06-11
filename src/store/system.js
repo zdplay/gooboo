@@ -390,13 +390,6 @@ export default {
                         value: false,
                         defaultValue: false
                     },
-                    bingoPrediction: {
-                        unlock: null,
-                        hasDescription: true,
-                        type: 'switch',
-                        value: false,
-                        defaultValue: false
-                    },
                     treasurePreview: {
                         unlock: 'treasureFeature',
                         hasDescription: true,
