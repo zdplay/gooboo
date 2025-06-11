@@ -787,23 +787,11 @@ export default {
             if (newBingos >= 3 && oldBingos < 3) {
                 dispatch('winPrize', {prize: state.casino_bingo_prize_3, pool: 'bingo4', notify: true});
             }
-
-            // 更新预测结果并显示
-            const predictions = getters.predictNextBingoDraw;
-            commit('updateNextBingoDraw', predictions);
         },
         casinoApplyMultiplier({ state, getters, commit }, num) {
-            const index = state.casino_bingo_boosts.indexOf(num);
-            if (index !== -1) {
-                // 如果数字已经有倍率，则撤销倍率
-                commit('removeKey', {key: 'casino_bingo_boosts', index});
-            } else if (getters.casinoMultipliersAvailable > 0) {
-                // 如果数字没有倍率且有可用倍率，则设置倍率
+            if (getters.casinoMultipliersAvailable > 0 && !state.casino_bingo_boosts.includes(num)) {
                 commit('pushKey', {key: 'casino_bingo_boosts', value: num});
             }
-            // 更新预测结果并显示
-            const predictions = getters.predictNextBingoDraw;
-            commit('updateNextBingoDraw', predictions);
         },
         casinoBingoBuy({ state, rootGetters, commit, dispatch }) {
             if (!state.casino_bingo_bought && rootGetters['currency/value']('gem_topaz') >= CASINO_BINGO_CARD_COST) {
