@@ -9,14 +9,19 @@
   height: 52px;
   font-size: 20px;
 }
+.bingo-predicted {
+  border: 2px solid red !important;
+}
 </style>
 
 <template>
   <gb-tooltip :disabled="cell.prize === null" :title-text="$vuetify.lang.t(`$vuetify.event.casino.prize`)">
     <template v-slot:activator="{ on, attrs }">
-      <div class="bg-tile-default rounded d-flex justify-center align-center bingo-card-cell mx-1 my-2" :class="{'success': drawn, 'bingo-cell-mobile': $vuetify.breakpoint.xsOnly}" v-bind="attrs" v-on="{...$listeners, ...on}">
+      <div class="bg-tile-default rounded d-flex justify-center align-center bingo-card-cell mx-1 my-2" 
+           :class="{'success': drawn, 'bingo-cell-mobile': $vuetify.breakpoint.xsOnly, 'bingo-predicted': isPredicted && showPrediction}" 
+           v-bind="attrs" v-on="{...$listeners, ...on}">
         <v-badge :value="!drawn && cell.prize !== null" :color="cell.prize !== null && cell.isRare ? 'green' : 'grey'">
-          <v-badge bottom :value="!drawn && cell.multiplier !== null" :content="`x${cell.multiplier}`">
+          <v-badge bottom :value="!drawn && cell.multiplier !== null" :content="cell.multiplier">
             <div>{{ cell.value }}</div>
           </v-badge>
         </v-badge>
@@ -39,6 +44,19 @@ export default {
     drawn: {
       type: Boolean,
       required: true
+    },
+    predictedDraws: {
+      type: Array,
+      default: () => []
+    },
+    showPrediction: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    isPredicted() {
+      return !this.drawn && this.predictedDraws.includes(this.cell.value);
     }
   }
 }

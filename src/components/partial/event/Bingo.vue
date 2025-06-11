@@ -43,7 +43,15 @@
     </div>
     <div v-if="bingoCard !== null" class="d-flex flex-wrap mx-auto bingo-card-container" :class="{'bingo-card-mobile': $vuetify.breakpoint.xsOnly}">
       <div v-for="(column, y) in bingoCard" :key="y" class="bingo-card-column">
-        <bingo-cell v-for="(cell, x) in column" :key="y + '-' + x" :cell="cell" :drawn="bingoDraws.includes(cell.value)" @click="applyMultiplier(cell.value)"></bingo-cell>
+        <bingo-cell 
+          v-for="(cell, x) in column" 
+          :key="y + '-' + x" 
+          :cell="cell" 
+          :drawn="bingoDraws.includes(cell.value)" 
+          :predicted-draws="predictedDraws"
+          :show-prediction="predictionEnabled"
+          @click="applyMultiplier(cell.value)"
+        ></bingo-cell>
       </div>
     </div>
     <div class="d-flex flex-wrap justify-center">
@@ -82,7 +90,10 @@ export default {
       bingoPrize1: state => state.event.casino_bingo_prize_1,
       bingoPrize2: state => state.event.casino_bingo_prize_2,
       bingoPrize3: state => state.event.casino_bingo_prize_3,
-      isBought: state => state.event.casino_bingo_bought
+      isBought: state => state.event.casino_bingo_bought,
+      predictedDraws: state => state.event.casino_bingo_predicted_draws,
+      casinoBoosts: state => state.event.casino_bingo_boosts,
+      recentBoosts: state => state.event.casino_bingo_recent_boosts
     }),
     ...mapGetters({
       multiplierNext: 'event/casinoMultiplierNext'
@@ -93,8 +104,43 @@ export default {
       }
       return this.$store.state.event.casino_bingo_card.map(column => {
         return [...column].map(cell => {
-          const boostIndex = this.$store.state.event.casino_bingo_boosts.findIndex(boost => boost === cell.value);
-          return {...cell, multiplier: boostIndex === -1 ? null : Math.floor(boostIndex / 2 + 3)};
+          const boostIndex = this.$store.state.event.casino_bingo_boosts.indexOf(cell.value);
+          if (boostIndex === -1) {
+            return {...cell, multiplier: null};
+          } else {
+            const boostData = this.$store.state.event.casino_bingo_boost_values[cell.value];
+            if (boostData) {
+              let displayValue = null;
+              
+              if (typeof boostData === 'object' && boostData.value !== undefined) {
+                displayValue = `x${boostData.value}`;
+              } else {
+                const availableBoosts = this.$store.state.event.casino_bingo_available_boosts;
+                for (const boost of availableBoosts) {
+                  if (boost.id === boostData) {
+                    displayValue = `x${boost.value}`;
+                    break;
+                  }
+                }
+                
+                if (displayValue === null && typeof boostData === 'string' && boostData.startsWith('x')) {
+                  const valueMatch = boostData.match(/^x(\d+)/);
+                  if (valueMatch) {
+                    displayValue = `x${valueMatch[1]}`;
+                  }
+                }
+                
+                if (displayValue === null) {
+                  displayValue = `x${Math.floor(boostIndex / 2 + 3)}`;
+                }
+              }
+              
+              return {...cell, multiplier: displayValue};
+            } else {
+              const value = Math.floor(boostIndex / 2 + 3);
+              return {...cell, multiplier: `x${value}`};
+            }
+          }
         });
       });
     },
@@ -111,6 +157,31 @@ export default {
       return buildArray(25).map(elem => {
         return this.bingoDraws.length >= (elem + 1) ? this.bingoDraws[elem] : null;
       });
+    },
+    predictionEnabled() {
+      return this.$store.state.system.settings.experiment.items.bingoPrediction.value;
+    }
+  },
+  mounted() {
+    if (this.predictionEnabled && this.isBought) {
+      this.$store.dispatch('event/updateBingoPredictions');
+    }
+  },
+  watch: {
+    predictionEnabled(newVal) {
+      if (newVal && this.isBought) {
+        this.$store.dispatch('event/updateBingoPredictions');
+      }
+    },
+    isBought(newVal) {
+      if (newVal && this.predictionEnabled) {
+        this.$store.dispatch('event/updateBingoPredictions');
+      }
+    },
+    casinoBoosts() {
+      if (this.predictionEnabled && this.isBought) {
+        this.$store.dispatch('event/updateBingoPredictions');
+      }
     }
   },
   methods: {

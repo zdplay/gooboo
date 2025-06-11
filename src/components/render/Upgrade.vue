@@ -303,8 +303,9 @@ export default {
           const currencyState = this.$store.state.currency[currency];
           if (!currencyState) continue;
           
-          const cap = currencyState.cap || 0;
-          percents.push(cap < required ? cap / required : 1);
+          const currentValue = currencyState.value || 0;
+          const ratio = currentValue / required;
+          percents.push(ratio);
         }
       }
       

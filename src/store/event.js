@@ -20,6 +20,10 @@ export default {
         casino_bingo_card: null,
         casino_bingo_draws: [],
         casino_bingo_boosts: [],
+        casino_bingo_available_boosts: [],
+        casino_bingo_recent_boosts: [],
+        casino_bingo_boost_values: {},
+        casino_bingo_predicted_draws: [],
         casino_bingo_prize_1: null,
         casino_bingo_prize_2: null,
         casino_bingo_prize_3: null,
@@ -302,41 +306,6 @@ export default {
         },
         bingoCellIsRare: () => (index) => {
             return [1, 3, 5, 9, 15, 19, 21, 23].includes(index);
-        },
-        predictNextBingoDraw: (state, getters, rootState, rootGetters) => {
-            if (!state.casino_bingo_card) return null;
-            
-            // 如果已经抽中25个数字，则不再预测
-            if (state.casino_bingo_draws.length >= 25) {
-                return null;
-            }
-            
-            let weights = buildArray(75).map(elem => {
-                const num = elem + 1;
-                if (state.casino_bingo_draws.includes(num)) {
-                    return 0;
-                }
-                const boostIndex = state.casino_bingo_boosts.findIndex(boost => boost === num);
-                return boostIndex === -1 ? 1 : Math.floor(boostIndex / 2 + 3);
-            });
-
-            let rngGen = rootGetters['system/getRng']('bingo_draw');
-            let predictions = [];
-            let remainingWeights = [...weights];
-            
-            // 根据已抽中数字数量决定预测数量
-            const drawnCount = state.casino_bingo_draws.length;
-            const predictionCount = drawnCount >= 22 ? 3 : 5;
-            
-            // 预测指定数量的最可能结果
-            for (let i = 0; i < predictionCount; i++) {
-                if (remainingWeights.some(w => w > 0)) {
-                    const nextDraw = weightSelect(remainingWeights, rngGen());
-                    predictions.push(nextDraw + 1);
-                    remainingWeights[nextDraw] = 0; // 确保不会重复预测同一个数字
-                }
-            }
-            return predictions;
         }
     },
     mutations: {
@@ -395,6 +364,10 @@ export default {
             commit('updateKey', {key: 'casino_bingo_card', value: null});
             commit('updateKey', {key: 'casino_bingo_draws', value: []});
             commit('updateKey', {key: 'casino_bingo_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_available_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_recent_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_boost_values', value: {}});
+            commit('updateKey', {key: 'casino_bingo_predicted_draws', value: []});
             commit('updateKey', {key: 'casino_bingo_prize_1', value: null});
             commit('updateKey', {key: 'casino_bingo_prize_2', value: null});
             commit('updateKey', {key: 'casino_bingo_prize_3', value: null});
@@ -702,7 +675,7 @@ export default {
                 dispatch('currency/gain', {feature: 'gem', name: 'topaz', amount: state.bank_investment, refund: true}, {root: true});
             }
         },
-        casinoBingoCardGenerate({ state, getters, rootGetters, commit }) {
+        casinoBingoCardGenerate({ state, getters, rootGetters, rootState, commit, dispatch }) {
             let bingoCard = [];
             let rngGen = rootGetters['system/getRng']('bingo_generate');
             commit('system/nextRng', {name: 'bingo_generate', amount: 1}, {root: true});
@@ -725,6 +698,9 @@ export default {
             commit('updateKey', {key: 'casino_bingo_card', value: bingoCard});
             commit('updateKey', {key: 'casino_bingo_draws', value: []});
             commit('updateKey', {key: 'casino_bingo_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_available_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_recent_boosts', value: []});
+            commit('updateKey', {key: 'casino_bingo_boost_values', value: {}});
             for (let i = 0; i < 3; i++) {
                 const pool = 'bingo' + (i + 2);
                 const prize = getters.getRandomPrize(pool)[0];
@@ -735,20 +711,37 @@ export default {
                 }
                 commit('updateKey', {key: 'casino_bingo_prize_' + (i + 1), value: prize});
             }
+            // 计算可用倍率
+            dispatch('updateBingoAvailableBoosts');
+            // 如果预测功能开启，计算初始预测
+            if (rootState.system.settings.experiment.items.bingoPrediction.value) {
+                dispatch('updateBingoPredictions');
+            }
         },
-        casinoBingoCardDraw({ state, getters, rootGetters, commit, dispatch }) {
+        casinoBingoCardDraw({ state, getters, rootGetters, rootState, commit, dispatch }) {
             let weights = buildArray(75).map(elem => {
                 const num = elem + 1;
                 if (state.casino_bingo_draws.includes(num)) {
                     return 0;
                 }
                 const boostIndex = state.casino_bingo_boosts.findIndex(boost => boost === num);
-                return boostIndex === -1 ? 1 : Math.floor(boostIndex / 2 + 3);
+                if (boostIndex === -1) {
+                    return 1;
+                } else {
+                    const boostData = state.casino_bingo_boost_values[num];
+                    if (boostData) {
+                        if (typeof boostData === 'object' && boostData.value !== undefined) {
+                            return boostData.value;
+                        } else if (typeof boostData === 'string' && boostData.startsWith('x')) {
+                            return parseInt(boostData.substring(1, 2));
+                        }
+                    }
+                    return Math.floor(boostIndex / 2 + 3);
+                }
             });
 
             const oldBingos = getters.getBingoCount;
 
-            // Set draw goal based on drawn numbers
             let drawGoal = 12;
             if (state.casino_bingo_draws.length >= 22) {
                 drawGoal = 25;
@@ -765,7 +758,6 @@ export default {
                 weights[drawnNum] = 0;
                 commit('pushKey', {key: 'casino_bingo_draws', value: drawnNum + 1});
 
-                // Award cell prizes
                 state.casino_bingo_card.forEach(column => {
                     column.forEach(cell => {
                         if (cell.value === (drawnNum + 1) && cell.prize !== null) {
@@ -777,7 +769,6 @@ export default {
 
             const newBingos = getters.getBingoCount;
 
-            // Award bingo prizes
             if (newBingos >= 1 && oldBingos < 1) {
                 dispatch('winPrize', {prize: state.casino_bingo_prize_1, pool: 'bingo2', notify: true});
             }
@@ -787,10 +778,121 @@ export default {
             if (newBingos >= 3 && oldBingos < 3) {
                 dispatch('winPrize', {prize: state.casino_bingo_prize_3, pool: 'bingo4', notify: true});
             }
+
+            commit('updateKey', {key: 'casino_bingo_recent_boosts', value: []});
+            
+            dispatch('updateBingoAvailableBoosts');
+            
+            if (rootState.system.settings.experiment.items.bingoPrediction.value) {
+                dispatch('updateBingoPredictions');
+            }
         },
-        casinoApplyMultiplier({ state, getters, commit }, num) {
-            if (getters.casinoMultipliersAvailable > 0 && !state.casino_bingo_boosts.includes(num)) {
-                commit('pushKey', {key: 'casino_bingo_boosts', value: num});
+        casinoApplyMultiplier({ state, getters, rootState, commit, dispatch }, num) {
+            // If prediction feature is not enabled, use original logic
+            if (!rootState.system.settings.experiment.items.bingoPrediction.value) {
+                if (getters.casinoMultipliersAvailable > 0 && !state.casino_bingo_boosts.includes(num) && !state.casino_bingo_draws.includes(num)) {
+                    commit('pushKey', {key: 'casino_bingo_boosts', value: num});
+                }
+                return;
+            }
+            
+            // Check if this number already has a multiplier
+            const boostIndex = state.casino_bingo_boosts.indexOf(num);
+            
+            if (boostIndex !== -1) {
+                // Only allow removal if the boost was added after the last draw AND prediction feature is enabled
+                if (state.casino_bingo_recent_boosts.includes(num) && rootState.system.settings.experiment.items.bingoPrediction.value) {
+                    // Get the boost ID
+                    const boostData = state.casino_bingo_boost_values[num];
+                    
+                    if (boostData) {
+                        // Extract boost ID and value
+                        let boostId, boostValue;
+                        
+                        // Handle both object format and string format (for backward compatibility)
+                        if (typeof boostData === 'object') {
+                            boostId = boostData.id;
+                            boostValue = boostData.value;
+                        } else {
+                            boostId = boostData;
+                            
+                            // Try to find the boost with this ID in the available list
+                            const boostObj = state.casino_bingo_available_boosts.find(b => b.id === boostId);
+                            
+                            if (boostObj) {
+                                boostValue = boostObj.value;
+                            } else {
+                                // Try to parse value from ID (compatibility with old format)
+                                if (boostId.startsWith('x') && !isNaN(parseInt(boostId.substring(1, 2)))) {
+                                    boostValue = parseInt(boostId.substring(1, 2));
+                                } else {
+                                    boostValue = 3;
+                                }
+                            }
+                        }
+                        
+                        // Create the boost object to add back to available list
+                        const boostToAdd = {
+                            id: boostId,
+                            value: boostValue
+                        };
+                        
+                        // Add back to available list
+                        let newAvailable = [...state.casino_bingo_available_boosts];
+                        newAvailable.push(boostToAdd);
+                        commit('updateKey', {key: 'casino_bingo_available_boosts', value: newAvailable});
+                    }
+                    
+                    // Remove the boost
+                    commit('removeKey', {key: 'casino_bingo_boosts', index: boostIndex});
+                    
+                    // Remove from recent boost list
+                    const recentIndex = state.casino_bingo_recent_boosts.indexOf(num);
+                    if (recentIndex !== -1) {
+                        let newRecent = [...state.casino_bingo_recent_boosts];
+                        newRecent.splice(recentIndex, 1);
+                        commit('updateKey', {key: 'casino_bingo_recent_boosts', value: newRecent});
+                    }
+                    
+                    // Remove from boost values mapping
+                    let newBoostValues = {...state.casino_bingo_boost_values};
+                    delete newBoostValues[num];
+                    commit('updateKey', {key: 'casino_bingo_boost_values', value: newBoostValues});
+                    
+                    // Update predictions
+                    dispatch('updateBingoPredictions');
+                }
+                return;
+            }
+            
+            // Add new boost
+            if (getters.casinoMultipliersAvailable > 0 && !state.casino_bingo_draws.includes(num)) {
+                // Get a boost from the available boosts list
+                if (state.casino_bingo_available_boosts.length > 0) {
+                    // Copy the available boosts list
+                    let newAvailable = [...state.casino_bingo_available_boosts];
+                    // Take a boost (preserve original ID and value)
+                    const boostObj = newAvailable.shift();
+                    
+                    // Update available boosts list
+                    commit('updateKey', {key: 'casino_bingo_available_boosts', value: newAvailable});
+                    
+                    // Add boost to the specified number
+                    commit('pushKey', {key: 'casino_bingo_boosts', value: num});
+                    
+                    // Store the boost data (ID and value) for this number
+                    let newBoostValues = {...state.casino_bingo_boost_values};
+                    newBoostValues[num] = { id: boostObj.id, value: boostObj.value };
+                    commit('updateKey', {key: 'casino_bingo_boost_values', value: newBoostValues});
+                    
+                    // Add to recent boosts list
+                    let newRecent = [...state.casino_bingo_recent_boosts];
+                    newRecent.push(num);
+                    commit('updateKey', {key: 'casino_bingo_recent_boosts', value: newRecent});
+                    
+                    // Update predictions
+                    dispatch('updateBingoPredictions');
+                }
             }
         },
         casinoBingoBuy({ state, rootGetters, commit, dispatch }) {
@@ -923,6 +1025,130 @@ export default {
         giveTokens({ commit, dispatch }, o) {
             dispatch('currency/gain', {feature: 'event', name: o.event + 'Token', amount: o.amount}, {root: true});
             commit('stat/add', {feature: 'event', name: o.event + 'Highscore', value: o.amount}, {root: true});
+        },
+        updateBingoAvailableBoosts({ state, getters, commit }) {
+            const multipliersAvailable = getters.casinoMultipliersAvailable;
+            
+            // If current has no boost available, clear available boosts list
+            if (multipliersAvailable <= 0) {
+                commit('updateKey', {key: 'casino_bingo_available_boosts', value: []});
+                return;
+            }
+            
+            // Determine default multiplier value for current stage (only for newly generated boosts)
+            let currentStageMultiplier = 0;
+            if (state.casino_bingo_draws.length >= 22) {
+                currentStageMultiplier = 5; // Third stage multiplier x5
+            } else if (state.casino_bingo_draws.length >= 17) {
+                currentStageMultiplier = 4; // Second stage multiplier x4
+            } else if (state.casino_bingo_draws.length >= 12) {
+                currentStageMultiplier = 3; // First stage multiplier x3
+            }
+            
+            if (currentStageMultiplier === 0) {
+                commit('updateKey', {key: 'casino_bingo_available_boosts', value: []});
+                return;
+            }
+            
+            // Keep existing available boosts (not affected by stage)
+            // Note: No need to filter available boosts here, all boosts are kept as original values
+            let newBoosts = [...state.casino_bingo_available_boosts];
+            
+            // Calculate existing boost ID maximum
+            let maxId = 0;
+            
+            // Check used boost IDs
+            Object.values(state.casino_bingo_boost_values).forEach(id => {
+                const numericId = parseInt(id);
+                if (!isNaN(numericId) && numericId > maxId) {
+                    maxId = numericId;
+                }
+            });
+            
+            // Check available boosts IDs
+            state.casino_bingo_available_boosts.forEach(boost => {
+                const numericId = parseInt(boost.id);
+                if (!isNaN(numericId) && numericId > maxId) {
+                    maxId = numericId;
+                }
+            });
+            
+            // Calculate needed new boost quantity
+            const neededNew = multipliersAvailable - newBoosts.length;
+            
+            // Generate new boosts
+            for (let i = 0; i < neededNew; i++) {
+                newBoosts.push({
+                    id: String(maxId + i + 1),  // Use increasing numbers as unique ID
+                    value: currentStageMultiplier  // New boost value is current stage value
+                });
+            }
+            
+            commit('updateKey', {key: 'casino_bingo_available_boosts', value: newBoosts});
+        },
+        updateBingoPredictions({ state, rootState, rootGetters, commit }) {
+            if (!rootState.system.settings.experiment.items.bingoPrediction.value) {
+                commit('updateKey', {key: 'casino_bingo_predicted_draws', value: []});
+                return;
+            }
+            
+            if (!state.casino_bingo_card || state.casino_bingo_draws.length >= 25) {
+                commit('updateKey', {key: 'casino_bingo_predicted_draws', value: []});
+                return;
+            }
+            
+            let weights = buildArray(75).map(elem => {
+                const num = elem + 1;
+                if (state.casino_bingo_draws.includes(num)) {
+                    return 0;
+                }
+                const boostIndex = state.casino_bingo_boosts.indexOf(num);
+                if (boostIndex === -1) {
+                    return 1;
+                } else {
+                    const boostData = state.casino_bingo_boost_values[num];
+                    if (boostData) {
+                        if (typeof boostData === 'object' && boostData.value !== undefined) {
+                            return boostData.value;
+                        }
+                        
+                        for (const boost of state.casino_bingo_available_boosts) {
+                            if (boost.id === boostData) {
+                                return boost.value;
+                            }
+                        }
+                        
+                        if (typeof boostData === 'string' && boostData.startsWith('x') && !isNaN(parseInt(boostData.substring(1, 2)))) {
+                            return parseInt(boostData.substring(1, 2));
+                        }
+                    }
+                    
+                    return Math.floor(boostIndex / 2 + 3);
+                }
+            });
+            
+            let rngGen = rootGetters['system/getRng']('bingo_draw');
+            let predictions = [];
+            let remainingWeights = [...weights];
+            
+            const drawnCount = state.casino_bingo_draws.length;
+            let predictionCount = 12;
+            
+            if (drawnCount >= 22) {
+                predictionCount = 3;
+            } else if (drawnCount >= 12) {
+                predictionCount = 5;
+            }
+            
+            for (let i = 0; i < predictionCount; i++) {
+                if (remainingWeights.some(w => w > 0)) {
+                    const nextDraw = weightSelect(remainingWeights, rngGen());
+                    predictions.push(nextDraw + 1);
+                    remainingWeights[nextDraw] = 0;
+                }
+            }
+            
+            commit('updateKey', {key: 'casino_bingo_predicted_draws', value: predictions});
         }
     }
 }

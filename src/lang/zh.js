@@ -1434,8 +1434,8 @@ export default {
           description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加'
         },
         bingoPrediction: {
-          name: '宾果预测（测试）',
-          description: '在宾果游戏中启用数字预测功能，预测最可能被抽中的数字'
+          name: '启用宾果预测和撤销）',
+          description: '在宾果游戏中启用数字预测功能和点击撤销倍率功能，预测最可能被抽中的数字'
         },
         enablePlayerName: {
           name: '显示玩家名称',
@@ -1455,7 +1455,7 @@ export default {
         },
         enableSnakeGame: {
           name: '贪吃神秘碎片',
-          description: '给部落的神秘碎片加上彩蛋游戏'
+          description: '给部落的神秘碎片加上彩蛋游戏，离线超过10分钟增加神秘碎片保底为1。'
         }
       }
   },
