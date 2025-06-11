@@ -284,29 +284,14 @@ export default {
       if (!price) return 0;
       
       let percents = [];
-      if (this.ableAfford) {
-        for (const currency in price) {
-          const required = price[currency];
-          if (required <= 0) continue;
-          
-          const currencyState = this.$store.state.currency[currency];
-          if (!currencyState) continue;
-          const currentValue = currencyState.value || 0;
-          const ratio = Math.min(currentValue / required, 1);
-          percents.push(ratio);
-        }
-      } else {
-        for (const currency in price) {
-          const required = price[currency];
-          if (required <= 0) continue;
-          
-          const currencyState = this.$store.state.currency[currency];
-          if (!currencyState) continue;
-          
-          const currentValue = currencyState.value || 0;
-          const ratio = currentValue / required;
-          percents.push(ratio);
-        }
+      
+      for (const currency in price) {
+        const required = price[currency];
+        if (required <= 0) continue;
+        
+        const effectiveValue = this.$store.getters['currency/value'](currency) || 0;
+        const ratio = Math.min(effectiveValue / required, 1);
+        percents.push(ratio);
       }
       
       if (percents.length === 0) return 0;

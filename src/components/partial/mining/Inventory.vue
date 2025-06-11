@@ -142,7 +142,7 @@
       <v-btn class="ma-1" color="primary" :disabled="enhancementBars < enhancementBarsNeeded || !canEnhanceFinal" @click="performEnhancementFinal">{{ $vuetify.lang.t('$vuetify.mining.enhance') }}</v-btn>
     </div>
     <div v-if="unlock.miningEnhancement.use && subfeature === 0 && enhancementIngredient" class="d-flex flex-column justify-center align-center flex-wrap mt-2 grey--text text--darken-1">
-      <div>下级增加需要: {{ $formatNum(nextLevelEnhancementBarsNeeded) }}，增强需要: {{ $formatNum(enhancementFinalNeeded) }}</div>
+      <div>下级增加需要: {{ $formatNum(nextLevelEnhancementBarsNeeded) }}，强化需要: {{ $formatNum(enhancementFinalNeeded) }}</div>
     </div>
     <smeltery v-if="unlock.miningSmeltery.see && subfeature === 0" class="mt-4 mt-lg-8"></smeltery>
   </div>
