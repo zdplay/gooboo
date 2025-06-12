@@ -1,4 +1,5 @@
 import axios from 'axios';
+import store from "@/store";
 
 const instance = axios.create({
     baseURL: "https://gamesaves.ggff.eu.org",
@@ -131,6 +132,69 @@ export function saveData(saveData, userId, tokenId) {
         method: 'post',
         data: data
     });
+}
+
+export function updateMemo(saveId, memo, userId, tokenId) {
+    const gameId = window.location.hostname;
+
+    const data = {
+        userId: userId,
+        tokenId: tokenId,
+        gameId: gameId,
+        saveId: parseInt(saveId),
+        action: 'update_memo',
+        memo: memo
+    };
+    
+    return instance({
+        url: '/listweb',
+        method: 'post',
+        data: data
+    }).then(response => {
+        if (response.success) {
+            return response;
+        } else {
+            console.error("更新备注失败:", response);
+            throw new Error(response.error || "更新备注失败");
+        }
+    }).catch(error => {
+        console.error("更新备注请求出错:", error);
+        if (error.data && error.data.error) {
+            throw new Error(error.data.error);
+        }
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error(error.message || "更新备注请求失败");
+    });
+}
+
+/**
+ * 统一处理云存档通知
+ * @param {string} type - 通知类型: 'success'|'error'
+ * @param {string} operation - 操作类型: 'save'|'load'|'update_memo'|'list'等
+ * @param {Object} [error] - 错误信息对象
+ * @param {string} [customMessage] - 自定义消息
+ */
+export function addCloudNotification(type, operation, error, customMessage) {
+    let color, timeout, message;
+    
+    if (type === 'error') {
+        color = 'error';
+        timeout = 2500;
+    } else {
+        color = 'success';
+        timeout = 1500;
+    }
+    
+    message = {
+        type: 'cloudSave',
+        operation: operation,
+        error: type === 'error' ? (error || {}) : null,
+        customMessage: customMessage
+    };
+    
+    store.commit('system/addNotification', { color, timeout, message });
 }
 
 export default instance;

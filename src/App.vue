@@ -440,7 +440,7 @@
 /* When menu is at bottom, adjust the content area */
 .bottom-positioned ~ .v-main {
   padding-top: 0 !important;
-  padding-bottom: 104px !important; /* 添加底部间距，防止内容被底部菜单遮挡 */
+  padding-bottom: 104px !important;
 }
 .bottom-positioned ~ .v-main .v-content__wrap {
   padding-top: 0;
@@ -449,6 +449,15 @@
 .bottom-positioned ~ .v-main {
   min-height: 100vh;
 }
+
+
+.selected-item {
+  font-weight: bold;
+}
+.selected-item .v-list-item__title {
+  color: var(--v-primary-base) !important;
+}
+
 /* Force components to use full available height */
 .bottom-positioned ~ .v-main > div {
   min-height: calc(100vh - 56px);
@@ -655,6 +664,7 @@
         <update-message v-else-if="message.type === 'update'" :message="message"></update-message>
         <farm-harvest-message v-else-if="message.type === 'farmHarvest'" :message="message"></farm-harvest-message>
         <farm-plant-message v-else-if="message.type === 'farmPlant'" :message="message"></farm-plant-message>
+        <cloud-save-message v-else-if="message.type === 'cloudSave'" :message="message"></cloud-save-message>
       </template>
       <template v-slot:action="{ close }">
         <v-btn icon @click="close()"><v-icon>mdi-close</v-icon></v-btn>
@@ -680,16 +690,43 @@
       <v-card class="default-card" elevation="5" shaped>
         <v-card-title primary-title class="title">选择云存档</v-card-title>
         <v-card-text>
-          <v-list rounded style="max-height: 250px; overflow-y: auto;">
+          <v-list style="max-height: 250px; overflow-y: auto;">
             <v-list-item
               v-for="file in formattedSaveFiles"
               :key="file.id"
               @click="selectedSavefile = file"
               ripple
-              :active="selectedSavefile === file"
-              active-class="primary--text"
+              :class="{'selected-item': selectedSavefile === file}"
             >
-              <v-list-item-title>{{ file.formattedText }}</v-list-item-title>
+              <v-list-item-content>
+                <v-list-item-title v-if="file.editMode">
+                  <v-text-field 
+                    v-model="file.editMemo" 
+                    dense
+                    hide-details
+                    autofocus
+                    @keyup.enter="saveMemo(file)"
+                    @blur="file.editMode = false"
+                  ></v-text-field>
+                </v-list-item-title>
+                <v-list-item-title v-else class="d-flex align-center">
+                  <span class="mr-2">{{ file.memo || '未命名' }}</span>
+                  <v-btn 
+                    icon 
+                    x-small
+                    color="amber" 
+                    @click.stop="editMemo(file)"
+                    title="修改备注"
+                  >
+                    <v-icon x-small>mdi-pencil</v-icon>
+                  </v-btn>
+                </v-list-item-title>
+              </v-list-item-content>
+              
+              <div class="d-flex align-center">
+                <v-icon v-if="selectedSavefile === file" color="success" class="mr-2">mdi-check-circle</v-icon>
+                <span class="text-right">{{ file.created_at }}</span>
+              </div>
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -758,7 +795,7 @@ import General from './components/view/General.vue';
 import Event from './components/view/Event.vue';
 import Treasure from './components/view/Treasure.vue';
 import Cryolab from './components/view/Cryolab.vue';
-import { cleanStore, decodeFile, exportFile, saveLocal, saveFileData, loadLatestFileData, getCloudSaveFileList, loadSelectedFileData } from './js/savefile';
+import { cleanStore, decodeFile, exportFile, saveLocal, loadLatestFileData, getCloudSaveFileList, loadSelectedFileData, startEditSavefileMemo, completeSavefileMemo, autoSaveToCloud } from './js/savefile';
 import NextTile from './components/partial/main/NextTile.vue';
 import VSnackbars from 'v-snackbars'
 import AchievementMessage from './components/partial/snackbar/AchievementMessage.vue';
@@ -784,6 +821,8 @@ import FarmHarvestMessage from './components/partial/snackbar/FarmHarvestMessage
 import FarmPlantMessage from './components/partial/snackbar/FarmPlantMessage.vue';
 import DailyCheckIn from './components/partial/menu/DailyCheckIn.vue';
 import EventHourglass from './components/render/EventHourglass.vue';
+import CloudSaveMessage from './components/partial/snackbar/CloudSaveMessage.vue';
+import { addCloudNotification } from './js/cloud';
 const semverCompare = require('semver/functions/compare');
 
 export default {
@@ -835,7 +874,8 @@ export default {
     FarmHarvestMessage,
     FarmPlantMessage,
     DailyCheckIn,
-    EventHourglass
+    EventHourglass,
+    CloudSaveMessage
   },
   data: () => ({
     dialogDust: false,
@@ -930,10 +970,7 @@ export default {
       return null;
     },
     formattedSaveFiles() {
-      return this.saveFiles.map(saveFile => ({
-        ...saveFile,
-        formattedText: `存档时间: ${saveFile.created_at}`,
-      }));
+      return this.saveFiles;
     },
     featureBadges() {
       let badges = 0;
@@ -1048,12 +1085,11 @@ export default {
       this.isSaving = true;
       try {
         saveLocal();
-        await saveFileData();
+        await autoSaveToCloud();
       } finally {
         this.isSaving = false;
         this.$store.commit('system/resetcloudAutosaveTimer');
       }
-
     },
     CloudLoadLatest(){
       loadLatestFileData()
@@ -1066,6 +1102,7 @@ export default {
         this.dialogSaveList = true;
       } catch (error) {
         console.error("获取云存档列表失败:", error);
+        addCloudNotification('error', 'list', error, '获取云存档列表失败');
       }
     },
     confirmLoadSavefile() {
@@ -1154,6 +1191,12 @@ export default {
       const featureNames = Object.keys(this.bigFeatures);
       const index = featureNames.indexOf(this.currentBigFeature);
       return index === -1 ? 0 : index;
+    },
+    editMemo(file) {
+      startEditSavefileMemo(file);
+    },
+    async saveMemo(file) {
+      await completeSavefileMemo(file, this.CloudLoadList);
     },
   },
   watch: {

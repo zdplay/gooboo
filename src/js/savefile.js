@@ -14,7 +14,7 @@ import treasure from "./modules/treasure";
 import general from "./modules/general";
 import event from "./modules/event";
 import cryolab from "./modules/cryolab";
-import { saveData, getLatestDataList, getLatestData, loadSaveFile } from "./cloud"
+import { saveData, getLatestDataList, getLatestData, loadSaveFile, updateMemo, addCloudNotification } from "./cloud"
 import {loadGame} from "@/js/init";
 import v1_1_0 from "./modules/migration/v1_1_0";
 import { getDay } from "./utils/date";
@@ -49,7 +49,24 @@ const migrations = {
     '1.5.6': v1_5_6,
 };
 
-export { checkLocal, saveLocal, loadFile, exportFile, cleanStore, getSavefile, getSavefileName, encodeFile, decodeFile, saveFileData, loadLatestFileData, getCloudSaveFileList, loadSelectedFileData }
+export { 
+    checkLocal, 
+    saveLocal, 
+    loadFile, 
+    exportFile, 
+    cleanStore, 
+    getSavefile, 
+    getSavefileName, 
+    encodeFile, 
+    decodeFile, 
+    saveFileData, 
+    loadLatestFileData, 
+    getCloudSaveFileList, 
+    loadSelectedFileData,
+    updateSavefileMemo,
+    startEditSavefileMemo,
+    completeSavefileMemo
+}
 const semverCompare = require('semver/functions/compare');
 
 /**
@@ -68,7 +85,7 @@ function saveLocal() {
 
 const saveFileData = async () => {
     if (isSaving) {
-        console.log("正在上传存档，请稍候...");
+        //console.log("正在上传存档，请稍候...");
         return;
     }
     isSaving = true;
@@ -78,8 +95,7 @@ const saveFileData = async () => {
         let tokenId = store.state.system.settings.general.items.cloudpwd.value;
 
         if (!userId || !tokenId) {
-            console.error("clouduser or cloudpwd error");
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: { message: "clouduser or cloudpwd error" } } });
+            addCloudNotification('error', 'save', { message: "用户密码不对" });
             isSaving = false;
             return; 
         }
@@ -89,14 +105,13 @@ const saveFileData = async () => {
 
         const res = await saveData(goobooSavefile, userId, tokenId); 
         if (res.success){
-            store.commit('system/addNotification', { color: 'info', timeout: 2000, message: { type: 'save', name: 'auto' } });
+            addCloudNotification('success', 'save');
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'save', name: 'auto', error: { message: error } } });
+        addCloudNotification('error', 'save', { message: "用户密码不对" });
     } finally {
         isSaving = false;
     }
-
 };
 
 const loadLatestFileData = async (userId = null, tokenId = null) => {
@@ -105,11 +120,7 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
         const effectiveTokenId = tokenId !== null ? tokenId : store.state.system.settings.general.items.cloudpwd.value;
 
         if (!effectiveUserId || !effectiveTokenId) {
-            store.commit('system/addNotification', { 
-                color: 'error', 
-                timeout: 5000, 
-                message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } 
-            });
+            addCloudNotification('error', 'load', { message: '用户密码不对' });
             return;
         }
 
@@ -119,18 +130,10 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
             cleanStore();
             loadGame(res.save_data);
         } else {
-            store.commit('system/addNotification', { 
-                color: 'warning', 
-                timeout: 5000, 
-                message: { type: 'load', name: 'cloud', error: { message: 'No cloud save found' } } 
-            });
+            addCloudNotification('error', 'load', { message: '没找到云存档' });
         }
     } catch (error) {
-        store.commit('system/addNotification', { 
-            color: 'error', 
-            timeout: 5000, 
-            message: { type: 'load', name: 'cloud', error: { message: error } } 
-        });
+        addCloudNotification('error', 'load', error);
     }
 };
 
@@ -140,14 +143,14 @@ const getCloudSaveFileList = async () => {
         let tokenId = store.state.system.settings.general.items.cloudpwd.value;
 
         if (!userId || !tokenId) {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } });
+            addCloudNotification('error', 'list', { message: '用户密码不对' });
             return null;
         }
         const saveFiles = await getLatestDataList(userId, tokenId);
         console.log('saveFileData res:', saveFiles);
         return saveFiles;
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: error } } });
+        addCloudNotification('error', 'list', error);
         return null;
     }
 };
@@ -158,7 +161,7 @@ const loadSelectedFileData = async (selectedSavefile) => {
         let tokenId = store.state.system.settings.general.items.cloudpwd.value;
 
         if (!userId || !tokenId) {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'clouduser or cloudpwd error' } } });
+            addCloudNotification('error', 'download', { message: '用户密码不对' });
             return;
         }
 
@@ -167,15 +170,80 @@ const loadSelectedFileData = async (selectedSavefile) => {
         if (saveData) {
             cleanStore();
             loadGame(saveData);
-            //store.commit('system/addNotification', { color: 'success', timeout: 2000, message: { type: 'load', name: 'cloud' } });
+            //addCloudNotification('load', 'cloud');
         } else {
-            store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: 'Failed to load cloud save' } } });
+            addCloudNotification('error', 'download', { message: '加载云存档失败' });
         }
     } catch (error) {
-        store.commit('system/addNotification', { color: 'error', timeout: 5000, message: { type: 'load', name: 'cloud', error: { message: error } } });
+        addCloudNotification('error', 'download', error);
     }
 };
 
+/**
+ * 开始编辑存档备注
+ * @param {Object} saveFile - 存档对象
+ */
+const startEditSavefileMemo = (saveFile) => {
+    Vue.set(saveFile, 'editMemo', saveFile.memo || '');
+    Vue.set(saveFile, 'editMode', true);
+};
+
+/**
+ * 完成备注编辑并保存
+ * @param {Object} saveFile - 存档对象
+ * @param {Function} refreshCallback - 成功后刷新列表的回调函数
+ * @returns {Promise<void>}
+ */
+const completeSavefileMemo = async (saveFile, refreshCallback) => {
+    if (!saveFile.editMode) return;
+
+    const originalMemo = saveFile.memo || '';
+
+    saveFile.memo = saveFile.editMemo;
+    saveFile.editMode = false;
+    
+    try {
+        const success = await updateSavefileMemo(saveFile);
+
+        if (success && typeof refreshCallback === 'function') {
+            await refreshCallback();
+        } else if (!success) {
+            saveFile.memo = originalMemo;
+        }
+    } catch (error) {
+        console.error('备注更新处理错误:', error);
+        saveFile.editMode = false;
+        saveFile.memo = originalMemo;
+        addCloudNotification('error', 'save', { message: '备注更新处理错误' });
+    }
+};
+
+/**
+ * 更新存档备注信息
+ * @param {Object} saveFile - 存档对象，包含id和新的memo
+ * @returns {Promise<boolean>} - 是否更新成功
+ */
+const updateSavefileMemo = async (saveFile) => {
+    try {
+        let userId = store.state.system.settings.general.items.clouduser.value;
+        let tokenId = store.state.system.settings.general.items.cloudpwd.value;
+
+        if (!userId || !tokenId) {
+            addCloudNotification('error', 'update_memo', null, '云存档用户名或密码未设置');
+            return false;
+        }
+        
+        await updateMemo(saveFile.id, saveFile.editMemo, userId, tokenId);
+        
+        addCloudNotification('success', 'update_memo');
+        
+        return true;
+    } catch (error) {
+        console.error('更新备注时出错:', error);
+        addCloudNotification('error', 'update_memo', error);
+        return false;
+    }
+};
 
 function cleanStore() {
     Object.keys(store._modules.root._children).forEach(module => {
@@ -757,3 +825,16 @@ function getSavefile() {
 
     return encodeFile(save);
 }
+
+/**
+ * 自动保存到云存档
+ * 供tick.js调用
+ */
+export const autoSaveToCloud = async () => {
+    try {
+        await saveFileData();
+        return null;
+    } catch (error) {
+        return error;
+    }
+};

@@ -9,10 +9,11 @@ import school from "./modules/school";
 import cryolab from "./modules/cryolab";
 import achievement from "./modules/achievement";
 import store from "../store";
-import { saveLocal, saveFileData } from "./savefile";
+import { saveLocal, autoSaveToCloud } from "./savefile";
 import general from "./modules/general";
 import event from "./modules/event";
 import { getDay } from "./utils/date";
+import { addCloudNotification } from "./cloud";
 
 export { advance, tick }
 
@@ -80,16 +81,12 @@ function advance() {
                     store.commit('system/resetcloudAutosaveTimer');
                     let saveError = null;
                     try {
-                        saveFileData();
+                        autoSaveToCloud();
                     } catch (error) {
                         saveError = error;
                     }
                     if (saveError !== null) {
-                        store.commit('system/addNotification', {color: 'error', timeout: 5000, message: {
-                            type: 'save',
-                            name: 'auto',
-                            error: saveError
-                        }});
+                        addCloudNotification('error', 'save', saveError);
                     }
                 }
             }    

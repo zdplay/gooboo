@@ -68,6 +68,7 @@
         <v-btn class="ma-1" color="primary" @click="toPatchnote"><v-icon class="mr-2">mdi-script-text</v-icon>{{ $vuetify.lang.t('$vuetify.info.viewPatchnotes') }}</v-btn>
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/zdplay/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>修改源码</v-btn>
         <v-btn class="ma-1" color="primary" target="_blank" href="https://github.com/Tendsty/gooboo"><v-icon class="mr-2">mdi-open-in-new</v-icon>{{ $vuetify.lang.t('$vuetify.info.socials.viewCode') }}</v-btn>
+        <v-btn class="ma-1" color="light-green darken-1" target="_blank" href="https://gamesaves.ggff.eu.org/listweb"><v-icon class="mr-2">mdi-cloud-search</v-icon>云存档找回</v-btn>
       </v-card-actions>
     </v-card>
     
@@ -266,26 +267,26 @@ export default {
       { category: '画廊', color: 'orange', content: '增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊形状【清管】功能，一键清空动力值。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊显示全局美丽等级。', isCurrentUpdate: false },
-      { category: '画廊', color: 'orange', content: '增加画廊画布预计显示和创意进度条，可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
-      { category: '学校', color: 'green', content: '修改学校参考考试为直接满分通过，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
-      { category: '农场', color: 'brown', content: '在农场单元格中显示植物名称，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '画廊', color: 'orange', content: '增加画廊画布预计显示和创意进度条，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '学校', color: 'green', content: '修改学校参考考试为直接满分通过，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '在农场单元格中显示植物名称，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '在农场货币中显示掉落来源。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场植物生长阶段鼠标显示。', isCurrentUpdate: false },
-      { category: '农场', color: 'brown', content: '增加农场基因阻断跳过功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '增加农场基因阻断跳过功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场物品收获和使用通知功能。', isCurrentUpdate: false },
-      { category: '农场', color: 'brown', content: '增加农场离线汇总功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '增加农场离线汇总功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面卡包购买预测功能。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏整理排序功能。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏购买预测功能，可以预览未来10次随机效果。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '调整每日签到奖励，可在【设置】-【实验性】中开关。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
+      { category: '事件', color: 'blue', content: '调整每日签到奖励，在【设置】-【实验性】中开关。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志，互动钓鱼小游戏。', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },
       { category: '事件', color: 'blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '增加宾果预测和撤销功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '事件', color: 'blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
-      { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择和自动使用考试券功能，可在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择和自动使用考试券功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '在升级菜单中添加材料筛选功能。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加购买按钮进度条功能，在【设置】-【实验性】中开启。', isCurrentUpdate: false },
@@ -298,7 +299,7 @@ export default {
       { category: '其他', color: 'cyan', content: '增加手机菜单栏移动到底部，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加【显示科学记数法】选项，在【设置】-【实验性】设置。', isCurrentUpdate: false },
-      { category: '其他', color: 'cyan', content: '增加升级队列功能。可在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加升级队列功能。在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: false },
     ],
     categoryIcons: {
       '设置': 'mdi-cog',

@@ -175,6 +175,11 @@ export default {
                     secondsLeft = 0;
                 }
             }
+            if (shards === 0 && seconds >= 600 && 
+                store.state.system.settings.experiment.items.enableSnakeGame.value &&
+                store.state.currency.horde_mysticalShard.value < store.state.currency.horde_mysticalShard.cap) {
+                shards = 1;
+            }
             if (shards > 0) {
                 store.dispatch('currency/gain', {feature: 'horde', name: 'mysticalShard', amount: shards});
             }
