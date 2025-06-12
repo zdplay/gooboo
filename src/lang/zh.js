@@ -1238,11 +1238,11 @@ export default {
       },
       clouduser: {
         name: '云端用户名',
-        description: '请谨记，不提供找回'
+        description: '无需注册，用户名随便写，只要用户名没别人用过即可'
       },
       cloudpwd: {
         name: '云端密码',
-        description: '请谨记，不提供找回'
+        description: '请谨记，用户名和密码不提供找回'
       }
     },
     automation: {

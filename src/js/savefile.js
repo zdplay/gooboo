@@ -103,7 +103,11 @@ const saveFileData = async () => {
         const goobooSavefile = localStorage.getItem('goobooSavefile');
         if (!goobooSavefile) return;
 
-        const res = await saveData(goobooSavefile, userId, tokenId); 
+        // 获取全局等级并设置为备注
+        const globalLevel = store.state.meta.globalLevel;
+        const memo = `等级：${globalLevel}`;
+
+        const res = await saveData(goobooSavefile, userId, tokenId, memo); 
         if (res.success){
             addCloudNotification('success', 'save');
         }

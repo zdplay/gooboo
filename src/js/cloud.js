@@ -118,7 +118,7 @@ export async function getLatestDataList(userId, tokenId) {
 }
 
 
-export function saveData(saveData, userId, tokenId) {
+export function saveData(saveData, userId, tokenId, memo) {
     const gameId = window.location.hostname;
 
     const data = {
@@ -127,6 +127,11 @@ export function saveData(saveData, userId, tokenId) {
         gameId: gameId,
         saveData: saveData
     };
+    
+    if (memo) {
+        data.memo = memo;
+    }
+    
     return instance({
         url: '/save',
         method: 'post',
