@@ -1600,11 +1600,14 @@ export default {
                 const extendedInfo = state.loadoutExtended[loadout.id];
                 if (extendedInfo) {
                     commit('updateKey', {key: 'autocast', value: []});
-                    const maxAutocast = rootGetters['mult/get']('hordeAutocast');
-                    const newAutocast = extendedInfo.autocast.slice(0, maxAutocast);
-                    commit('updateKey', {key: 'autocast', value: newAutocast});
+                    if (extendedInfo.autocast && extendedInfo.autocast.length > 0) {
+                        const maxAutocast = rootGetters['mult/get']('hordeAutocast');
+                        const newAutocast = extendedInfo.autocast.slice(0, maxAutocast);
+                        commit('updateKey', {key: 'autocast', value: newAutocast});
+                    }
 
-                    if (extendedInfo.passiveItems) {
+                    if (extendedInfo.passiveItems && extendedInfo.passiveItems.length > 0) {
+
                         for (const [key, elem] of Object.entries(state.items)) {
                             if (elem.equipped && elem.passive) {
                                 commit('updateItemKey', {name: key, key: 'passive', value: false});
@@ -1622,6 +1625,8 @@ export default {
 
                         dispatch('resetStats');
                     }
+                } else {
+                    commit('updateKey', {key: 'autocast', value: []});
                 }
             }
         },
