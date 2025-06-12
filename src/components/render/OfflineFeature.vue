@@ -74,6 +74,7 @@ export default {
   methods: {
     visitFeature() {
       this.$store.commit('system/updateKey', {key: 'screen', value: this.name});
+      window.scrollTo(0, 0);
     },
     calculateStats() {
       // Reset data
