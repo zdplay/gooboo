@@ -44,9 +44,9 @@
                 <v-card-text class="text-center">
                   <div>可穿墙</div>
                   <div>得分规则：</div>
-                  <div>前25分：每个食物1分</div>
-                  <div>25-50分：每个食物2分</div>
-                  <div>50分以上：每个食物3分</div>
+                  <div>前30分：每个食物1分</div>
+                  <div>30-60分：每个食物2分</div>
+                  <div>60分以上：每个食物3分</div>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -61,9 +61,9 @@
                 <v-card-text class="text-center">
                   <div>不可穿墙</div>
                   <div>得分规则：</div>
-                  <div>前25分：每个食物2分</div>
-                  <div>25-50分：每个食物3分</div>
-                  <div>50分以上：每个食物5分</div>
+                  <div>前30分：每个食物2分</div>
+                  <div>30-60分：每个食物3分</div>
+                  <div>60分以上：每个食物5分</div>
                 </v-card-text>
               </v-card>
             </v-col>
