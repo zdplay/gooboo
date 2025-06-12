@@ -60,6 +60,7 @@ export default {
         fightTime: 0,
         fightRampage: 0,
         loadout: [],
+        loadoutExtended: {},
         nextLoadoutId: 1,
         enemyTimer: 0,
         minibossTimer: 0,
@@ -533,10 +534,20 @@ export default {
         },
         addEmptyLoadout(state) {
             state.loadout.push({id: state.nextLoadoutId, name: '#' + (state.loadout.length + 1), content: []});
+            Vue.set(state.loadoutExtended, state.nextLoadoutId, {
+                autocast: [],
+                passiveItems: []
+            });
             Vue.set(state, 'nextLoadoutId', state.nextLoadoutId + 1);
         },
         addExistingLoadout(state, o) {
             state.loadout.push(o);
+            if (!state.loadoutExtended[o.id]) {
+                Vue.set(state.loadoutExtended, o.id, {
+                    autocast: [],
+                    passiveItems: []
+                });
+            }
         },
         updateLoadoutKey(state, o) {
             Vue.set(state.loadout[o.id], o.key, o.value);
@@ -551,10 +562,21 @@ export default {
             Vue.set(state.trinket[o.name], o.key, o.value);
         },
         deleteLoadout(state, index) {
+            const loadoutId = state.loadout[index].id;
             state.loadout.splice(index, 1);
+            Vue.delete(state.loadoutExtended, loadoutId);
         },
         updateAutomation(state, automation) {
             state.hordeAutomation = automation;
+        },
+        updateLoadoutExtended(state, o) {
+            Vue.set(state.loadoutExtended, o.id, o.value);
+        },
+        initLoadoutExtended(state, id) {
+            Vue.set(state.loadoutExtended, id, {
+                autocast: [],
+                passiveItems: []
+            });
         },
     },
     actions: {
@@ -570,6 +592,7 @@ export default {
             commit('updateKey', {key: 'fightTime', value: 0});
             commit('updateKey', {key: 'fightRampage', value: 0});
             commit('updateKey', {key: 'loadout', value: []});
+            commit('updateKey', {key: 'loadoutExtended', value: {}});
             commit('updateKey', {key: 'nextLoadoutId', value: 1});
             commit('updateKey', {key: 'enemyTimer', value: 0});
             commit('updateKey', {key: 'minibossTimer', value: 0});
@@ -1562,7 +1585,7 @@ export default {
                 }
             }
         },
-        equipLoadout({ state, getters, rootGetters, dispatch }, index) {
+        equipLoadout({ state, getters, rootGetters, dispatch, commit }, index) {
             const loadout = state.loadout[index];
             let freeSlots = rootGetters['mult/get']('hordeMaxItems') - getters.itemsEquipped;
             if (loadout) {
@@ -1573,6 +1596,33 @@ export default {
                         freeSlots--;
                     }
                 });
+
+                const extendedInfo = state.loadoutExtended[loadout.id];
+                if (extendedInfo) {
+                    commit('updateKey', {key: 'autocast', value: []});
+                    const maxAutocast = rootGetters['mult/get']('hordeAutocast');
+                    const newAutocast = extendedInfo.autocast.slice(0, maxAutocast);
+                    commit('updateKey', {key: 'autocast', value: newAutocast});
+
+                    if (extendedInfo.passiveItems) {
+                        for (const [key, elem] of Object.entries(state.items)) {
+                            if (elem.equipped && elem.passive) {
+                                commit('updateItemKey', {name: key, key: 'passive', value: false});
+                                dispatch('applyItemEffects', key);
+                            }
+                        }
+
+                        extendedInfo.passiveItems.forEach(name => {
+                            const item = state.items[name];
+                            if (item && item.equipped && item.masteryLevel >= 2) {
+                                commit('updateItemKey', {name, key: 'passive', value: true});
+                                dispatch('applyItemEffects', name);
+                            }
+                        });
+
+                        dispatch('resetStats');
+                    }
+                }
             }
         },
         unequipLoadout({ state, dispatch }, index) {

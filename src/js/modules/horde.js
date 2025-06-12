@@ -1108,8 +1108,15 @@ export default {
 
         if (store.state.horde.loadout.length > 0) {
             obj.loadout = store.state.horde.loadout.map(elem => {
-                return {name: encodeURIComponent(elem.name), content: elem.content};
+                return {name: encodeURIComponent(elem.name), content: elem.content, id: elem.id};
             });
+            
+            if (Object.keys(store.state.horde.loadoutExtended).length > 0) {
+                obj.loadoutExtended = {};
+                for (const [key, elem] of Object.entries(store.state.horde.loadoutExtended)) {
+                    obj.loadoutExtended[key] = {...elem};
+                }
+            }
         }
 
         for (const [key, elem] of Object.entries(store.state.horde.heirloom)) {
@@ -1291,14 +1298,24 @@ export default {
         if (data.loadout) {
             let nextId = 1;
             data.loadout.forEach(elem => {
+                const id = elem.id || nextId;
                 store.commit('horde/addExistingLoadout', {
-                    id: nextId,
+                    id,
                     name: decodeURIComponent(elem.name),
                     content: elem.content
                 });
-                nextId++;
+                nextId = Math.max(nextId, id) + 1;
             });
             store.commit('horde/updateKey', {key: 'nextLoadoutId', value: nextId});
+
+            if (data.loadoutExtended) {
+                for (const [key, elem] of Object.entries(data.loadoutExtended)) {
+                    store.commit('horde/updateLoadoutExtended', {
+                        id: parseInt(key),
+                        value: elem
+                    });
+                }
+            }
         }
         if (data.heirloom) {
             for (const [key, elem] of Object.entries(data.heirloom)) {
