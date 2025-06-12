@@ -33,6 +33,14 @@
 .update-card-content {
   padding: 8px 16px !important;
 }
+/* 添加描边效果 */
+.category-icon {
+  text-shadow: 0px 0px 2px rgba(0,0,0,0.7);
+}
+.category-text {
+  font-weight: medium;
+  text-shadow: 0px 0px 2px rgba(0,0,0,0.7);
+}
 </style>
 <template>
   <div :class="$vuetify.breakpoint.mdAndUp ? 'scroll-container' : ''">
@@ -84,11 +92,11 @@
                  class="update-col">
             <v-list-item dense class="rounded wrap-content update-item">
               <v-list-item-icon class="mr-2">
-                <v-icon :color="update.color">{{ getCategoryIcon(update.category) }}</v-icon>
+                <v-icon :color="update.color" class="category-icon">{{ getCategoryIcon(update.category) }}</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title>
-                  <span :class="`${update.color}--text font-weight-medium`">【{{ update.category }}】</span> 
+                  <span :class="`${update.color}--text font-weight-medium category-text`">【{{ update.category }}】</span> 
                   {{ update.content }}
                 </v-list-item-title>
               </v-list-item-content>
@@ -110,8 +118,8 @@
           >
             <v-expansion-panel-header>
               <div class="d-flex align-center">
-                <v-icon :color="getCategoryColor(category)" class="mr-2">{{ getCategoryIcon(category) }}</v-icon>
-                <span :class="`${getCategoryColor(category)}--text`">{{ category }}</span>
+                <v-icon :color="getCategoryColor(category)" class="mr-2 category-icon">{{ getCategoryIcon(category) }}</v-icon>
+                <span :class="`${getCategoryColor(category)}--text category-text`">{{ category }}</span>
                 <span class="ml-2 grey--text text--darken-1">
                   ({{ getCategoryItems(category).length }} 项)
                 </span>
@@ -305,14 +313,14 @@ export default {
     categoryIcons: {
       '设置': 'mdi-cog',
       '挖矿': 'mdi-pickaxe',
-      '村庄': 'mdi-home-city',
-      '部落': 'mdi-sword',
-      '画廊': 'mdi-palette',
+      '村庄': 'mdi-home-group',
+      '部落': 'mdi-account-group',
+      '画廊': 'mdi-image-frame',
       '学校': 'mdi-school',
-      '农场': 'mdi-sprout',
+      '农场': 'mdi-barn',
       '卡片': 'mdi-cards',
       '宝藏': 'mdi-treasure-chest',
-      '事件': 'mdi-calendar-star',
+      '事件': 'mdi-calendar',
       '其他': 'mdi-dots-horizontal-circle'
     },
     tech: {
