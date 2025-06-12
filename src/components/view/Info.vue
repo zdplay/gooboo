@@ -142,6 +142,13 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </v-card-text>
+      <v-card-text class="text-center">
+        部分功能借鉴了
+        <a href="https://github.com/gityxs/gooboo" target="_blank"><b class="text-lg">gityx</b></a>,
+        <a href="https://github.com/baicy/gooboo" target="_blank"><b class="text-lg">baicy</b></a>,
+        <a href="https://github.com/pzgme/gooboo-zhHans" target="_blank"><b class="text-lg">pzgme</b></a>
+        感谢大佬们的支持。
+      </v-card-text>
     </v-card>
     <v-card class="ma-2">
       <v-card-title class="justify-center">{{ $vuetify.lang.t('$vuetify.info.socials.title') }}</v-card-title>
