@@ -215,16 +215,28 @@ export default {
     
     sortHarvestItems(items) {
       const sortedItems = {};
+      
+      // 基础农作物资源
       ['farm_vegetable', 'farm_berry', 'farm_grain', 'farm_flower'].forEach(type => {
         if (items[type]) {
           sortedItems[type] = items[type];
         }
       });
+      
+      // 金币
       if (items['farm_gold']) {
         sortedItems['farm_gold'] = items['farm_gold'];
       }
+      
+      // 其他在farm.js中定义的材料
+      const validMaterials = [
+        'farm_seedHull', 'farm_grass', 'farm_petal', 'farm_bug', 
+        'farm_butterfly', 'farm_ladybug', 'farm_spider', 'farm_bee', 
+        'farm_mysteryStone', 'farm_goldenPetal', 'farm_smallSeed'
+      ];
+      
       Object.keys(items).forEach(key => {
-        if (!sortedItems[key] && !['farm_vegetable', 'farm_berry', 'farm_grain', 'farm_flower', 'farm_gold'].includes(key)) {
+        if (!sortedItems[key] && validMaterials.includes(key)) {
           sortedItems[key] = items[key];
         }
       });
