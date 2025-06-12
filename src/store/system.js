@@ -1065,9 +1065,12 @@ export default {
         processKeyPress({ state, rootState, getters, commit, dispatch }, e) {
             const snakeGameOpen = document.querySelector('.snake-game-dialog');
             if (snakeGameOpen) {
-                const gameStarted = snakeGameOpen.__vue__?.gameStarted && !snakeGameOpen.__vue__?.showGameOverDialog && !snakeGameOpen.__vue__?.showPauseDialog;
-                if (gameStarted) {
-                    return;
+                // 检查游戏是否处于任何弹窗状态(游戏结束或暂停)
+                const snakeGameComponent = snakeGameOpen.__vue__;
+                if (snakeGameComponent?.gameStarted || 
+                    snakeGameComponent?.showGameOverDialog || 
+                    snakeGameComponent?.showPauseDialog) {
+                    return; // 如果蛇游戏处于任何活动状态(包括结束弹窗)，禁用全局快捷键
                 }
             }
             

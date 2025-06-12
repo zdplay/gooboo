@@ -43,7 +43,10 @@
                 <v-card-title class="justify-center">简单模式</v-card-title>
                 <v-card-text class="text-center">
                   <div>可穿墙</div>
-                  <div>每个食物得1分</div>
+                  <div>得分规则：</div>
+                  <div>前25分：每个食物1分</div>
+                  <div>25-50分：每个食物2分</div>
+                  <div>50分以上：每个食物3分</div>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -57,7 +60,10 @@
                 <v-card-title class="justify-center">困难模式</v-card-title>
                 <v-card-text class="text-center">
                   <div>不可穿墙</div>
-                  <div>每个食物得2分</div>
+                  <div>得分规则：</div>
+                  <div>前25分：每个食物2分</div>
+                  <div>25-50分：每个食物3分</div>
+                  <div>50分以上：每个食物5分</div>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -76,6 +82,7 @@
               <div v-for="i in gridSize" :key="`v-line-${i}`" class="v-line" :style="{ left: `${i * cellSize}px` }"></div>
             </div>
             
+            <!-- 蛇 -->
             <div 
               v-for="(segment, index) in snake" 
               :key="`snake-${index}`" 
@@ -85,18 +92,73 @@
                 top: `${segment.y * cellSize}px`,
                 width: `${cellSize}px`,
                 height: `${cellSize}px`,
-                backgroundColor: index === 0 ? '#F44336' : '#9C27B0'
               }"
-            ></div>
+            >
+              <!-- 蛇头 -->
+              <v-icon 
+                v-if="index === 0" 
+                :size="cellSize" 
+                color="error"
+                :style="getSnakeHeadStyle()"
+              >
+                mdi-pac-man
+              </v-icon>
+              
+              <!-- 蛇尾 -->
+              <v-icon 
+                v-else-if="index === snake.length - 1" 
+                :size="cellSize * 0.8" 
+                color="purple"
+              >
+                mdi-circle-small
+              </v-icon>
+              
+              <!-- 蛇身 -->
+              <v-icon 
+                v-else 
+                :size="cellSize" 
+                color="purple"
+              >
+                mdi-circle-medium
+              </v-icon>
+            </div>
+            
+            <!-- 食物 -->
             <div 
-              class="food"
+              v-for="(foodItem, index) in foods" 
+              :key="`food-${index}`"
+              class="food-item"
               :style="{ 
-                left: `${food.x * cellSize}px`, 
-                top: `${food.y * cellSize}px`,
+                left: `${foodItem.x * cellSize}px`, 
+                top: `${foodItem.y * cellSize}px`,
                 width: `${cellSize}px`,
                 height: `${cellSize}px`
               }"
-            ></div>
+            >
+              <v-icon :size="cellSize * 0.8" color="amber">
+                mdi-dots-horizontal-circle
+              </v-icon>
+            </div>
+            
+            <!-- 道具 -->
+            <div 
+              v-for="(item, index) in items" 
+              :key="`item-${index}`"
+              class="game-item"
+              :style="{ 
+                left: `${item.x * cellSize}px`, 
+                top: `${item.y * cellSize}px`,
+                width: `${cellSize}px`,
+                height: `${cellSize}px`
+              }"
+            >
+              <v-icon 
+                :size="cellSize" 
+                :color="item.type === 'mapExpand' ? 'amber' : 'cyan'"
+              >
+                {{ item.type === 'mapExpand' ? 'mdi-map-marker-plus' : 'mdi-food-fork-drink' }}
+              </v-icon>
+            </div>
           </div>
 
           <!-- 控制按钮 - 简化的控制布局 -->
@@ -132,12 +194,41 @@
               <v-icon small color="warning">mdi-information</v-icon>
               游戏开始后需要鼠标点击游戏区域才能使用键盘快捷键操作(方向键/WASD/QE)
             </div>
+            
+            <!-- 速度控制 -->
+            <div class="speed-control mt-3" v-if="gameStarted && !showGameOverDialog && !showPauseDialog">
+              <div class="d-flex align-center">
+                <v-icon small class="mr-1">mdi-speedometer</v-icon>
+                <span class="caption mr-2">速度：</span>
+                <v-btn x-small fab class="mx-1" :color="speedLevel === 1 ? 'primary' : ''" @click="changeSpeed(1)">1</v-btn>
+                <v-btn x-small fab class="mx-1" :color="speedLevel === 2 ? 'primary' : ''" @click="changeSpeed(2)">2</v-btn>
+                <v-btn x-small fab class="mx-1" :color="speedLevel === 3 ? 'primary' : ''" @click="changeSpeed(3)">3</v-btn>
+                <v-btn x-small fab class="mx-1" :color="speedLevel === 4 ? 'primary' : ''" @click="changeSpeed(4)">4</v-btn>
+                <v-btn x-small fab class="mx-1" :color="speedLevel === 5 ? 'primary' : ''" @click="changeSpeed(5)">5</v-btn>
+                <div class="caption ml-2">(1慢-5快，可用数字键1-5调节)</div>
+              </div>
+            </div>
+            
+            <!-- 道具信息 -->
+            <div class="item-info mt-3" v-if="gameStarted && !showGameOverDialog && !showPauseDialog">
+              <div class="d-flex align-center">
+                <div class="caption">
+                  <v-icon x-small color="primary">mdi-information</v-icon>
+                  游戏进行中可使用数字键1-5调节速度
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </v-card-text>
       
       <!-- 游戏结束弹窗 -->
-      <v-dialog v-model="showGameOverDialog" persistent max-width="400">
+      <v-dialog 
+        v-model="showGameOverDialog" 
+        persistent 
+        max-width="400"
+        @keydown.stop.prevent
+      >
         <v-card class="default-card">
           <v-card-title class="headline">游戏结束</v-card-title>
           <v-card-text>
@@ -154,7 +245,12 @@
       </v-dialog>
       
       <!-- 暂停弹窗 -->
-      <v-dialog v-model="showPauseDialog" persistent max-width="300">
+      <v-dialog 
+        v-model="showPauseDialog" 
+        persistent 
+        max-width="300"
+        @keydown.stop.prevent
+      >
         <v-card class="default-card">
           <v-card-title class="headline">游戏暂停</v-card-title>
           <v-card-text class="text-center">
@@ -164,7 +260,12 @@
       </v-dialog>
       
       <!-- 错误提示弹窗 -->
-      <v-dialog v-model="showErrorDialog" persistent max-width="400">
+      <v-dialog 
+        v-model="showErrorDialog" 
+        persistent 
+        max-width="400"
+        @keydown.stop.prevent
+      >
         <v-card class="default-card">
           <v-card-title class="headline">无法开始游戏</v-card-title>
           <v-card-text>
@@ -199,6 +300,8 @@ export default {
       gameEngine: null,
       snake: [],
       food: { x: 0, y: 0 },
+      foods: [], // 存储多个食物
+      items: [], // 存储道具
       score: 0,
       reward: 0,
       gameStarted: false,
@@ -209,6 +312,7 @@ export default {
       showErrorDialog: false,
       errorMessage: '',
       focusInterval: null,
+      speedLevel: 3, // 默认速度等级
     };
   },
   computed: {
@@ -252,13 +356,24 @@ export default {
     this.gameEngine.onUpdate = () => {
       this.snake = [...this.gameEngine.snake];
       this.food = { ...this.gameEngine.food };
+      this.foods = [...this.gameEngine.foods];
+      this.items = [...this.gameEngine.items];
+      this.gridSize = this.gameEngine.gridSize;
       this.score = this.gameEngine.score;
       this.isPaused = this.gameEngine.isPaused;
+      this.speedLevel = this.gameEngine.speedLevel;
     };
     
     this.gameEngine.onGameOver = (score) => {
       if (score > this.currentShards) {
         this.reward = score - this.currentShards;
+        
+        // 立即计算奖励，而不是等到关闭时
+        this.$store.dispatch('currency/gain', {
+          feature: 'horde', 
+          name: 'mysticalShard', 
+          amount: this.reward
+        });
       } else {
         this.reward = 0;
       }
@@ -338,6 +453,13 @@ export default {
         this.gameEngine.changeDirection(direction);
       }
     },
+    
+    changeSpeed(level) {
+      if (this.gameEngine) {
+        this.speedLevel = level;
+        this.gameEngine.setSpeedLevel(level);
+      }
+    },
 
     turnLeft() {
       if (!this.gameEngine) return;
@@ -370,6 +492,13 @@ export default {
       }
     },
     handleDialogKeyDown(e) {
+      // 如果游戏结束弹窗显示，禁用所有键盘快捷键
+      if (this.showGameOverDialog) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+      
       const gameRunning = this.gameStarted && !this.showGameOverDialog && !this.showPauseDialog;
       
       if (gameRunning) {
@@ -386,7 +515,12 @@ export default {
           'd': 'right', 
           'q': 'turnLeft',
           'e': 'turnRight',
-          ' ': 'pause'
+          ' ': 'pause',
+          '1': 'speed1',
+          '2': 'speed2',
+          '3': 'speed3',
+          '4': 'speed4',
+          '5': 'speed5'
         };
         
         if (keyMap[e.key]) {
@@ -396,6 +530,10 @@ export default {
             this.turnLeft();
           } else if (keyMap[e.key] === 'turnRight') {
             this.turnRight();
+          } else if (keyMap[e.key].startsWith('speed')) {
+            // 处理速度调整快捷键
+            const speedLevel = parseInt(keyMap[e.key].substring(5));
+            this.changeSpeed(speedLevel);
           } else {
             this.changeDirection(keyMap[e.key]);
           }
@@ -403,29 +541,61 @@ export default {
         }
       }
       
-      if (e.key === 'Escape') {
+      // 只有在非游戏结束弹窗显示时才处理Escape键
+      if (e.key === 'Escape' && !this.showGameOverDialog) {
         this.closeDialog();
       }
     },
     restartGame() {
+      // 先处理奖励
+      this.processReward();
       this.showGameOverDialog = false;
       this.resetGame();
     },
     closeGame() {
-      if (this.reward > 0) {
-        this.$store.dispatch('currency/gain', {
-          feature: 'horde', 
-          name: 'mysticalShard', 
-          amount: this.reward
-        });
-      }
+      // 先处理奖励
+      this.processReward();
       this.showGameOverDialog = false;
       this.closeDialog();
+    },
+    processReward() {
+      // 奖励已在游戏结束时处理，这里只清空奖励状态
+      this.reward = 0;
     },
     closeDialog() {
       this.dialog = false;
       this.resetGame();
-    }
+    },
+    // 获取蛇头的样式，根据方向旋转图标
+    getSnakeHeadStyle() {
+      if (!this.gameEngine) return {};
+      
+      const direction = this.gameEngine.direction;
+      let rotation = 0;
+      
+      switch (direction) {
+        case 'right':
+          rotation = 0;   // 默认朝右
+          break;
+        case 'down':
+          rotation = 90;  // 向下转90度
+          break;
+        case 'left':
+          rotation = 180; // 向左转180度
+          break;
+        case 'up':
+          rotation = 270; // 向上转270度
+          break;
+      }
+      
+      return {
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      };
+    },
   }
 }
 </script>
@@ -441,7 +611,12 @@ export default {
   pointer-events: none;
 }
 
-.snake-segment, .food {
+.snake-segment, .food-item, .game-item {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
   pointer-events: auto;
 }
 
@@ -464,19 +639,6 @@ export default {
   height: 100%;
   width: 1px;
   background-color: rgba(128, 128, 128, 0.2);
-}
-
-.snake-segment {
-  position: absolute;
-  border-radius: 2px;
-  z-index: 2;
-}
-
-.food {
-  position: absolute;
-  background-color: #4CAF50;
-  border-radius: 50%;
-  z-index: 2;
 }
 
 .control-grid {
