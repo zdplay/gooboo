@@ -1,6 +1,6 @@
 <template>
     <div class="strategy-container">
-      <div class="spacer-container">
+      <div class="spacer-container" v-if="selectedSource === 'wiki'">
         <div class="spacer"></div>
       </div>
       <div class="iframe-container" v-if="selectedSource">
@@ -49,9 +49,7 @@
         this.showDialog = false;
       },
       cancel() {
-        // 默认使用wiki
-        this.selectedSource = 'wiki';
-        this.showDialog = false;
+        this.$store.commit('system/updateKey', {key: 'screen', value: 'mining'});
       }
     }
   };
