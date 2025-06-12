@@ -732,6 +732,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
+          <v-btn class="ma-1" color="light-green darken-1" target="_blank" href="https://gamesaves.ggff.eu.org/listweb"><v-icon class="mr-2">mdi-cloud-search</v-icon>管理</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="blue-grey darken-1" text @click="dialogSaveList = false">
             取消
