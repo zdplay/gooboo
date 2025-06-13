@@ -222,9 +222,7 @@ export default class SnakeGame {
 
   // 获取当前分数增量
   getScoreIncrement() {
-    if (this.score >= 60) {
-      return this.hardMode ? 5 : 3;
-    } else if (this.score >= 30) {
+    if (this.score >= 50) {
       return this.hardMode ? 3 : 2;
     } else {
       return this.hardMode ? 2 : 1;
