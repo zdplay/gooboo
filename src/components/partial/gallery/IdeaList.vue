@@ -26,13 +26,14 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             class="ma-1"
+            icon
             :color="canResetIdeas ? 'warning' : 'grey'"
             :disabled="!canResetIdeas || isFrozen"
             @click="resetIdeas"
             v-bind="attrs"
             v-on="on"
           >
-            重置灵感
+            <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
         <div class="tooltip-text-container">
