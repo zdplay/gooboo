@@ -16,7 +16,12 @@ export default {
         shape: {},
         shapeGrid: null,
         hourglassCombo: 0,
-        canvasSpace: []
+        canvasSpace: [],
+        ideaResetData: {
+            lastResetTime: 0,
+            resetCount: 0,
+            hasPrestiged: false
+        }
     },
     getters: {
         availableColors: (state, getters, rootState) => {
@@ -144,6 +149,9 @@ export default {
         updateShapeCell(state, o) {
             Vue.set(state.shapeGrid[o.y], o.x, o.value);
         },
+        updateIdeaResetDataKey(state, o) {
+            Vue.set(state.ideaResetData, o.key, o.value);
+        },
         initColorData(state, o) {
             Vue.set(state.colorData, o.name, {
                 progress: 0,
@@ -201,6 +209,12 @@ export default {
             commit('updateKey', {key: 'shapeGrid', value: null});
             commit('updateKey', {key: 'hourglassCombo', value: 0});
             commit('updateKey', {key: 'canvasSpace', value: []});
+
+            commit('updateKey', {key: 'ideaResetData', value: {
+                lastResetTime: 0,
+                resetCount: 0,
+                hasPrestiged: false
+            }});
         },
         prestige({ state, getters, rootGetters, commit, dispatch }) {
             commit('stat/increaseTo', {feature: 'gallery', name: 'bestPrestige', value: getters.prestigeGain}, {root: true});
@@ -219,6 +233,10 @@ export default {
             for (const [key] of Object.entries(state.colorData)) {
                 commit('updateColorDataKey', {name: key, key: 'cacheSpace', value: 0});
             }
+
+            // 重置灵感重置数据，并标记已进行过声望
+            commit('updateIdeaResetDataKey', {key: 'resetCount', value: 0});
+            commit('updateIdeaResetDataKey', {key: 'hasPrestiged', value: true});
 
             dispatch('upgrade/reset', {feature: 'gallery', type: 'regular'}, {root: true});
             dispatch('currency/reset', {feature: 'gallery', type: 'regular'}, {root: true});
@@ -265,6 +283,53 @@ export default {
                 commit('stat/increaseTo', {feature: 'gallery', name: 'highestTierIdea', value: state.idea[name].tier}, {root: true});
                 dispatch('applyIdea', {name, onBuy: true});
             }
+        },
+        resetIdeas({ state, rootState, rootGetters, commit, dispatch }) {
+            const now = Math.floor(Date.now() / 1000);
+            const SECONDS_PER_DAY = 86400;
+            const RESET_COOLDOWN = SECONDS_PER_DAY;
+            const MAX_RESETS_PER_PRESTIGE = 3;
+
+            if (!rootState.system.settings.experiment.items.enableGalleryIdeaReset.value) {
+                return;
+            }
+
+            if (!state.ideaResetData.hasPrestiged) {
+                return;
+            }
+
+            if (now - state.ideaResetData.lastResetTime < RESET_COOLDOWN) {
+                return;
+            }
+
+            if (state.ideaResetData.resetCount >= MAX_RESETS_PER_PRESTIGE) {
+                return;
+            }
+
+            const hasInspirationToReset = rootGetters['currency/value']('gallery_inspiration') > 0;
+            const hasIdeaLevelsToReset = Object.values(state.idea).some(idea => idea.level > 0);
+
+            if (!hasInspirationToReset && !hasIdeaLevelsToReset) {
+                return;
+            }
+
+            for (const [key, elem] of Object.entries(state.idea)) {
+                if (elem.level > 0) {
+                    commit('updateIdeaKey', {name: key, key: 'level', value: 0});
+                    dispatch('applyIdeaReset', key);
+                }
+            }
+
+            const currentInspiration = rootGetters['currency/value']('gallery_inspiration');
+            if (currentInspiration > 0) {
+                dispatch('currency/spend', {feature: 'gallery', name: 'inspiration', amount: currentInspiration}, {root: true});
+            }
+
+            commit('updateKey', {key: 'inspirationTime', value: 0});
+            commit('updateKey', {key: 'inspirationAmount', value: 0});
+
+            commit('updateIdeaResetDataKey', {key: 'lastResetTime', value: now});
+            commit('updateIdeaResetDataKey', {key: 'resetCount', value: state.ideaResetData.resetCount + 1});
         },
         openPackages({ state, rootState, rootGetters, commit, dispatch }) {
             const amount = Math.floor(rootState.currency.gallery_package.value);

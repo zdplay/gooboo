@@ -1420,6 +1420,10 @@ export default {
         enableSnakeGame: {
           name: 'Snake Game for Shards',
           description: 'Add an easter egg snake game to Horde Mystical Shards'
+        },
+        enableGalleryIdeaReset: {
+          name: 'Gallery Idea Reset',
+          description: 'Reset inspiration and creativity to 0, start over, cooldown 1 day, 3 resets per prestige. After opening the switch, you need to prestige once to use it.'
         }
       }
   },

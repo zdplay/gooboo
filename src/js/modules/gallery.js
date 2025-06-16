@@ -191,6 +191,11 @@ export default {
             }
             obj.idea = ideas;
         }
+        if (store.state.gallery.ideaResetData.lastResetTime > 0 ||
+            store.state.gallery.ideaResetData.resetCount > 0 ||
+            store.state.gallery.ideaResetData.hasPrestiged) {
+            obj.ideaResetData = store.state.gallery.ideaResetData;
+        }
         if (store.state.unlock.galleryCanvas.see) {
             let colorData = {};
             for (const [key, elem] of Object.entries(store.state.gallery.colorData)) {
@@ -253,6 +258,15 @@ export default {
                     }
                 }
             }
+        }
+        if (data.ideaResetData !== undefined) {
+            store.commit('gallery/updateKey', {key: 'ideaResetData', value: data.ideaResetData});
+        } else {
+            store.commit('gallery/updateKey', {key: 'ideaResetData', value: {
+                lastResetTime: 0,
+                resetCount: 0,
+                hasPrestiged: false
+            }});
         }
     }
 }

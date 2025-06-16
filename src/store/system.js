@@ -439,6 +439,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    enableGalleryIdeaReset: {
+                        unlock: 'galleryFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             },
             automation: {

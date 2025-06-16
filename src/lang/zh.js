@@ -1456,6 +1456,10 @@ export default {
         enableSnakeGame: {
           name: '贪吃神秘碎片',
           description: '给部落的神秘碎片加上彩蛋游戏，离线超过10分钟增加神秘碎片保底为1。'
+        },
+        enableGalleryIdeaReset: {
+          name: '灵感重置',
+          description: '重置灵感和创意为0，重新开始，冷却时间1天，每轮声望可重置3次。打开开关后需要声望一次才可以使用。'
         }
       }
   },
