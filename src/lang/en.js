@@ -1431,6 +1431,10 @@ export default {
           name: 'Double Door Fridge',
           description: 'Expand cryolab to refrigerate and freeze dual systems, 1.3x prestige effect when using both'
         },
+        mechanicalMine: {
+          name: 'Mechanical Mine',
+          description: 'Enable the village mechanical mine building. When disabled, hides the building option and clears built amounts'
+        },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',
           description: 'Show the level of the farm icon'

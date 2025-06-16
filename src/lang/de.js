@@ -1463,6 +1463,10 @@ export default {
         name: 'Doppeltür-Kühlschrank',
         description: 'Erweitert das Kryolabor zu Kühl- und Gefriersystemen, 1,3x Prestige-Effekt bei gleichzeitiger Nutzung'
       },
+      mechanicalMine: {
+        name: 'Mechanische Mine',
+        description: 'Aktiviert das mechanische Minengebäude im Dorf. Bei Deaktivierung wird die Gebäudeoption ausgeblendet und gebaute Mengen gelöscht'
+      },
       showFarmIconLevel: {
         name: 'Show Farm Icon Level',
         description: 'Show the level of the farm icon'

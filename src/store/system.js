@@ -460,6 +460,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    mechanicalMine: {
+                        unlock: 'villageBuildings6',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             },
             automation: {
@@ -1252,6 +1259,13 @@ export default {
             }
             if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
                 dispatch('cryolab/clearFreezeStates', null, {root: true});
+            }
+            if (o.category === 'experiment' && o.name === 'mechanicalMine' && !o.value) {
+                dispatch('village/setWorkerCount', {name: 'remoteMiner', amount: 0}, {root: true});
+                commit('upgrade/updateKey', {name: 'village_mechanicalMine', key: 'level', value: 0}, {root: true});
+                commit('upgrade/updateKey', {name: 'village_mechanicalMine', key: 'bought', value: 0}, {root: true});
+                dispatch('upgrade/applyReset', 'village_mechanicalMine', {root: true});
+                dispatch('upgrade/updateVillageStats', null, {root: true});
             }
         },
         buyTheme({ state, rootGetters, commit, dispatch }, name) {

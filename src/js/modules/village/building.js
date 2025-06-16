@@ -745,7 +745,7 @@ export default {
         {name: 'villageWorker', type: 'base', value: lvl => lvl * 4}
     ]},
     mechanicalMine: {cap: 10, capMult: true, note: 'village_mechanicalMine', subtype: 'workstation', icon: 'mdi-robot-industrial', requirement() {
-        return store.state.unlock.villageBuildings6.use && store.state.upgrade.item.village_steamEngine.level >= 1;
+        return store.state.unlock.villageBuildings6.use && store.state.upgrade.item.village_steamEngine.level >= 1 && store.state.system.settings.experiment.items.mechanicalMine.value;
     }, price(lvl) {
         return {
             village_metal: Math.pow(1.75, lvl) * buildNum(50, 'B'),

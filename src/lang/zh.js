@@ -1470,6 +1470,10 @@ export default {
         doubleDoorFridge: {
           name: '双开门冰箱',
           description: '将冰冻实验室扩展为冷藏和冷冻双系统，同一个使用时为1.3倍声望效果'
+        },
+        mechanicalMine: {
+          name: '机械矿场',
+          description: '启用村庄机械矿场建筑。关闭时会隐藏建筑选项并清空已建成数量'
         }
       }
   },
