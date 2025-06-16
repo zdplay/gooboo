@@ -1,3 +1,40 @@
+<style scoped>
+.crop-button-container {
+  position: relative;
+  display: inline-block;
+}
+.crop-level-badge {
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  line-height: 1;
+  pointer-events: none;
+  border-radius: 2px;
+  padding: 1px 3px;
+  min-width: 14px;
+  text-align: center;
+}
+.crop-level-badge-small {
+  font-size: 10px;
+  padding: 1px 2px;
+  min-width: 12px;
+}
+.crop-level-prestige {
+  top: 0px;
+  right: 0px;
+}
+.crop-level-current {
+  bottom: 0px;
+  right: 0px;
+}
+.crop-level-current-higher {
+  color: #4CAF50;
+}
+</style>
+
 <template>
   <div>
     <div class="d-flex flex-wrap justify-center ma-1">
@@ -14,9 +51,18 @@
     <template v-if="useLegacySelect">
       <div class="d-flex flex-wrap justify-center ma-1">
         <template v-for="(item, key) in crops">
-          <v-btn :data-cy="`farm-crop-${ key }`" v-if="item.found" class="ma-1 px-2" :class="{'selected-primary': selectedCropName === key}" min-width="0" :key="'crop-' + key" :color="item.color" @click="selectCrop(key)">
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-btn>
+          <div v-if="item.found" class="crop-button-container ma-1" :key="'crop-' + key">
+            <v-btn :data-cy="`farm-crop-${ key }`" class="px-2" :class="{'selected-primary': selectedCropName === key}" min-width="0" :color="item.color" @click="selectCrop(key)">
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-btn>
+            <!-- 等级显示 -->
+            <span v-if="showIconLevel" class="crop-level-badge crop-level-prestige" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown}">
+              {{ item.levelMax || 0 }}
+            </span>
+            <span v-if="showIconLevel" class="crop-level-badge crop-level-current" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown, 'crop-level-current-higher': (item.level || 0) > (item.levelMax || 0)}">
+              {{ item.level || 0 }}
+            </span>
+          </div>
         </template>
       </div>
       <div class="d-flex flex-wrap justify-center ma-1">
@@ -98,6 +144,9 @@ export default {
     },
     useLegacySelect() {
       return this.$store.state.system.settings.general.items.useLegacyFarmSelect.value;
+    },
+    showIconLevel() {
+      return this.$store.state.system.settings.experiment.items.showFarmIconLevel.value;
     },
     rareDropSource() {
       const drops = {};

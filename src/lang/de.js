@@ -1456,6 +1456,10 @@ export default {
       enableGalleryIdeaReset: {
         name: 'Gallery Idea Reset',
         description: 'Reset inspiration and creativity to 0, start over, cooldown 1 day, 3 resets per prestige. After opening the switch, you need to prestige once to use it.'
+      },
+      showFarmIconLevel: {
+        name: 'Show Farm Icon Level',
+        description: 'Show the level of the farm icon'
       }
     }
   },

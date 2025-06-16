@@ -298,6 +298,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    showFarmIconLevel: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                     enableSnakeGame: {
                         unlock: 'hordeFeature',
                         hasDescription: true,

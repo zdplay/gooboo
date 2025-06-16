@@ -192,7 +192,8 @@ export default {
       return [
         'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
         'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
-        'mobileHordeLoadoutLayout', 'enableMenuShortcuts'
+        'mobileHordeLoadoutLayout', 'enableMenuShortcuts', 'tierProgress', 'showFarmIconLevel', 'showFarmHarvestNotify',
+        'showFarmOfflineSummary'
       ];
     },
     uiExperimentSettings() {

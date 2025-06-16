@@ -1413,6 +1413,10 @@ export default {
           name: '显示农场植物名称',
           description: '在农场单元格中显示植物的名称，方便识别不同作物'
         },
+        showFarmIconLevel: {
+          name: '显示农场植物等级',
+          description: '在旧农场植物选择图标上显示等级信息'
+        },
         showFarmHarvestNotify: {
           name: '农场收获通知',
           description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知'
@@ -1434,7 +1438,7 @@ export default {
           description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加'
         },
         bingoPrediction: {
-          name: '启用宾果预测和撤销）',
+          name: '启用宾果预测和撤销',
           description: '在宾果游戏中启用数字预测功能和点击撤销倍率功能，预测最可能被抽中的数字'
         },
         enablePlayerName: {
