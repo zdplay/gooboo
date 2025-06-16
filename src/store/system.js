@@ -453,6 +453,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    doubleDoorFridge: {
+                        unlock: 'cryolabFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             },
             automation: {
@@ -1242,6 +1249,9 @@ export default {
             }
             if (o.category === 'notification' && o.name === 'cropReady') {
                 dispatch('farm/updateGrownHint', null, {root: true});
+            }
+            if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
+                dispatch('cryolab/clearFreezeStates', null, {root: true});
             }
         },
         buyTheme({ state, rootGetters, commit, dispatch }, name) {

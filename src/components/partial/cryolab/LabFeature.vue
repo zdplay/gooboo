@@ -19,7 +19,7 @@
       <div class="d-flex justify-center align-center ma-1">
         <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.cryolab.passiveTitle`)">
           <template v-slot:activator="{ on, attrs }">
-            <div :class="{'primary--text': !feature.active}" v-bind="attrs" v-on="on">{{ $vuetify.lang.t('$vuetify.cryolab.passive', $formatNum(passiveMult * 100, true)) }}</div>
+            <div :class="{'primary--text': !isAnyFrozen}" v-bind="attrs" v-on="on">{{ $vuetify.lang.t('$vuetify.cryolab.passive', $formatNum(passiveMult * 100, true)) }}</div>
           </template>
           <div>{{ $vuetify.lang.t('$vuetify.cryolab.passiveDescription', $formatNum(passiveMult * 100, true)) }}</div>
           <stat-breakdown :name="passiveMultName"></stat-breakdown>
@@ -27,7 +27,7 @@
         <v-icon>mdi-circle-small</v-icon>
         <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.cryolab.activeTitle`)">
           <template v-slot:activator="{ on, attrs }">
-            <div :class="{'primary--text': feature.active}" v-bind="attrs" v-on="on">{{ $vuetify.lang.t('$vuetify.cryolab.active', $formatNum(activeMult * 100, true)) }}</div>
+            <div :class="{'primary--text': isAnyFrozen}" v-bind="attrs" v-on="on">{{ $vuetify.lang.t('$vuetify.cryolab.active', $formatNum(activeMult * 100, true)) }}</div>
           </template>
           <div>{{ $vuetify.lang.t('$vuetify.cryolab.activeDescription', $formatNum(activeMult * 100, true)) }}</div>
           <stat-breakdown :name="activeMultName"></stat-breakdown>
@@ -55,7 +55,29 @@
       </div>
     </v-card-text>
     <v-card-actions class="justify-center">
-      <v-btn :color="feature.active ? 'cyan' : 'secondary'" :disabled="!canFreeze" @click="toggleActive"><v-icon>mdi-snowflake</v-icon></v-btn>
+      <template v-if="doubleDoorFridgeEnabled">
+        <gb-tooltip :min-width="0">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn class="mr-1" :color="feature.active ? 'cyan' : 'secondary'" :disabled="!canRefrigerate" @click="toggleActive" v-bind="attrs" v-on="on">
+              <v-icon>mdi-door-open</v-icon>
+            </v-btn>
+          </template>
+          <div>{{ $vuetify.lang.t('$vuetify.cryolab.refrigerate') }}</div>
+        </gb-tooltip>
+        <gb-tooltip :min-width="0">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn class="ml-1" :color="feature.freeze ? 'light-blue' : 'secondary'" :disabled="!canFreeze" @click="toggleFreeze" v-bind="attrs" v-on="on">
+              <v-icon>mdi-door-closed</v-icon>
+            </v-btn>
+          </template>
+          <div>{{ $vuetify.lang.t('$vuetify.cryolab.freeze') }}</div>
+        </gb-tooltip>
+      </template>
+      <template v-else>
+        <v-btn :color="feature.active ? 'cyan' : 'secondary'" :disabled="!canRefrigerate" @click="toggleActive">
+          <v-icon>mdi-snowflake</v-icon>
+        </v-btn>
+      </template>
     </v-card-actions>
   </v-card>
 </template>
@@ -114,8 +136,29 @@ export default {
         };
       });
     },
+    doubleDoorFridgeEnabled() {
+      return this.$store.state.system.settings.experiment.items.doubleDoorFridge.value;
+    },
+    isAnyFrozen() {
+      return this.feature.active || this.feature.freeze;
+    },
     canFreeze() {
-      return this.feature.active || this.$store.getters['cryolab/currentFrozen'] < this.$store.getters['mult/get']('cryolabMaxFeatures');
+      if (this.doubleDoorFridgeEnabled) {
+        const currentFreezeCount = this.getCurrentFreezeCount();
+        const maxFeatures = this.$store.getters['mult/get']('cryolabMaxFeatures');
+        return this.feature.freeze || currentFreezeCount < maxFeatures;
+      } else {
+        return this.feature.active || this.$store.getters['cryolab/currentFrozen'] < this.$store.getters['mult/get']('cryolabMaxFeatures');
+      }
+    },
+    canRefrigerate() {
+      if (this.doubleDoorFridgeEnabled) {
+        const currentRefrigerateCount = this.getCurrentRefrigerateCount();
+        const maxFeatures = this.$store.getters['mult/get']('cryolabMaxFeatures');
+        return this.feature.active || currentRefrigerateCount < maxFeatures;
+      } else {
+        return this.feature.active || this.$store.getters['cryolab/currentFrozen'] < this.$store.getters['mult/get']('cryolabMaxFeatures');
+      }
     },
     expGain() {
       return this.$store.getters['cryolab/expGain'](this.name);
@@ -135,6 +178,27 @@ export default {
   methods: {
     toggleActive() {
       this.$store.dispatch('cryolab/toggleActive', this.name);
+    },
+    toggleFreeze() {
+      this.$store.dispatch('cryolab/toggleFreeze', this.name);
+    },
+    getCurrentRefrigerateCount() {
+      let count = 0;
+      for (const [, elem] of Object.entries(this.$store.state.cryolab)) {
+        if (elem.active) {
+          count++;
+        }
+      }
+      return count;
+    },
+    getCurrentFreezeCount() {
+      let count = 0;
+      for (const [, elem] of Object.entries(this.$store.state.cryolab)) {
+        if (elem.freeze) {
+          count++;
+        }
+      }
+      return count;
     }
   }
 }

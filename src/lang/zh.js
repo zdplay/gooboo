@@ -475,6 +475,8 @@ export default {
   },
   cryolab: {
     frozen: '{0} / {1} 功能冻结',
+    refrigerate: '冷藏',
+    freeze: '冷冻',
     active: '主动: {0}%',
     activeTitle: '声望增益 (主动)',
     activeDescription: '每天被动获得相当于您最佳声望的 {0}% 的声望货币。 仅当功能被冻结时此功能才有效。',
@@ -1464,6 +1466,10 @@ export default {
         enableGalleryIdeaReset: {
           name: '灵感重置',
           description: '重置灵感和创意为0，重新开始，冷却时间1天，每轮声望可重置3次。打开开关后需要声望一次才可以使用。'
+        },
+        doubleDoorFridge: {
+          name: '双开门冰箱',
+          description: '将冰冻实验室扩展为冷藏和冷冻双系统，同一个使用时为1.3倍声望效果'
         }
       }
   },

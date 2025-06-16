@@ -60,7 +60,7 @@ export default {
     unlockNeeded: 'cryolabFeature',
     tick(seconds) {
         for (const [key, elem] of Object.entries(store.state.cryolab)) {
-            if (elem.active) {
+            if (elem.active || elem.freeze) {
                 const expGain = store.getters['cryolab/expGain'](key);
                 if (expGain > 0) {
                     store.dispatch('cryolab/gainExp', {feature: key, amount: expGain * seconds / SECONDS_PER_DAY});
@@ -115,8 +115,8 @@ export default {
     saveGame() {
         let obj = {};
         for (const [key, elem] of Object.entries(store.state.cryolab)) {
-            if (elem.active || elem.exp.find(elem => elem > 0) || elem.level.find(elem => elem > 0)) {
-                obj[key] = {active: elem.active, exp: elem.exp, level: elem.level};
+            if (elem.active || elem.freeze || elem.exp.find(elem => elem > 0) || elem.level.find(elem => elem > 0)) {
+                obj[key] = {active: elem.active, freeze: elem.freeze, exp: elem.exp, level: elem.level};
             }
         }
         return obj;
@@ -125,6 +125,7 @@ export default {
         for (const [key, elem] of Object.entries(data)) {
             if (store.state.cryolab[key] !== undefined) {
                 store.commit('cryolab/updateKey', {name: key, key: 'active', value: elem.active});
+                store.commit('cryolab/updateKey', {name: key, key: 'freeze', value: elem.freeze ?? false});
                 elem.exp.forEach((value, index) => {
                     store.commit('cryolab/updateSubfeatureKey', {name: key, subfeature: index, key: 'exp', value});
                 });

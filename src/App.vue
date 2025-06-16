@@ -1014,7 +1014,10 @@ export default {
     },
     bigFeatures() {
       const features = {};
-      this.mainFeatures.filter(f => this.$store.state.cryolab[f.name] && !this.$store.state.cryolab[f.name].active).forEach(f => {
+      this.mainFeatures.filter(f => {
+        const feature = this.$store.state.cryolab[f.name];
+        return feature && !(feature.active || feature.freeze);
+      }).forEach(f => {
         features[f.name] = {
           name: f.name,
           icon: f.icon,

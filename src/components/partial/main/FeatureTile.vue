@@ -95,7 +95,8 @@ export default {
              (this.name === 'farm' && this.$store.state.system.farmHint);
     },
     isFrozen() {
-      return !!this.$store.state.cryolab[this.name] && this.$store.state.cryolab[this.name].active;
+      const feature = this.$store.state.cryolab[this.name];
+      return !!(feature && (feature.active || feature.freeze));
     }
   }
 }

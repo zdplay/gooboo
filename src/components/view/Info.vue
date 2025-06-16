@@ -297,11 +297,11 @@ export default {
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏整理排序功能。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏购买预测功能，可以预览未来10次随机效果。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '调整每日签到奖励，在【设置】-【实验性】中开关。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志，互动钓鱼小游戏。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
-      { category: '事件', color: 'blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '事件', color: 'dark-blue', content: '调整每日签到奖励，在【设置】-【实验性】中开关。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
+      { category: '事件', color: 'dark-blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志，互动钓鱼小游戏。', isCurrentUpdate: false },
+      { category: '事件', color: 'dark-blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },
+      { category: '事件', color: 'dark-blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
+      { category: '事件', color: 'dark-blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择和自动使用考试券功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
@@ -317,6 +317,7 @@ export default {
       { category: '其他', color: 'cyan', content: '增加新UI的布局，在【设置】-【实验性】设置，需要跟货币标签一起开启。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加【显示科学记数法】选项，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加升级队列功能。在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: false },
+      { category: '冰冻实验室', color: 'blue', content: '增加双开门冰箱功能，扩展为冷藏和冷冻双系统，同时使用时1.3倍效果。', isCurrentUpdate: true },
     ],
     categoryIcons: {
       '设置': 'mdi-cog',
@@ -329,6 +330,7 @@ export default {
       '卡片': 'mdi-cards',
       '宝藏': 'mdi-treasure-chest',
       '事件': 'mdi-calendar',
+      '冰冻实验室': 'mdi-snowflake',
       '其他': 'mdi-dots-horizontal-circle'
     },
     tech: {

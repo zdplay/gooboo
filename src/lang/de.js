@@ -475,6 +475,8 @@ export default {
   },
   cryolab: {
     frozen: '{0} / {1} Funktionen eingefroren',
+    refrigerate: 'Kühlen',
+    freeze: 'Einfrieren',
     active: 'Aktiv: {0}%',
     activeTitle: 'Prestige-Einkommen (aktiv)',
     activeDescription: 'Erhalte automatisch Prestige-Währung in Höhe von {0}% vom besten Prestige pro Tag. Das ist nur aktiv, wenn die Funktion gefroren ist.',
@@ -1456,6 +1458,10 @@ export default {
       enableGalleryIdeaReset: {
         name: 'Gallery Idea Reset',
         description: 'Reset inspiration and creativity to 0, start over, cooldown 1 day, 3 resets per prestige. After opening the switch, you need to prestige once to use it.'
+      },
+      doubleDoorFridge: {
+        name: 'Doppeltür-Kühlschrank',
+        description: 'Erweitert das Kryolabor zu Kühl- und Gefriersystemen, 1,3x Prestige-Effekt bei gleichzeitiger Nutzung'
       },
       showFarmIconLevel: {
         name: 'Show Farm Icon Level',

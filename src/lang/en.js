@@ -475,6 +475,8 @@ export default {
   },
   cryolab: {
     frozen: '{0} / {1} features frozen',
+    refrigerate: 'Refrigerate',
+    freeze: 'Freeze',
     active: 'Active: {0}%',
     activeTitle: 'Prestige gain (active)',
     activeDescription: 'Passively gain prestige currency equal to {0}% of your best prestige per day. This is only active when the feature is frozen.',
@@ -1424,6 +1426,10 @@ export default {
         enableGalleryIdeaReset: {
           name: 'Gallery Idea Reset',
           description: 'Reset inspiration and creativity to 0, start over, cooldown 1 day, 3 resets per prestige. After opening the switch, you need to prestige once to use it.'
+        },
+        doubleDoorFridge: {
+          name: 'Double Door Fridge',
+          description: 'Expand cryolab to refrigerate and freeze dual systems, 1.3x prestige effect when using both'
         },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',

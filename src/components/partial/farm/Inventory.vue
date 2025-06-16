@@ -9,7 +9,7 @@
   font-size: 12px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  z-index: 100;
+  z-index: 1;
   line-height: 1;
   pointer-events: none;
   border-radius: 2px;

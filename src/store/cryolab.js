@@ -11,14 +11,15 @@ export default {
         currentFrozen: (state) => {
             let frozen = 0;
             for (const [, elem] of Object.entries(state)) {
-                if (elem.active) {
+                if (elem.active || elem.freeze) {
                     frozen++;
                 }
             }
             return frozen;
         },
         featureIsFrozen: (state, getters, rootState) => {
-            return !!state[rootState.system.screen]?.active;
+            const feature = state[rootState.system.screen];
+            return !!(feature?.active || feature?.freeze);
         },
         expGain: (state, getters, rootState) => (feature) => {
             let gain = 0;
@@ -36,12 +37,14 @@ export default {
             const subfeature = rootState.system.features[feature].currentSubfeature;
             let obj = {};
             state[feature].data.forEach((data, index) => {
-                const gainMult = rootGetters['mult/get'](`${ feature }Cryolab${ (subfeature === index && state[feature].active) ? 'Active' : 'Passive' }${ index }`);
+                const isActive = subfeature === index && (state[feature].active || state[feature].freeze);
+                const gainMult = rootGetters['mult/get'](`${ feature }Cryolab${ isActive ? 'Active' : 'Passive' }${ index }`);
                 if (gainMult > 0) {
                     for (const [currency, stat] of Object.entries(data)) {
                         const statValue = rootState.stat[stat].total;
                         if (statValue > 0) {
-                            obj[currency] = statValue * gainMult * (stat === 'farm_bestPrestige' ? 500 : 1);
+                            const doubleFreezeMultiplier = (state[feature].active && state[feature].freeze) ? 1.3 : 1;
+                            obj[currency] = statValue * gainMult * doubleFreezeMultiplier * (stat === 'farm_bestPrestige' ? 500 : 1);
                         }
                     }
                 }
@@ -55,6 +58,7 @@ export default {
             Vue.set(state, o.name, {
                 unlock: o.unlock ?? null,
                 active: false,
+                freeze: false,
                 exp: effect.map(() => 0),
                 level: effect.map(() => 0),
                 data: o.data ?? [{}],
@@ -72,11 +76,48 @@ export default {
         cleanState({ state, commit }) {
             for (const [key] of Object.entries(state)) {
                 commit('updateKey', {name: key, key: 'active', value: false});
+                commit('updateKey', {name: key, key: 'freeze', value: false});
             }
         },
-        toggleActive({ state, getters, rootGetters, commit }, name) {
-            if (state[name].active || getters.currentFrozen < rootGetters['mult/get']('cryolabMaxFeatures')) {
-                commit('updateKey', {name, key: 'active', value: !state[name].active});
+        toggleActive({ state, getters, rootGetters, rootState, commit }, name) {
+            const isDoubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+            if (isDoubleDoorEnabled) {
+                let currentActiveCount = 0;
+                for (const [, elem] of Object.entries(state)) {
+                    if (elem.active) {
+                        currentActiveCount++;
+                    }
+                }
+                if (state[name].active || currentActiveCount < rootGetters['mult/get']('cryolabMaxFeatures')) {
+                    commit('updateKey', {name, key: 'active', value: !state[name].active});
+                }
+            } else {
+                if (state[name].active || getters.currentFrozen < rootGetters['mult/get']('cryolabMaxFeatures')) {
+                    commit('updateKey', {name, key: 'active', value: !state[name].active});
+                }
+            }
+        },
+        toggleFreeze({ state, getters, rootGetters, rootState, commit }, name) {
+            const isDoubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+            if (isDoubleDoorEnabled) {
+                let currentFreezeCount = 0;
+                for (const [, elem] of Object.entries(state)) {
+                    if (elem.freeze) {
+                        currentFreezeCount++;
+                    }
+                }
+                if (state[name].freeze || currentFreezeCount < rootGetters['mult/get']('cryolabMaxFeatures')) {
+                    commit('updateKey', {name, key: 'freeze', value: !state[name].freeze});
+                }
+            } else {
+                if (state[name].freeze || getters.currentFrozen < rootGetters['mult/get']('cryolabMaxFeatures')) {
+                    commit('updateKey', {name, key: 'freeze', value: !state[name].freeze});
+                }
+            }
+        },
+        clearFreezeStates({ state, commit }) {
+            for (const [key] of Object.entries(state)) {
+                commit('updateKey', {name: key, key: 'freeze', value: false});
             }
         },
         init({ commit }, o) {
