@@ -411,7 +411,7 @@ export default {
       unlock: state => state.unlock,
       subfeature: state => state.system.features.mining.currentSubfeature,
       beacon: state => state.mining.beacon,
-      isFrozen: state => state.cryolab.mining.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
       niterAutomation: state => state.mining.niterAutomation
     }),
     ...mapGetters({

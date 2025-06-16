@@ -135,7 +135,7 @@ export default {
   computed: {
     ...mapState({
       craftingList: state => state.village.crafting,
-      isFrozen: state => state.cryolab.village.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.village.active || state.cryolab.village.freeze) : state.cryolab.village.active,
     }),
     ...mapGetters({
       currentArtisan: 'village/artisansActive',

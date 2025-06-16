@@ -21,6 +21,17 @@ export default {
             const feature = state[rootState.system.screen];
             return !!(feature?.active || feature?.freeze);
         },
+        isFeatureFrozen: (state, getters, rootState) => (featureName) => {
+            const feature = state[featureName];
+            if (!feature) return false;
+
+            const isDoubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+            if (isDoubleDoorEnabled) {
+                return feature.active || feature.freeze;
+            } else {
+                return feature.active;
+            }
+        },
         expGain: (state, getters, rootState) => (feature) => {
             let gain = 0;
             const subfeature = rootState.system.features[feature].currentSubfeature;

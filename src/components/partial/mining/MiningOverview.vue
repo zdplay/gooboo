@@ -223,7 +223,7 @@ export default {
     ...mapState({
       depth: state => state.mining.depth,
       subfeature: state => state.system.features.mining.currentSubfeature,
-      isFrozen: state => state.cryolab.mining.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
       ingredients: state => state.mining.ingredient,
       currency: state => state.currency,
     }),

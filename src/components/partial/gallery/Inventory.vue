@@ -18,7 +18,7 @@ export default {
   components: { Color, Currency },
   computed: {
     ...mapState({
-      isFrozen: state => state.cryolab.gallery.active
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.gallery.active || state.cryolab.gallery.freeze) : state.cryolab.gallery.active
     }),
     ...mapGetters({
       availableColors: 'gallery/availableColors'

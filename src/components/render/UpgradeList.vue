@@ -330,7 +330,7 @@ export default {
       return this.showQueueSpeed ? ('queueSpeed' + capitalize(this.feature) + capitalize(this.type)) : null;
     },
     isFrozen() {
-      return !['premium', 'book'].includes(this.type) && !!this.$store.state.cryolab[this.feature] && this.$store.state.cryolab[this.feature].active;
+      return !['premium', 'book'].includes(this.type) && !!this.$store.state.cryolab[this.feature] && this.$store.getters['cryolab/isFeatureFrozen'](this.feature);
     },
     upgradeTranslation() {
       if (this.feature === 'village' && this.type === 'building') {

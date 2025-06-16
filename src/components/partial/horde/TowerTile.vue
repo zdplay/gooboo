@@ -91,7 +91,7 @@ export default {
     ...mapState({
       crown: state => state.currency.horde_crown,
       heirloomList: state => state.horde.heirloom,
-      isFrozen: state => state.cryolab.horde.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.horde.active || state.cryolab.horde.freeze) : state.cryolab.horde.active,
     }),
     tower() {
       return this.$store.state.horde.tower[this.name];

@@ -131,7 +131,7 @@ export default {
   }),
   computed: {
     ...mapState({
-      isFrozen: state => state.cryolab.gallery.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.gallery.active || state.cryolab.gallery.freeze) : state.cryolab.gallery.active,
       totalBeauty: state => state.stat.gallery_beauty.total
     }),
     prestigeStone() {

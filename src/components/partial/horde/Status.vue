@@ -224,7 +224,7 @@ export default {
       bossFight: state => state.horde.bossFight,
       respawn: state => state.horde.respawn,
       enemy: state => state.horde.enemy,
-      isFrozen: state => state.cryolab.horde.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.horde.active || state.cryolab.horde.freeze) : state.cryolab.horde.active,
       enemyTimer: state => state.horde.enemyTimer,
       minibossTimer: state => state.horde.minibossTimer,
       canSeeTower: state => state.unlock.hordeBrickTower.see,

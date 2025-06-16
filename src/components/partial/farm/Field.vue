@@ -78,7 +78,7 @@ export default {
       selectedFertilizerName: state => state.farm.selectedFertilizerName,
       selectedColor: state => state.farm.selectedColor,
       deleting: state => state.farm.deleting,
-      isFrozen: state => state.cryolab.farm.active
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active
     })
   },
   methods: {

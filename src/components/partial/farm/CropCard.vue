@@ -212,7 +212,7 @@ export default {
       icons: state => state.farm.cropUpgradeIcons,
       currency: state => state.currency,
       unlock: state => state.unlock,
-      isFrozen: state => state.cryolab.farm.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active,
       gene: state => state.farm.gene,
     }),
     ...mapGetters({

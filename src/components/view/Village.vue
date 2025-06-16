@@ -152,7 +152,7 @@ export default {
   }),
   computed: {
     ...mapState({
-      isFrozen: state => state.cryolab.village.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.village.active || state.cryolab.village.freeze) : state.cryolab.village.active,
       subfeature: state => state.system.features.village.currentSubfeature
     }),
     canSeeUpgrades() {

@@ -95,7 +95,7 @@ export default {
       beaconPlaced: state => state.mining.beaconPlaced,
       depth: state => state.mining.depth,
       beaconCooldown: state => state.mining.beaconCooldown,
-      isFrozen: state => state.cryolab.mining.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
     }),
     maxTotalDepth() {
       return this.$store.state.stat[`mining_maxDepth0`].total;

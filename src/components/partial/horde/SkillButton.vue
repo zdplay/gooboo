@@ -107,7 +107,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isFrozen: state => state.cryolab.horde.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.horde.active || state.cryolab.horde.freeze) : state.cryolab.horde.active,
     }),
     circleIcon() {
       switch (this.type) {

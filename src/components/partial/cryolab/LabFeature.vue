@@ -59,7 +59,7 @@
         <gb-tooltip :min-width="0">
           <template v-slot:activator="{ on, attrs }">
             <v-btn class="mr-1" :color="feature.active ? 'cyan' : 'secondary'" :disabled="!canRefrigerate" @click="toggleActive" v-bind="attrs" v-on="on">
-              <v-icon>mdi-door-open</v-icon>
+              <v-icon>mdi-table-column-plus-after</v-icon>
             </v-btn>
           </template>
           <div>{{ $vuetify.lang.t('$vuetify.cryolab.refrigerate') }}</div>
@@ -67,7 +67,7 @@
         <gb-tooltip :min-width="0">
           <template v-slot:activator="{ on, attrs }">
             <v-btn class="ml-1" :color="feature.freeze ? 'light-blue' : 'secondary'" :disabled="!canFreeze" @click="toggleFreeze" v-bind="attrs" v-on="on">
-              <v-icon>mdi-door-closed</v-icon>
+              <v-icon>mdi-table-column-plus-before</v-icon>
             </v-btn>
           </template>
           <div>{{ $vuetify.lang.t('$vuetify.cryolab.freeze') }}</div>

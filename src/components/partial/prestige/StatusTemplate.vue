@@ -77,7 +77,7 @@ export default {
       return Object.keys(this.prestigeGain).length > 0;
     },
     isFrozen() {
-      return this.$store.state.cryolab[this.feature].active;
+      return this.$store.getters['cryolab/isFeatureFrozen'](this.feature);
     }
   },
   methods: {

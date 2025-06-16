@@ -246,7 +246,7 @@ export default {
       return this.$store.state.horde.loadout;
     },
     itemsBlocked() {
-      return this.$store.state.cryolab.horde.active || this.$store.state.horde.currentTower !== null;
+      return this.$store.getters['cryolab/isFeatureFrozen']('horde') || this.$store.state.horde.currentTower !== null;
     }
   },
   methods: {

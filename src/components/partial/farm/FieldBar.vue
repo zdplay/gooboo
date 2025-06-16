@@ -58,7 +58,7 @@ export default {
       deleting: state => state.farm.deleting,
       showColors: state => state.farm.showColors,
       unlock: state => state.unlock,
-      isFrozen: state => state.cryolab.farm.active
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active
     }),
     canSeeBuildings() {
       return this.$store.state.upgrade.item.farm_gardenGnome.level >= 1;

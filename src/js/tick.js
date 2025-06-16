@@ -103,7 +103,7 @@ function advance() {
 
 function tick(newTime, oldTime) {
     [meta, mining, village, horde, farm, gallery, gem, school, event, achievement, general, cryolab].forEach(module => {
-        const isFrozen = !!store.state.cryolab[module.name] && store.state.cryolab[module.name].active;
+        const isFrozen = store.getters['cryolab/isFeatureFrozen'](module.name);
         if ((module.unlockNeeded === null || store.state.unlock[module.unlockNeeded].use)) {
             const diff = Math.floor(newTime * store.state.system.timeMult / module.tickspeed) - Math.floor(oldTime * store.state.system.timeMult / module.tickspeed);
             if (diff > 0) {

@@ -82,7 +82,7 @@ export default {
   },
   computed: {
     ...mapState({
-      isFrozen: state => state.cryolab.mining.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
     }),
     smeltery() {
       return this.$store.state.mining.smeltery[this.name];

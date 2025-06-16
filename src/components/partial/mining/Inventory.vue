@@ -177,7 +177,7 @@ export default {
       resin: state => state.mining.resin,
       resinCurrency: state => state.currency.mining_resin,
       subfeature: state => state.system.features.mining.currentSubfeature,
-      isFrozen: state => state.cryolab.mining.active,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
       enhancement: state => state.mining.enhancement,
       enhancementIngredient: state => state.mining.enhancementIngredient,
       enhancementBars: state => state.mining.enhancementBars,
