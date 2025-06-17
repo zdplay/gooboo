@@ -18,6 +18,7 @@
         <span v-else>{{ $vuetify.lang.t(`$vuetify.horde.active.${ effect.type }.0`) }} </span>
         <span v-if="['revive', 'divisionShield'].includes(effect.type)">{{ $formatNum(finalValue) }} </span>
         <span v-else-if="['stun', 'silence'].includes(effect.type)">{{ $formatTime(finalValue) }} </span>
+        <span v-else-if="effect.type === 'freezeTime'"> 1h </span>
         <template v-else-if="['permanentStat', 'gainStat'].includes(effect.type)">
           <span v-if="effect.stat.split('_')[1] === 'mult'">{{ effect.type === 'permanentStat' ? '+' : ''}}{{ $formatNum(finalValue, true) }}x </span>
           <span v-else>+{{ $formatNum(finalValue, true) }} </span>

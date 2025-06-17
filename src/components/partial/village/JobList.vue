@@ -44,7 +44,7 @@
       </v-row>
     </v-card>
     <template v-for="(item, key) in jobs">
-      <job v-if="item.max === null || item.max > 0" :key="'job-' + key" class="ma-2" :name="key" :disabled="isFrozen"></job>
+      <job v-if="shouldShowJob(key, item)" :key="'job-' + key" class="ma-2" :name="key" :disabled="isFrozen"></job>
     </template>
     <v-card v-if="taxPercent > 0" class="ma-2 pa-2">
       <v-row no-gutters>
@@ -108,6 +108,14 @@ export default {
     },
     canSeeHappiness() {
       return this.$store.state.unlock.villageBuildings4.see;
+    }
+  },
+  methods: {
+    shouldShowJob(key, item) {
+      if (key === 'iceMaker') {
+        return this.$store.state.system.settings.experiment.items.doubleDoorFridge.value && (item.max === null || item.max > 0);
+      }
+      return item.max === null || item.max > 0;
     }
   }
 }

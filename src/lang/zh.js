@@ -491,7 +491,24 @@ export default {
     frozenFeature: {
       title: '功能被冻结',
       description: '此功能已被冷冻实验室冻结。 您不会在此功能中获得任何进展，但会自动获得声望货币。'
-    }
+    },
+    freezeTimeAvailable: '可用冷冻时间',
+    freezeTimeDescription: '冷冻功能需要消耗冷冻时间。时间用完后冷冻状态会自动关闭。',
+    freezeTimeMax: '最大冷冻时间',
+    freezeTimeGain: '冷冻时间增长',
+    freezeTimeNegative: '冷冻时间为负数！需要搬冰工生产时间填平负数才能重新冷冻。',
+    freezeTimeDailyGain: '每日自然恢复',
+    freezeTimeIncrease: '净增长',
+    freezeTimeDecrease: '净消耗',
+    freezeTimeStable: '增减平衡',
+    freezeTimeEmpty: '预计耗尽',
+    freezeTimeFull: '预计满容',
+    freezeTimeConsumption: '冷冻消耗',
+    iceMakerOutput: '搬冰工产出',
+    villageFrozenWarning: '村庄被冻结',
+    noIceMakerHint: '可以通过村庄工种【搬冰工】恢复可用冷冻时间',
+    iceClawsBonus: '冰爪装备加成',
+    iceClawsHint: '可通过部落装备【冰爪】获得可用冷冻时间'
   },
   general: {
     completionReward: '完成奖励',
@@ -1648,6 +1665,7 @@ export default {
       sculptor: '雕塑家',
       explorer: '探险家',
       remoteMiner: '遥控矿车',
+      iceMaker: '搬冰工',
     },
     policy: {
       name: '政策',
@@ -1922,6 +1940,7 @@ export default {
       fireOrb: '火球',
       campfire: '营火',
       clover: '三叶草',
+      iceClaws: '冰爪',
       snowflake: '雪花',
       oppressor: '压迫者',
       toxin: '毒素',
@@ -2090,6 +2109,10 @@ export default {
       refillMana: {
         0: '恢复',
         1: '法力'
+      },
+      freezeTime: {
+        0: '增加',
+        1: '可用冷冻时间'
       },
       buff: {
         duration: '增益持续时间',

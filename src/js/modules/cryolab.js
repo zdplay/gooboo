@@ -59,7 +59,23 @@ export default {
     tickspeed: 1,
     unlockNeeded: 'cryolabFeature',
     tick(seconds) {
+        const isDoubleDoorEnabled = store.state.system.settings.experiment.items.doubleDoorFridge.value;
+        let activeFreezeCount = 0;
+        if (isDoubleDoorEnabled) {
+            for (const [key, elem] of Object.entries(store.state.cryolab)) {
+                if (key === 'freezeTimeAvailable') continue;
+                if (elem.freeze) {
+                    activeFreezeCount++;
+                }
+            }
+        }
+        if (activeFreezeCount > 0) {
+            store.dispatch('cryolab/consumeFreezeTime', activeFreezeCount * seconds);
+        }
+
         for (const [key, elem] of Object.entries(store.state.cryolab)) {
+            if (key === 'freezeTimeAvailable') continue;
+
             if (elem.active || elem.freeze) {
                 const expGain = store.getters['cryolab/expGain'](key);
                 if (expGain > 0) {
@@ -93,12 +109,45 @@ export default {
             }
         }
     },
+
+    forceTick(seconds, oldTime, newTime) {
+        const isDoubleDoorEnabled = store.state.system.settings.experiment.items.doubleDoorFridge.value;
+        if (isDoubleDoorEnabled) {
+            const oldDate = new Date(oldTime * 1000);
+            const newDate = new Date(newTime * 1000);
+            const oldDay = oldDate.toDateString();
+            const newDay = newDate.toDateString();
+
+            if (oldDay !== newDay) {
+                const daysDiff = Math.floor((newDate.setHours(0, 0, 0, 0) - oldDate.setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24));
+                if (daysDiff > 0) {
+                    const dailyGain = 7200 * daysDiff;
+                    store.dispatch('cryolab/addFreezeTime', dailyGain);
+                }
+            }
+        }
+    },
     unlock: ['cryolabFeature'],
     mult: {
         cryolabMaxFeatures: {round: true, baseValue: 1},
     },
     note: buildArray(2).map(() => 'g'),
     init() {
+        store.dispatch('currency/init', {
+            feature: 'cryolab',
+            name: 'freezeTime',
+            capMult: {baseValue: 259200, display: 'time'},
+            showGainMult: false,
+            showGainTimer: false
+        });
+
+        store.commit('mult/init', {
+            feature: 'cryolab',
+            name: 'cryolabFreezeTimeGainBase',
+            baseValue: 0,
+            display: 'perSecond'
+        });
+
         for (const [key, elem] of Object.entries(store.state.system.features)) {
             let obj = {name: key, unlock: elem.unlock};
             if (data[key] !== undefined) {

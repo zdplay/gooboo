@@ -70,6 +70,11 @@ export default {
             if (joyGain > 0) {
                 store.dispatch('currency/gain', {feature: 'village', name: 'joy', gainMult: true, amount: joyGain * seconds});
             }
+
+            const freezeTimeGain = store.getters['mult/get']('cryolabFreezeTimeGainBase');
+            if (freezeTimeGain > 0) {
+                store.dispatch('cryolab/addFreezeTime', freezeTimeGain * seconds);
+            }
             if (happiness <= VILLAGE_MIN_HAPPINESS) {
                 store.commit('stat/increaseTo', {feature: 'village', name: 'minHappiness', value: 1});
             }
@@ -269,6 +274,9 @@ export default {
         // Loot mults
         villageLootGain: {display: 'perHour'},
         villageLootQuality: {round: true},
+
+        // Cryolab freeze time gain
+        cryolabFreezeTimeGainBase: {display: 'perSecond'},
     },
     multGroup: [
         {mult: 'villageHousingCap', name: 'upgradeCap', subtype: 'housing'},

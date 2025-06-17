@@ -173,6 +173,7 @@ export default {
   galleryCardCap: 'Gallerie-Kartenlimit',
   treasureSlots: 'Schatzplätze',
   cryolabMaxFeatures: 'Maximale eingefrorene Funktionen',
+  cryolabFreezeTimeGainBase: 'Eismacher-Ausgabe',
   merchantOffers: 'Händlerangebote',
   bankInvestmentSize: 'Investitionsgröße',
   bankLoanSize: 'Kreditgröße',

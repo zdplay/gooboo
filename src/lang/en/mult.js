@@ -173,6 +173,7 @@ export default {
   galleryCardCap: 'Gallery card capacity',
   treasureSlots: 'Treasure slots',
   cryolabMaxFeatures: 'Maximum frozen features',
+  cryolabFreezeTimeGainBase: 'Ice maker output',
   merchantOffers: 'Merchant offers',
   bankInvestmentSize: 'Investment size',
   bankLoanSize: 'Loan size',

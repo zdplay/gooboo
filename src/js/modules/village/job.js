@@ -8,6 +8,13 @@ export default {
             {type: 'base', name: 'currencyVillageStoneGain', amount: 0.3}
         ]
     },
+    iceMaker: {
+        max: null,
+        needed: 20,
+        rewards: [
+            {type: 'base', name: 'cryolabFreezeTimeGainBase', amount: 0.25} // 每个搬冰工每秒提供0.25秒冷冻时间
+        ]
+    },
     farmer: {
         max: 0,
         needed: 2,

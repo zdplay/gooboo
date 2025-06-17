@@ -1267,6 +1267,10 @@ export default {
                 dispatch('upgrade/applyReset', 'village_mechanicalMine', {root: true});
                 dispatch('upgrade/updateVillageStats', null, {root: true});
             }
+            if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
+                dispatch('village/setWorkerCount', {name: 'iceMaker', amount: 0}, {root: true});
+                dispatch('cryolab/clearFreezeStates', null, {root: true});
+            }
         },
         buyTheme({ state, rootGetters, commit, dispatch }, name) {
             const theme = state.themes[name];

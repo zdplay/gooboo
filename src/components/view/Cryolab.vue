@@ -16,6 +16,98 @@
         <stat-breakdown name="cryolabMaxFeatures"></stat-breakdown>
       </gb-tooltip>
     </div>
+    <div v-if="doubleDoorFridgeEnabled" class="d-flex justify-center ma-2">
+      <gb-tooltip :title-text="$vuetify.lang.t('$vuetify.cryolab.freezeTimeAvailable')" :min-width="300" :max-width="400">
+        <template v-slot:activator="{ on, attrs }">
+          <span v-bind="attrs" v-on="on" :class="freezeTimeAvailable < 0 ? 'error--text font-weight-bold' : 'success--text'">
+            {{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeAvailable') }}:
+            <template v-if="freezeTimeAvailable < 0">-{{ $formatTime(Math.abs(freezeTimeAvailable), Math.abs(freezeTimeAvailable) < 3600 ? 'short' : 'long') }}</template>
+            <template v-else>{{ $formatTime(freezeTimeAvailable, freezeTimeAvailable < 3600 ? 'short' : 'long') }}</template>
+          </span>
+        </template>
+
+        <div class="tooltip-text-container">
+
+          <div class="text-center mb-2">
+            <div v-if="freezeTimeNetChange > 0" class="success--text d-flex align-center justify-center">
+              <v-icon small class="mr-1">mdi-trending-up</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeIncrease') }}: +{{ formatFreezeTimeRate(freezeTimeNetChange) }}/秒</span>
+              <div v-if="timeUntilFull > 0" class="ml-2">
+                <v-chip small color="success">
+                  <v-icon small class="mr-1">mdi-clock</v-icon>
+                  {{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeFull') }}: {{ $formatTime(timeUntilFull, timeUntilFull < 3600 ? 'short' : 'long') }}
+                </v-chip>
+              </div>
+            </div>
+            <div v-else-if="freezeTimeNetChange < 0" class="error--text d-flex align-center justify-center">
+              <v-icon small class="mr-1">mdi-trending-down</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeDecrease') }}: -{{ formatFreezeTimeRate(Math.abs(freezeTimeNetChange)) }}/秒</span>
+              <div v-if="timeUntilEmpty > 0" class="ml-2">
+                <v-chip small color="error">
+                  <v-icon small class="mr-1">mdi-clock-alert</v-icon>
+                  {{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeEmpty') }}: {{ $formatTime(timeUntilEmpty, timeUntilEmpty < 3600 ? 'short' : 'long') }}
+                </v-chip>
+              </div>
+            </div>
+            <div v-else class="info--text d-flex align-center justify-center">
+              <v-icon small class="mr-1">mdi-minus</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeStable') }}</span>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <div v-if="effectiveFreezeTimeGain > 0" class="d-flex align-center">
+              <v-icon small class="mr-2" color="light-blue">mdi-snowflake</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.iceMakerOutput') }}: +{{ $formatTime(iceClawsEquipped ? baseFreezeTimeGain : effectiveFreezeTimeGain, 'short') }}/秒</span>
+            </div>
+            <div v-else-if="freezeTimeGainBase > 0" class="d-flex align-center">
+              <v-icon small class="mr-2" color="grey">mdi-snowflake</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.iceMakerOutput') }}: +{{ $formatTime(iceClawsEquipped ? baseFreezeTimeGain : freezeTimeGainBase, 'short') }}/秒</span>
+              <v-chip x-small class="ml-2" color="warning">{{ $vuetify.lang.t('$vuetify.cryolab.villageFrozenWarning') }}</v-chip>
+            </div>
+            <div v-else-if="iceMakerCount === 0" class="d-flex align-center">
+              <v-icon small class="mr-2" color="grey">mdi-information</v-icon>
+              <span class="grey--text">{{ $vuetify.lang.t('$vuetify.cryolab.noIceMakerHint') }}</span>
+            </div>
+          </div>
+
+          <div v-if="iceClawsEquipped" class="mb-2">
+            <div class="d-flex align-center">
+              <v-icon small class="mr-2" color="light-blue">mdi-paw</v-icon>
+              <span class="light-blue--text">{{ $vuetify.lang.t('$vuetify.cryolab.iceClawsBonus') }}: +20%</span>
+            </div>
+          </div>
+          <div v-else-if="iceClawsAvailable && !iceClawsEquipped" class="mb-2">
+            <div class="d-flex align-center">
+              <v-icon small class="mr-2" color="grey">mdi-paw</v-icon>
+              <span class="grey--text">{{ $vuetify.lang.t('$vuetify.cryolab.iceClawsHint') }}</span>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <div v-if="currentFreezeConsumption > 0" class="d-flex align-center mb-1">
+              <v-icon small class="mr-2" color="red">mdi-fire</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeConsumption') }}: -{{ currentFreezeConsumption }}秒/秒</span>
+            </div>
+            <div class="d-flex align-center">
+              <v-icon small class="mr-2" color="green">mdi-calendar</v-icon>
+              <span>{{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeDailyGain') }}: +2h/天</span>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <v-chip small color="info">
+              <v-icon small class="mr-1">mdi-database</v-icon>
+              {{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeMax') }}: 72h
+            </v-chip>
+            <div v-if="freezeTimeAvailable < 0" class="error--text mt-1">
+              <v-icon small class="mr-1">mdi-alert</v-icon>
+              {{ $vuetify.lang.t('$vuetify.cryolab.freezeTimeNegative') }}
+            </div>
+          </div>
+        </div>
+      </gb-tooltip>
+    </div>
     <v-row class="ma-1" no-gutters>
       <v-col v-for="feature in features" :key="`feature-${ feature }`" cols="12" md="6" xl="3">
         <lab-feature class="ma-1" :name="feature"></lab-feature>
@@ -37,7 +129,8 @@ export default {
     currentFrozen() {
       if (this.doubleDoorFridgeEnabled) {
         let count = 0;
-        for (const [, elem] of Object.entries(this.$store.state.cryolab)) {
+        for (const [key, elem] of Object.entries(this.$store.state.cryolab)) {
+          if (key === 'freezeTimeAvailable') continue;
           if (elem.freeze) {
             count++;
           }
@@ -49,7 +142,8 @@ export default {
     },
     currentRefrigerated() {
       let count = 0;
-      for (const [, elem] of Object.entries(this.$store.state.cryolab)) {
+      for (const [key, elem] of Object.entries(this.$store.state.cryolab)) {
+        if (key === 'freezeTimeAvailable') continue;
         if (elem.active) {
           count++;
         }
@@ -59,6 +153,7 @@ export default {
     features() {
       let arr = [];
       for (const [key, elem] of Object.entries(this.$store.state.cryolab)) {
+        if (key === 'freezeTimeAvailable') continue;
         if (elem.unlock === null || this.$store.state.unlock[elem.unlock].see) {
           arr.push(key);
         }
@@ -67,6 +162,71 @@ export default {
     },
     maxFrozen() {
       return this.$store.getters['mult/get']('cryolabMaxFeatures');
+    },
+    freezeTimeAvailable() {
+      return this.$store.getters['currency/value']('cryolab_freezeTime');
+    },
+    freezeTimeGainBase() {
+      return this.$store.getters['mult/get']('cryolabFreezeTimeGainBase');
+    },
+    effectiveFreezeTimeGain() {
+      const isVillageFrozen = this.$store.getters['cryolab/isFeatureFrozen']('village');
+      return isVillageFrozen ? 0 : this.freezeTimeGainBase;
+    },
+    currentFreezeConsumption() {
+      return this.currentFrozen;
+    },
+    freezeTimeNetChange() {
+      return this.effectiveFreezeTimeGain - this.currentFreezeConsumption;
+    },
+    timeUntilEmpty() {
+      if (this.freezeTimeNetChange >= 0 || this.freezeTimeAvailable <= 0) {
+        return 0;
+      }
+      return Math.floor(this.freezeTimeAvailable / Math.abs(this.freezeTimeNetChange));
+    },
+    timeUntilFull() {
+      if (this.freezeTimeNetChange <= 0) {
+        return 0;
+      }
+      const maxTime = 259200;
+      const remaining = maxTime - this.freezeTimeAvailable;
+      if (remaining <= 0) {
+        return 0;
+      }
+      return Math.floor(remaining / this.freezeTimeNetChange);
+    },
+    iceMakerCount() {
+      // 获取当前搬冰工数量
+      return this.$store.state.village.job.iceMaker?.amount || 0;
+    },
+    iceClawsEquipped() {
+      // 检查冰爪装备是否已装备
+      return this.$store.state.horde.items.iceClaws?.equipped || false;
+    },
+    iceClawsAvailable() {
+      // 检查冰爪装备是否可用（双开门冰箱开关启用）
+      return this.$store.state.system.settings.experiment.items.doubleDoorFridge.value;
+    },
+    baseFreezeTimeGain() {
+      // 获取基础搬冰工产出（不含冰爪加成）
+      if (this.iceClawsEquipped && this.iceMakerCount > 0) {
+        // 当装备冰爪时，从总产出中反推基础产出
+        const isVillageFrozen = this.$store.getters['cryolab/isFeatureFrozen']('village');
+        const totalGain = isVillageFrozen ? 0 : this.freezeTimeGainBase;
+        return totalGain / 1.2;
+      }
+      return this.freezeTimeGainBase;
+    }
+  },
+  methods: {
+    formatFreezeTimeRate(seconds) {
+      // 自定义格式化冷冻时间速率，确保显示小数秒而不是毫秒
+      if (seconds >= 1) {
+        return Math.round(seconds * 10) / 10 + 's';
+      } else {
+        return Math.round(seconds * 10) / 10 + 's';
+      }
     }
   }
 }

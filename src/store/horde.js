@@ -252,11 +252,17 @@ export default {
             }
             return obj;
         },
-        itemsList: (state) => {
+        itemsList: (state, getters, rootState) => {
             let obj = {};
             for (const [key, elem] of Object.entries(state.items)) {
                 if (elem.known) {
-                    obj[key] = elem;
+                    if (key === 'iceClaws') {
+                        if (rootState.system.settings.experiment.items.doubleDoorFridge.value) {
+                            obj[key] = elem;
+                        }
+                    } else {
+                        obj[key] = elem;
+                    }
                 }
             }
             return obj;
@@ -1321,6 +1327,8 @@ export default {
                             const split = elem.stat.split('_');
                             commit('updateSubkey', {name: 'itemStatMult', key: elem.stat, value: statValue});
                             dispatch('system/applyEffect', {type: split[1], name: split[0], multKey: `hordeItemPermanent`, value: statValue + (split[1] === 'mult' ? 1 : 0)}, {root: true});
+                        } else if (elem.type === 'freezeTime') {
+                            dispatch('cryolab/addFreezeTime', value, {root: true});
                         }
                     });
 

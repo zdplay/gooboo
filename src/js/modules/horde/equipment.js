@@ -49,6 +49,30 @@ export default {
         activeIcon: 'mdi-medical-bag',
         activeColor: 'green'
     },
+    iceClaws: {
+        findZone: 5,
+        findChance: 1,
+        price(lvl) {
+            return Math.pow(2, lvl - 1) * 120;
+        },
+        cap: 1,
+        masteryBoost: 0.25,
+        stats() {
+            return [
+                {isPositive: true, type: 'mult', name: 'cryolabFreezeTimeGainBase', value: 1.2}
+            ];
+        },
+        active() {
+            return [
+                {type: 'freezeTime', value: 3600}
+            ];
+        },
+        activeType: 'utility',
+        cooldown: () => 21600,
+        icon: 'mdi-paw',
+        activeIcon: 'mdi-paw',
+        activeColor: 'light-blue'
+    },
     guardianAngel: {
         findZone: 5,
         findChance: 1 / buildNum(10, 'K'),

@@ -491,7 +491,24 @@ export default {
     frozenFeature: {
       title: 'Funktion ist eingefroren',
       description: 'Diese Funktion wurde durch das Kryolabor eingefroren. Du erzeugst keinen Fortschritt in dieser Funktion, bekommst aber automatisch Prestige-Währung.'
-    }
+    },
+    freezeTimeAvailable: 'Verfügbare Einfrierzeit',
+    freezeTimeDescription: 'Die Einfrierfunktion benötigt Einfrierzeit zum Betrieb. Wenn die Zeit aufgebraucht ist, wird der Einfrierstatus automatisch ausgeschaltet.',
+    freezeTimeMax: 'Maximale Einfrierzeit',
+    freezeTimeGain: 'Einfrierzeit-Zuwachs',
+    freezeTimeNegative: 'Einfrierzeit ist negativ! Eismacher müssen Zeit produzieren, um den negativen Betrag zu füllen und >0 zu erreichen, um wieder einzufrieren.',
+    freezeTimeDailyGain: 'Tägliche natürliche Erholung',
+    freezeTimeIncrease: 'Netto-Zunahme',
+    freezeTimeDecrease: 'Netto-Verbrauch',
+    freezeTimeStable: 'Ausgeglichen',
+    freezeTimeEmpty: 'Geschätzte Erschöpfung',
+    freezeTimeFull: 'Geschätzte Vollständigkeit',
+    freezeTimeConsumption: 'Einfrierverbrauch',
+    iceMakerOutput: 'Eismacher-Ausgabe',
+    villageFrozenWarning: 'Dorf eingefroren',
+    noIceMakerHint: 'Verfügbare Einfrierzeit kann durch Eismacher-Arbeiter wiederhergestellt werden',
+    iceClawsBonus: 'Eiskrallen-Ausrüstungsbonus',
+    iceClawsHint: 'Verfügbare Einfrierzeit kann durch Horde-Ausrüstung [Eiskrallen] erhalten werden'
   },
   general: {
     completionReward: 'Abschlussbelohnung',
@@ -1918,6 +1935,7 @@ export default {
       fireOrb: 'Feuerkugel',
       campfire: 'Lagerfeuer',
       clover: 'Kleeblatt',
+      iceClaws: 'Eiskrallen',
       snowflake: 'Schneeflocke',
       oppressor: 'Unterdrücker',
       toxin: 'Gift',
@@ -2086,6 +2104,10 @@ export default {
       refillMana: {
         0: 'Stelle',
         1: 'Mana wieder her'
+      },
+      freezeTime: {
+        0: 'Hinzufügen',
+        1: 'verfügbare Einfrierzeit'
       },
       buff: {
         duration: 'Schubdauer',

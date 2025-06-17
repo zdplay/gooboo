@@ -61,6 +61,19 @@ export default {
                 }
             });
             return obj;
+        },
+        freezeTimeNetChange: (state, getters, rootState, rootGetters) => {
+            const isDoubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+            if (!isDoubleDoorEnabled) return 0;
+            const isVillageFrozen = getters.isFeatureFrozen('village');
+            const iceMakerBaseGain = isVillageFrozen ? 0 : rootGetters['mult/get']('cryolabFreezeTimeGainBase');
+            let freezeConsumption = 0;
+            for (const [, elem] of Object.entries(state)) {
+                if (elem && elem.freeze) {
+                    freezeConsumption++;
+                }
+            }
+            return iceMakerBaseGain - freezeConsumption;
         }
     },
     mutations: {
@@ -81,11 +94,24 @@ export default {
         },
         updateSubfeatureKey(state, o) {
             Vue.set(state[o.name][o.key], o.subfeature, o.value);
+        },
+        updateFreezeTimeKey(state, o) {
+            state[o.key] = o.value;
+        },
+        addFreezeTime(state, seconds) {
+            state.freezeTimeAvailable += seconds;
+            if (state.freezeTimeAvailable > 259200) {
+                state.freezeTimeAvailable = 259200;
+            }
+        },
+        consumeFreezeTime(state, seconds) {
+            state.freezeTimeAvailable -= seconds;
         }
     },
     actions: {
         cleanState({ state, commit }) {
             for (const [key] of Object.entries(state)) {
+                if (key === 'freezeTimeAvailable') continue;
                 commit('updateKey', {name: key, key: 'active', value: false});
                 commit('updateKey', {name: key, key: 'freeze', value: false});
             }
@@ -111,6 +137,11 @@ export default {
         toggleFreeze({ state, getters, rootGetters, rootState, commit }, name) {
             const isDoubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
             if (isDoubleDoorEnabled) {
+                const freezeTime = rootGetters['currency/value']('cryolab_freezeTime');
+                if (!state[name].freeze && freezeTime <= 0) {
+                    return;
+                }
+
                 let currentFreezeCount = 0;
                 for (const [, elem] of Object.entries(state)) {
                     if (elem.freeze) {
@@ -184,6 +215,22 @@ export default {
                         multKey: `cryolab_${ o.feature }_${ o.subfeature }`
                     }, {root: true});
                 });
+            }
+        },
+        addFreezeTime({ dispatch }, seconds) {
+            dispatch('currency/gain', {feature: 'cryolab', name: 'freezeTime', amount: seconds}, {root: true});
+        },
+        consumeFreezeTime({ dispatch }, seconds) {
+            dispatch('currency/spend', {feature: 'cryolab', name: 'freezeTime', amount: seconds}, {root: true});
+        },
+        checkFreezeTimeAndDisable({ state, rootGetters, commit }) {
+            const freezeTime = rootGetters['currency/value']('cryolab_freezeTime');
+            if (freezeTime <= 0) {
+                for (const [key, elem] of Object.entries(state)) {
+                    if (elem.freeze) {
+                        commit('updateKey', {name: key, key: 'freeze', value: false});
+                    }
+                }
             }
         },
     }

@@ -491,7 +491,24 @@ export default {
     frozenFeature: {
       title: 'Feature is frozen',
       description: 'This feature is frozen by the cryolab. You will not gain any progress in this feature, but gain prestige currency automatically.'
-    }
+    },
+    freezeTimeAvailable: 'Available freeze time',
+    freezeTimeDescription: 'Freeze function requires freeze time to operate. When time runs out, freeze status will automatically turn off.',
+    freezeTimeMax: 'Maximum freeze time',
+    freezeTimeGain: 'Freeze time gain',
+    freezeTimeNegative: 'Freeze time is negative! Ice makers need to produce time to fill the negative amount and >0 to freeze again.',
+    freezeTimeDailyGain: 'Daily natural recovery',
+    freezeTimeIncrease: 'Net increase',
+    freezeTimeDecrease: 'Net consumption',
+    freezeTimeStable: 'Balanced',
+    freezeTimeEmpty: 'Estimated depletion',
+    freezeTimeFull: 'Estimated full',
+    freezeTimeConsumption: 'Freeze consumption',
+    iceMakerOutput: 'Ice maker output',
+    villageFrozenWarning: 'village frozen',
+    noIceMakerHint: 'Available freeze time can be restored by ice maker workers',
+    iceClawsBonus: 'Ice Claws equipment bonus',
+    iceClawsHint: 'Available freeze time can be obtained through horde equipment [Ice Claws]'
   },
   general: {
     completionReward: 'Completion reward',
@@ -1886,6 +1903,7 @@ export default {
       fireOrb: 'Fire orb',
       campfire: 'Campfire',
       clover: 'Clover',
+      iceClaws: 'Ice Claws',
       snowflake: 'Snowflake',
       oppressor: 'Oppressor',
       toxin: 'Toxin',
@@ -2054,6 +2072,10 @@ export default {
       refillMana: {
         0: 'Restore',
         1: 'mana'
+      },
+      freezeTime: {
+        0: 'Add',
+        1: 'available freeze time'
       },
       buff: {
         duration: 'Buff duration',
