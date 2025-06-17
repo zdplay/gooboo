@@ -27,31 +27,58 @@
       <price-tag class="ma-1" :currency="smeltery.output" :amount="1" add></price-tag>
       <v-spacer></v-spacer>
       <v-badge v-if="smeltery.stored > 0" inline color="secondary" :content="$formatNum(smeltery.stored)"></v-badge>
+      <v-badge v-if="hasQueue" inline color="primary" :content="queueInfo.remainingTasks"></v-badge>
+      <v-btn class="ma-1" small :color="hasQueue ? 'orange' : 'blue-grey'" :disabled="isFrozen" @click="hasQueue ? cancelQueue() : openQueueDialog()">
+        {{ hasQueue ? '任务中' : '队列' }}
+      </v-btn>
       <v-btn class="ma-1" small color="primary" :disabled="isFrozen || !canAfford" @click="openSmeltDialog">指定</v-btn>
       <v-btn class="ma-1" color="primary" :disabled="isFrozen || !canAfford" @click="buy">{{ $vuetify.lang.t('$vuetify.mining.smelt') }}</v-btn>
     </div>
     <v-progress-linear class="rounded-b" height="4" :indeterminate="isHighspeed" :value="isHighspeed ? undefined : (smeltery.progress * 100)"></v-progress-linear>
-    <v-dialog v-model="showSmeltDialog" max-width="400px" persistent scrollable>
+    <v-dialog v-model="showSmeltDialog" max-width="500px" persistent scrollable>
       <v-card class="default-card">
       <v-card-title>
-        指定【{{ $vuetify.lang.t(`$vuetify.currency.mining_bar${formattedName}.name`) }}】冶炼数量
+        {{ isQueueMode ? '队列' : '指定' }}【{{ $vuetify.lang.t(`$vuetify.currency.mining_bar${formattedName}.name`) }}】冶炼数量
       </v-card-title>
       <v-card-text>
         <v-text-field
           v-model.number="smeltAmount"
           label="数量"
           type="number"
-          :max="maxAmount"
           :min="0"
-          :rules="[v => v <= maxAmount || '超过最大可购买量']"
+          :max="isQueueMode ? undefined : maxAmount"
+          :hint="isQueueMode ? '队列模式：可输入任意数量，材料不足时会等待，每次冶炼消耗单份材料' : '指定模式：最多可输入 ' + maxAmount + ' 个，一次性消耗指定数量的材料'"
+          persistent-hint
         ></v-text-field>
+
+
+
+        <!-- 预计完成时间 -->
+        <div v-if="smeltAmount > 0 && estimatedCompletionText" class="completion-time mt-4">
+          <div class="text-subtitle-2 mb-2">预计完成时间：</div>
+          <div class="text-body-2 primary--text">{{ estimatedCompletionText }}</div>
+        </div>
+
+        <!-- 材料预览区域 -->
+        <div v-if="smeltAmount > 0" class="material-preview mt-4">
+          <div class="text-subtitle-2 mb-2">所需材料：</div>
+          <div class="d-flex flex-wrap mx-n1">
+            <price-tag
+              v-for="material in materialRequirements"
+              :key="material.currency"
+              :currency="material.currency"
+              :amount="material.needed"
+              class="ma-1"
+            ></price-tag>
+          </div>
+        </div>
       </v-card-text>
       <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn class="ma-1" color="error" @click="handleCancelSmelt">
         {{ $vuetify.lang.t('$vuetify.gooboo.cancel') }}
       </v-btn>
-      <v-btn class="ma-1" color="success" :disabled="isFrozen || smeltAmount <= 0 || smeltAmount > maxAmount" @click="buyAmount(smeltAmount)">
+      <v-btn class="ma-1" color="success" :disabled="isFrozen || smeltAmount <= 0" @click="buyAmount(smeltAmount)">
         {{ $vuetify.lang.t('$vuetify.gooboo.convert') }}
       </v-btn>
     </v-card-actions>
@@ -78,11 +105,12 @@ export default {
     return {
       showSmeltDialog: false,
       smeltAmount: 0,
+      isQueueMode: false,
     };
   },
   computed: {
     ...mapState({
-      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
+      isFrozen: state => state.cryolab.mining.active,
     }),
     smeltery() {
       return this.$store.state.mining.smeltery[this.name];
@@ -125,12 +153,57 @@ export default {
     },
     formattedName() {
       return this.name.charAt(0).toUpperCase() + this.name.slice(1);
+    },
+    materialRequirements() {
+      const amount = this.smeltAmount || 0;
+      if (amount <= 0) return [];
+
+      const price = this.$store.getters['mining/smelteryPrice'](this.name, amount);
+      return Object.entries(price).map(([currency, needed]) => ({
+        currency,
+        needed
+      }));
+    },
+    hasQueue() {
+      return this.$store.getters['mining/hasSmelteryQueue'](this.name);
+    },
+    queueInfo() {
+      return this.$store.getters['mining/smelteryQueueInfo'](this.name);
+    },
+    estimatedCompletionTime() {
+      const amount = this.smeltAmount || 0;
+      if (amount <= 0) return null;
+
+      const smeltTime = this.$store.getters['mining/smelteryTimeNeeded'](this.name);
+      const totalTime = amount * smeltTime;
+
+      return totalTime;
+    },
+    estimatedCompletionText() {
+      const time = this.estimatedCompletionTime;
+      if (!time) return '';
+
+      if (time < 60) {
+        return `${Math.ceil(time)}秒`;
+      } else if (time < 3600) {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.ceil(time % 60);
+        return seconds > 0 ? `${minutes}分${seconds}秒` : `${minutes}分钟`;
+      } else {
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor((time % 3600) / 60);
+        return minutes > 0 ? `${hours}小时${minutes}分钟` : `${hours}小时`;
+      }
     }
   },
   watch: {
     showSmeltDialog(newVal) {
       if (newVal) {
-        this.smeltAmount = this.maxAmount;
+        if (this.isQueueMode) {
+          this.smeltAmount = this.maxAmount;
+        } else {
+          this.smeltAmount = this.maxAmount;
+        }
       }
     }
   },
@@ -139,15 +212,27 @@ export default {
       this.$store.dispatch('mining/addToSmelteryCustom', {name: this.name, amount: 1});
     },
     buyAmount(count) {
-      console.log('Smelting:', this.name, 'Amount:', count);
-      this.$store.dispatch('mining/addToSmelteryCustom', {name: this.name, amount: count});
+      if (this.isQueueMode) {
+        this.$store.dispatch('mining/addToSmelteryQueue', {name: this.name, amount: count});
+      } else {
+        const finalAmount = Math.min(count, this.maxAmount);
+        this.$store.dispatch('mining/addToSmelteryCustom', {name: this.name, amount: finalAmount});
+      }
       this.showSmeltDialog = false;
     },
     openSmeltDialog() {
+      this.isQueueMode = false;
+      this.showSmeltDialog = true;
+    },
+    openQueueDialog() {
+      this.isQueueMode = true;
       this.showSmeltDialog = true;
     },
     handleCancelSmelt() {
       this.showSmeltDialog = false;
+    },
+    cancelQueue() {
+      this.$store.dispatch('mining/cancelSmelteryQueue', this.name);
     },
   }
 }

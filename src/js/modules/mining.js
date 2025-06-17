@@ -149,6 +149,7 @@ export default {
             }
         }
 
+
         // Resin
         if (store.state.unlock.miningResin.use && subfeature === 0) {
             store.dispatch('currency/gain', {feature: 'mining', name: 'resin', amount: seconds * store.getters['mult/get']('currencyMiningResinGain')});
@@ -392,6 +393,12 @@ export default {
             if (store.state.mining.depth >= MINING_SULFUR_DEPTH && store.getters['mining/currentBreaks'] === 0) {
                 store.dispatch('currency/gain', {feature: 'mining', name: 'sulfur', amount: store.getters['mining/rareDropFinal']('sulfur') * seconds});
             }
+        }
+
+        if (seconds === 1) {
+            store.dispatch('mining/processSmelteryQueue');
+        } else {
+            store.dispatch('mining/processSmelteryQueueOffline', seconds);
         }
 
         // Depth dweller
@@ -684,10 +691,14 @@ export default {
             obj.beaconCooldown = store.state.mining.beaconCooldown;
         }
 
+        if (Object.keys(store.state.mining.smelteryQueue).length > 0) {
+            obj.smelteryQueue = store.state.mining.smelteryQueue;
+        }
+
         return obj;
     },
     loadGame(data) {
-        ['depth', 'durability', 'pickaxePower', 'breaks', 'ingredientList', 'enhancementBars', 'enhancementIngredient', 'resin', 'beaconPlaced', 'beaconCooldown', 'niterAutomation', 'niterAutomationStatus'].forEach(elem => {
+        ['depth', 'durability', 'pickaxePower', 'breaks', 'ingredientList', 'enhancementBars', 'enhancementIngredient', 'resin', 'beaconPlaced', 'beaconCooldown', 'niterAutomation', 'niterAutomationStatus', 'smelteryQueue'].forEach(elem => {
             if (data[elem] !== undefined) {
                 store.commit('mining/updateKey', {key: elem, value: data[elem]});
             }

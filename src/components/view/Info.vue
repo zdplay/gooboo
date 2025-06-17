@@ -268,6 +268,7 @@ export default {
     // 2. updateItems中相应项的isCurrentUpdate标记
     updateItems: [
       { category: '挖矿', color: 'pink', content: '修改冶炼最大按钮为指定数量按钮。', isCurrentUpdate: false },
+      { category: '挖矿', color: 'pink', content: '增加冶炼队列冶炼功能。', isCurrentUpdate: true },
       { category: '挖矿', color: 'pink', content: '增加自动采矿功能，在深度切换右侧机器人按钮，支持离线。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加矿物总览功能。', isCurrentUpdate: false },
       { category: '村庄', color: 'indigo', content: '在蒸汽机阶段增加机械矿场升级项目，解锁遥控矿车工作种类，大幅提高金属产量，在【设置】-【实验性】设置。', isCurrentUpdate: false },

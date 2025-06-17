@@ -31,6 +31,7 @@ export default {
         beaconPlaced: {},
         beaconCooldown: 0,
         niterAutomation: null,
+        smelteryQueue: {}
     },
     getters: {
         damage: (state, getters, rootState, rootGetters) => {
@@ -373,6 +374,19 @@ export default {
                 }
             }
             return amount;
+        },
+        hasSmelteryQueue: (state) => (name) => {
+            return state.smelteryQueue[name] && state.smelteryQueue[name].tasks && state.smelteryQueue[name].tasks.length > 0;
+        },
+        smelteryQueueInfo: (state) => (name) => {
+            if (!state.smelteryQueue[name]) {
+                return { totalTasks: 0, remainingTasks: 0, currentProgress: 0 };
+            }
+            const queue = state.smelteryQueue[name];
+            const totalTasks = queue.tasks.reduce((sum, task) => sum + task.amount, 0);
+            const remainingTasks = queue.tasks.reduce((sum, task) => sum + task.remaining, 0);
+            const currentProgress = totalTasks > 0 ? ((totalTasks - remainingTasks) / totalTasks) * 100 : 0;
+            return { totalTasks, remainingTasks, currentProgress };
         }
     },
     mutations: {
@@ -444,6 +458,41 @@ export default {
                 state.breaks.push(0);
             }
             Vue.set(state.breaks, o.depth - 1, state.breaks[o.depth - 1] + o.amount);
+        },
+        initSmelteryQueue(state, name) {
+            if (!state.smelteryQueue[name]) {
+                Vue.set(state.smelteryQueue, name, {
+                    tasks: [],
+                    currentTask: 0
+                });
+            }
+        },
+        addSmelteryQueueTask(state, o) {
+            if (!state.smelteryQueue[o.name]) {
+                Vue.set(state.smelteryQueue, o.name, {
+                    tasks: [],
+                    currentTask: 0
+                });
+            }
+            state.smelteryQueue[o.name].tasks.push({
+                amount: o.amount,
+                remaining: o.amount
+            });
+        },
+        updateSmelteryQueueTask(state, o) {
+            if (state.smelteryQueue[o.name] && state.smelteryQueue[o.name].tasks[o.taskIndex]) {
+                Vue.set(state.smelteryQueue[o.name].tasks[o.taskIndex], o.key, o.value);
+            }
+        },
+        removeSmelteryQueueTask(state, o) {
+            if (state.smelteryQueue[o.name] && state.smelteryQueue[o.name].tasks[o.taskIndex]) {
+                state.smelteryQueue[o.name].tasks.splice(o.taskIndex, 1);
+            }
+        },
+        clearSmelteryQueue(state, name) {
+            if (state.smelteryQueue[name]) {
+                Vue.delete(state.smelteryQueue, name);
+            }
         }
     },
     actions: {
@@ -468,6 +517,7 @@ export default {
             }
             commit('updateKey', {key: 'beaconPlaced', value: {}});
             commit('updateKey', {key: 'beaconCooldown', value: 0});
+            commit('updateKey', {key: 'smelteryQueue', value: {}});
         },
         craftPickaxe({ state, rootState, getters, commit, dispatch, rootGetters }, consumables = {}) {
             const subfeature = rootState.system.features.mining.currentSubfeature;
@@ -572,6 +622,134 @@ export default {
             commit('updateSmelteryKey', {name: o.name, key: 'stored', value: smeltery.stored + o.amount});
             commit('updateSmelteryKey', {name: o.name, key: 'total', value: smeltery.total + o.amount});
          },
+        addToSmelteryQueue({ commit }, o) {
+            commit('addSmelteryQueueTask', {name: o.name, amount: o.amount});
+        },
+        cancelSmelteryQueue({ commit }, name) {
+            commit('clearSmelteryQueue', name);
+        },
+        processSmelteryQueue({ state, getters, commit, dispatch }) {
+            for (const [smelteryName, queue] of Object.entries(state.smelteryQueue)) {
+                if (!queue.tasks || queue.tasks.length === 0) continue;
+
+                let currentTaskIndex = -1;
+                for (let i = 0; i < queue.tasks.length; i++) {
+                    if (queue.tasks[i].remaining > 0) {
+                        currentTaskIndex = i;
+                        break;
+                    }
+                }
+
+                if (currentTaskIndex === -1) {
+                    commit('clearSmelteryQueue', smelteryName);
+                    continue;
+                }
+
+                const currentTask = queue.tasks[currentTaskIndex];
+                const smeltery = state.smeltery[smelteryName];
+
+                if (smeltery.stored === 0 && getters.smelteryCanAfford(smelteryName, 1)) {
+                    for (const [key, elem] of Object.entries(getters.smelteryPrice(smelteryName, 1))) {
+                        dispatch('currency/spend', {feature: key.split('_')[0], name: key.split('_')[1], amount: elem}, {root: true});
+                    }
+
+                    commit('updateSmelteryKey', {name: smelteryName, key: 'stored', value: smeltery.stored + 1});
+                    commit('updateSmelteryKey', {name: smelteryName, key: 'total', value: smeltery.total + 1});
+
+                    commit('updateSmelteryQueueTask', {
+                        name: smelteryName,
+                        taskIndex: currentTaskIndex,
+                        key: 'remaining',
+                        value: currentTask.remaining - 1
+                    });
+
+                    if (currentTask.remaining - 1 <= 0) {
+                        commit('removeSmelteryQueueTask', {name: smelteryName, taskIndex: currentTaskIndex});
+                    }
+                }
+            }
+        },
+        processSmelteryQueueOffline({ state, getters, commit, dispatch, rootGetters }, offlineSeconds) {
+            if (offlineSeconds <= 0) return;
+
+            for (const [smelteryName, queue] of Object.entries(state.smelteryQueue)) {
+                if (!queue.tasks || queue.tasks.length === 0) continue;
+
+                const totalRemainingTasks = queue.tasks.reduce((sum, task) => sum + task.remaining, 0);
+                if (totalRemainingTasks === 0) {
+                    commit('clearSmelteryQueue', smelteryName);
+                    continue;
+                }
+
+                const smeltTime = getters.smelteryTimeNeeded(smelteryName);
+                const materialPrice = getters.smelteryPrice(smelteryName, 1);
+
+                const maxTasksByTime = Math.floor(offlineSeconds / smeltTime);
+
+                let maxTasksByResource = Infinity;
+                for (const [currencyKey, needed] of Object.entries(materialPrice)) {
+                    const available = rootGetters['currency/value'](currencyKey);
+                    const possibleTasks = Math.floor(available / needed);
+                    maxTasksByResource = Math.min(maxTasksByResource, possibleTasks);
+                }
+
+                const actualCompletableTasks = Math.min(maxTasksByTime, maxTasksByResource, totalRemainingTasks);
+
+                if (actualCompletableTasks > 0) {
+                    for (const [currencyKey, needed] of Object.entries(materialPrice)) {
+                        const [feature, name] = currencyKey.split('_');
+                        dispatch('currency/spend', {
+                            feature,
+                            name,
+                            amount: needed * actualCompletableTasks
+                        }, {root: true});
+                    }
+
+                    const smeltery = state.smeltery[smelteryName];
+                    const barSplit = smeltery.output.split('_');
+                    dispatch('currency/gain', {
+                        feature: barSplit[0],
+                        name: barSplit[1],
+                        amount: actualCompletableTasks
+                    }, {root: true});
+
+                    commit('updateSmelteryKey', {
+                        name: smelteryName,
+                        key: 'total',
+                        value: smeltery.total + actualCompletableTasks
+                    });
+
+                    let remainingToProcess = actualCompletableTasks;
+                    for (let i = 0; i < queue.tasks.length && remainingToProcess > 0; i++) {
+                        const task = queue.tasks[i];
+                        if (task.remaining > 0) {
+                            const processedFromThisTask = Math.min(task.remaining, remainingToProcess);
+                            commit('updateSmelteryQueueTask', {
+                                name: smelteryName,
+                                taskIndex: i,
+                                key: 'remaining',
+                                value: task.remaining - processedFromThisTask
+                            });
+                            remainingToProcess -= processedFromThisTask;
+                        }
+                    }
+
+                    const tasksToRemove = [];
+                    for (let i = queue.tasks.length - 1; i >= 0; i--) {
+                        if (queue.tasks[i].remaining <= 0) {
+                            tasksToRemove.push(i);
+                        }
+                    }
+                    tasksToRemove.forEach(index => {
+                        commit('removeSmelteryQueueTask', {name: smelteryName, taskIndex: index});
+                    });
+
+                    if (queue.tasks.length === 0 || queue.tasks.every(task => task.remaining <= 0)) {
+                        commit('clearSmelteryQueue', smelteryName);
+                    }
+                }
+            }
+        },
         enhanceBars({ state, getters, rootGetters, commit, dispatch }) {
             if (state.enhancementIngredient !== null) {
                 const barsNeeded = getters.enhancementBarsNeeded - state.enhancementBars;
