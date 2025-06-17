@@ -5,10 +5,9 @@
 }
 .crop-level-badge {
   position: absolute;
-  color: white;
+  rgb(194, 193, 193): white;
   font-size: 12px;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   z-index: 1;
   line-height: 1;
   pointer-events: none;
@@ -56,10 +55,10 @@
               <v-icon>{{ item.icon }}</v-icon>
             </v-btn>
             <!-- 等级显示 -->
-            <span v-if="showIconLevel" class="crop-level-badge crop-level-prestige" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown}">
+            <span v-if="showIconLevel" class="crop-level-badge crop-level-prestige balloon-text-dynamic" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown}">
               {{ item.levelMax || 0 }}
             </span>
-            <span v-if="showIconLevel" class="crop-level-badge crop-level-current" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown, 'crop-level-current-higher': (item.level || 0) > (item.levelMax || 0)}">
+            <span v-if="showIconLevel" class="crop-level-badge crop-level-current balloon-text-dynamic" :class="{'crop-level-badge-small': $vuetify.breakpoint.smAndDown, 'crop-level-current-higher': (item.level || 0) > (item.levelMax || 0)}">
               {{ item.level || 0 }}
             </span>
           </div>
