@@ -154,6 +154,7 @@ export default {
     },
     tick(seconds) {
         store.commit('stat/add', {feature: 'horde', name: 'timeSpent', value: seconds});
+        store.dispatch('horde/checkIceClawsStatus');
 
         const subfeature = store.state.system.features.horde.currentSubfeature;
 
@@ -1023,11 +1024,7 @@ export default {
         for (const [key, elem] of Object.entries(equipment)) {
             store.commit('horde/initItem', {name: key, ...elem});
         }
-        const isDoubleDoorEnabled = store.state.system.settings.experiment.items.doubleDoorFridge.value;
-        if (isDoubleDoorEnabled) {
-            store.commit('horde/updateItemKey', {name: 'iceClaws', key: 'known', value: true});
-            store.commit('horde/updateItemKey', {name: 'iceClaws', key: 'found', value: true});
-        }
+
         for (const [key, elem] of Object.entries(heirloom)) {
             store.dispatch('horde/initHeirloom', {name: key, ...elem});
         }

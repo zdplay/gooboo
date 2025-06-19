@@ -427,7 +427,7 @@ export default {
       return this.currency.cap !== null && this.currency.value >= this.currency.cap;
     },
     overcapStage() {
-      if (!this.isOvercap) {
+      if (!this.isOvercap || this.currency.cap <= 0) {
         return 0;
       }
       return Math.floor(this.currency.value / this.currency.cap);

@@ -15,17 +15,31 @@
 <template>
   <div class="ma-1">
     <div v-if="subfeature === 0" class="d-flex justify-center align-center ma-1">
-      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null" @click="zoneMin"><v-icon>mdi-skip-backward</v-icon></v-btn>
-      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null" @click="zonePrev10"><v-icon>mdi-step-backward-2</v-icon></v-btn>
-      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null" @click="zonePrev"><v-icon>mdi-step-backward</v-icon></v-btn>
+      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zoneMin"><v-icon>mdi-skip-backward</v-icon></v-btn>
+      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zonePrev10"><v-icon>mdi-step-backward-2</v-icon></v-btn>
+      <v-btn icon :disabled="zone <= 1 || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zonePrev"><v-icon>mdi-step-backward</v-icon></v-btn>
       <div v-if="currentTower !== null" class="mx-2">{{ $vuetify.lang.t('$vuetify.horde.zone') }} ~{{ zoneEstimation }}</div>
       <div v-else class="mx-2">{{ $vuetify.lang.t('$vuetify.horde.zone') }} {{ zone }}</div>
-      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext"><v-icon>mdi-step-forward</v-icon></v-btn>
-      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
-      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null" @click="zoneMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
-      <v-btn icon color="primary" v-if="canPrestige" @click="toggleAutomation" class="ml-2" :class="{'amber lighten-1': isHordeAutoRunning}">
-        <v-icon>mdi-robot</v-icon>
-      </v-btn>
+      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zoneNext"><v-icon>mdi-step-forward</v-icon></v-btn>
+      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zoneNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
+      <v-btn icon :disabled="isMaxZone || isFrozen || currentTower !== null || isHordeAutoRunning" @click="zoneMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
+      <v-tooltip bottom v-if="canPrestige">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            color="primary"
+            class="ml-2"
+            :class="{'amber lighten-1': isHordeAutoRunning}"
+            :disabled="isFrozen"
+            v-bind="attrs"
+            v-on="on"
+            @click="toggleAutomation"
+          >
+            <v-icon>mdi-robot</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ isFrozen ? '冻结时无法使用自动声望' : '自动声望' }}</span>
+      </v-tooltip>
     </div>
     <div v-if="subfeature === 0" class="d-flex flex-wrap justify-center align-center">
       <gb-tooltip :min-width="0">

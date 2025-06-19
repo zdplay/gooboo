@@ -197,21 +197,16 @@ export default {
       return Math.floor(remaining / this.freezeTimeNetChange);
     },
     iceMakerCount() {
-      // 获取当前搬冰工数量
       return this.$store.state.village.job.iceMaker?.amount || 0;
     },
     iceClawsEquipped() {
-      // 检查冰爪装备是否已装备
       return this.$store.state.horde.items.iceClaws?.equipped || false;
     },
     iceClawsAvailable() {
-      // 检查冰爪装备是否可用（双开门冰箱开关启用）
       return this.$store.state.system.settings.experiment.items.doubleDoorFridge.value;
     },
     baseFreezeTimeGain() {
-      // 获取基础搬冰工产出（不含冰爪加成）
       if (this.iceClawsEquipped && this.iceMakerCount > 0) {
-        // 当装备冰爪时，从总产出中反推基础产出
         const isVillageFrozen = this.$store.getters['cryolab/isFeatureFrozen']('village');
         const totalGain = isVillageFrozen ? 0 : this.freezeTimeGainBase;
         return totalGain / 1.2;
@@ -221,7 +216,6 @@ export default {
   },
   methods: {
     formatFreezeTimeRate(seconds) {
-      // 自定义格式化冷冻时间速率，确保显示小数秒而不是毫秒
       if (seconds >= 1) {
         return Math.round(seconds * 10) / 10 + 's';
       } else {

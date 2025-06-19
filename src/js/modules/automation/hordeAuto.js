@@ -7,8 +7,8 @@ class HordeAutomation {
       targetZone: 100,
       equipmentLoadout: null,
       prestigeAfterReaching: true,
-      autoUseSkills: true, // 添加自动使用技能选项，默认开启
-      autoUpgradeItems: true, // 添加自动升级项目选项，默认开启
+      autoUseSkills: true,
+      autoUpgradeItems: true,
     };
     this.currentState = 'idle';
     this.timerId = null;
@@ -18,7 +18,7 @@ class HordeAutomation {
     this._equipTimeout = null;
     this._prestigeTimeout = null;
     this._lastCheckTime = 0;
-    this._lastBossCheckTime = 0; // 添加上次检查 boss 的时间戳
+    this._lastBossCheckTime = 0;
     
     // 从 store 加载状态
     this.loadStateFromStore();
@@ -92,19 +92,13 @@ class HordeAutomation {
     this.currentState = 'idle';
     this.equipmentInProgress = false;
     this.prestigeInProgress = false;
-    
+
     if (this.timerId) {
       clearInterval(this.timerId);
       this.timerId = null;
     }
-    
+
     this.saveStateToStore();
-    
-    try {
-      store.commit('game/updateState');
-    } catch (e) {
-      return;
-    }
   }
 
   updateConfig(newConfig) {
@@ -329,32 +323,37 @@ class HordeAutomation {
     if (!this.isRunning) {
       return;
     }
-    
+
     if (!document.hidden) {
       const state = store.state;
       const currentZone = state.horde.zone;
       const isFighting = state.horde.enemyTimer > 0 || state.horde.enemy !== null;
       const canPrestige = state.unlock.hordePrestige?.use || false;
-      
+      const maxZone = state.stat.horde_maxZone.value; // 在函数开头声明一次
+
       if (this.currentState === 'idle') {
         this.stop();
         return;
       }
-      
+
       this.performChecks();
-      
+
       switch (this.currentState) {
         case 'starting':
           if (this.config.equipmentLoadout && state.horde.loadout && state.horde.loadout[this.config.equipmentLoadout]) {
             const loadoutObj = state.horde.loadout[this.config.equipmentLoadout];
             this.loadoutItems = loadoutObj && loadoutObj.content ? loadoutObj.content : [];
           }
-          
+
+          if (currentZone < maxZone) {
+            store.dispatch('horde/updateZone', maxZone);
+          }
+
           if (currentZone >= this.config.targetZone && this.config.prestigeAfterReaching && canPrestige) {
             this.currentState = 'prestiging';
             return;
           }
-          
+
           if (currentZone < this.config.targetZone) {
             this.currentState = 'fighting';
           } else {
@@ -373,7 +372,11 @@ class HordeAutomation {
             }
             return;
           }
-          
+
+          if (currentZone < maxZone) {
+            store.dispatch('horde/updateZone', maxZone);
+          }
+
           if (!isFighting) {
             const nextZone = Math.min(currentZone + 1, this.config.targetZone);
             store.dispatch('horde/updateZone', nextZone);

@@ -12,6 +12,12 @@
     
     <v-card-text>
       <div>
+        <v-alert v-if="isFrozen" type="warning" dense class="mb-4">
+          部落已冻结，无法使用自动声望功能
+        </v-alert>
+        <v-alert type="warning" dense class="mb-4">
+          需要浏览器在前台才能正常运行
+        </v-alert>
         <v-text-field
           v-model="targetZone"
           label="目标区域"
@@ -62,7 +68,7 @@
         <div class="d-flex justify-center mt-2">
           <v-btn
             color="primary"
-            :disabled="uiRunning || !canStart || stoppingInProgress"
+            :disabled="uiRunning || !canStart || stoppingInProgress || isFrozen"
             @click="startAutomation"
           >
             <v-icon left>mdi-play</v-icon>
@@ -104,7 +110,8 @@ export default {
     ...mapState({
       unlock: state => state.unlock,
       loadouts: state => state.horde.loadout || {},
-      hordeAutomation: state => state.horde.hordeAutomation
+      hordeAutomation: state => state.horde.hordeAutomation,
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.horde.active || state.cryolab.horde.freeze) : state.cryolab.horde.active
     }),
     canPrestige() {
       return this.unlock.hordePrestige?.use || false;
@@ -128,7 +135,7 @@ export default {
       return options;
     },
     canStart() {
-      return this.canPrestige && this.targetZone > 0;
+      return !this.isFrozen && this.canPrestige && this.targetZone > 0;
     },
     isRunning() {
       if (this.hordeAutomation) {
@@ -154,10 +161,19 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    
+
     if (this.config.stateTimer) {
       clearInterval(this.config.stateTimer);
       this.config.stateTimer = null;
+    }
+  },
+  watch: {
+    isFrozen: {
+      handler(newVal) {
+        if (newVal && this.isRunning) {
+          this.stopAutomation();
+        }
+      }
     }
   },
   methods: {

@@ -257,8 +257,14 @@ export default {
             for (const [key, elem] of Object.entries(state.items)) {
                 if (elem.known) {
                     if (key === 'iceClaws') {
-                        if (rootState.system.settings.experiment.items.doubleDoorFridge.value) {
-                            obj[key] = elem;
+                        const doubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+
+                        if (doubleDoorEnabled) {
+                            const timeThisPrestige = rootState.stat.horde_timeSpent.value;
+                            const sixHours = 2 * 60 * 60;
+                            if (timeThisPrestige >= sixHours) {
+                                obj[key] = elem;
+                            }
                         }
                     } else {
                         obj[key] = elem;
@@ -2044,6 +2050,32 @@ export default {
             if (rootGetters['consumable/canAfford']('horde_manaPotion')) {
                 dispatch('updateMana', Math.min(state.player.mana + state.cachePlayerStats.mana * 0.5, state.cachePlayerStats.mana));
                 dispatch('consumable/use', 'horde_manaPotion', {root: true});
+            }
+        },
+
+        checkIceClawsStatus({ state, rootState, commit, dispatch }) {
+            const iceClaws = state.items.iceClaws;
+            if (!iceClaws) return;
+
+            const doubleDoorEnabled = rootState.system.settings.experiment.items.doubleDoorFridge.value;
+
+            if (doubleDoorEnabled) {
+                if (!iceClaws.known) {
+                    commit('updateItemKey', {name: 'iceClaws', key: 'known', value: true});
+                }
+                if (!iceClaws.found) {
+                    commit('updateItemKey', {name: 'iceClaws', key: 'found', value: true});
+                }
+            } else {
+                if (iceClaws.known) {
+                    commit('updateItemKey', {name: 'iceClaws', key: 'known', value: false});
+                }
+                if (iceClaws.found) {
+                    commit('updateItemKey', {name: 'iceClaws', key: 'found', value: false});
+                }
+                if (iceClaws.equipped) {
+                    dispatch('unequipItem', 'iceClaws');
+                }
             }
         }
     }

@@ -101,7 +101,7 @@ function awardLoot(breaks, loots, hits) {
                     breaksMult++;
                 }
             }
-            //console.log(`获得硝: ${store.getters['mining/rareDropFinal']('niter') * breaksMult}`);
+
             store.dispatch('currency/gain', {feature: 'mining', name: 'niter', amount: store.getters['mining/rareDropFinal']('niter') * breaksMult});
         }
         if (gotLoot && depth >= MINING_OBSIDIAN_DEPTH && store.getters['mining/enhancementLevel'] <= 0) {
@@ -178,166 +178,6 @@ export default {
                 if (newDurability <= 0) {
                     breaks++;
 
-            // 检查是否启用自动挖硝功能
-            if (
-                store.state.mining.niterAutomation && // 有自动挖硝任务
-                store.state.mining.niterAutomation.isRunning // 处于运行状态
-            ) {
-                // 取自动挖硝的参数
-                const { startDepth, targetDepth, breaksPerDepth } = store.state.mining.niterAutomation.config;
-                // 当前深度
-                let curDepth = store.state.mining.depth;
-                // 当前层已挖次数
-                let curBreaks = store.getters['mining/currentBreaks'];
-
-                // 更新状态信息
-                store.commit('mining/updateKey', {
-                    key: 'niterAutomation',
-                    value: {
-                        ...store.state.mining.niterAutomation,
-                        currentDepth: curDepth,
-                        progress: `${curBreaks}/${breaksPerDepth}`,
-                        remainingBreaks: breaksPerDepth - curBreaks
-                    }
-                });
-
-                // 判断当前层是否在任务范围内
-                if (curDepth >= startDepth && curDepth <= targetDepth) {
-                    // 当前层还需要挖多少次才能达到目标
-                    const neededBreaks = breaksPerDepth - curBreaks;
-
-                    // 调试 - 挖破次数判断
-                   //console.log(`[自动挖硝判断] 当前层 ${curDepth}, 已挖次数 ${curBreaks}, 目标次数 ${breaksPerDepth}, 还需 ${neededBreaks}`);
-
-                    // 如果当前层已经达到目标挖掘次数
-                    if (neededBreaks <= 0) {
-                        // 已完成当前层，进入下一层
-                        const newDepth = curDepth + 1;
-
-                       //console.log(`[自动挖硝] 当前层 ${curDepth} 已达到目标挖掘次数 ${breaksPerDepth}, 准备进入下一层 ${newDepth}`);
-
-                        // 检查是否超出目标深度
-                        if (newDepth > targetDepth) {
-                           //console.log('[自动挖硝] 已达到目标深度，任务完成');
-                            store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
-                            // 继续正常的挖矿循环
-                            continue;
-                        }
-
-                        // 记录完成的层
-                        const completedDepths = [...store.state.mining.niterAutomation.completedDepths, curDepth];
-
-                       //console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
-
-                        // 进入下一层
-                        store.commit('mining/updateKey', { key: 'depth', value: newDepth });
-
-                        // 重置耐久
-                        newDurability = store.getters['mining/currentDurability'];
-                        store.commit('mining/updateKey', { key: 'durability', value: newDurability });
-
-                        // 更新自动挖硝状态
-                        store.commit('mining/updateKey', {
-                            key: 'niterAutomation',
-                            value: {
-                                ...store.state.mining.niterAutomation,
-                                currentDepth: newDepth,
-                                completedDepths: completedDepths,
-                                progress: `0/${breaksPerDepth}`,
-                                remainingBreaks: breaksPerDepth
-                            }
-                        });
-                        // 继续正常的挖矿循环，处理剩余的secondsLeft
-                        continue;
-                    }
-
-                    // 当前层每次挖掘需要多少点击
-                    const hitsPerBreak = store.getters['mining/currentHitsNeeded'];
-
-                    // 计算需要多少秒才能完成当前层的目标
-                    const secondsNeeded = hitsPerBreak * neededBreaks;
-                   //console.log(`[自动挖硝] 当前层 ${curDepth} 需要 ${secondsNeeded} 秒完成目标`);
-                   //console.log(`[自动挖硝] 当前秒数 ${secondsLeft} 秒`);
-                    if (secondsLeft >= secondsNeeded) {
-                        // 足够完成当前层目标
-                        awardLoot(neededBreaks, 0, secondsNeeded);
-                        // 消耗秒数
-                        secondsLeft -= secondsNeeded;
-
-                        // 记录完成的层
-                        const completedDepths = [...store.state.mining.niterAutomation.completedDepths, curDepth];
-
-                        // 进入下一层
-                        const newDepth = curDepth + 1;
-
-                        // 检查是否超出目标深度
-                        if (newDepth > targetDepth) {
-                           //console.log('[自动挖硝] 已达到目标深度，任务完成');
-                            store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
-                            // 继续正常的挖矿循环
-                            continue;
-                        }
-
-                       //console.log(`[自动挖硝] 完成 ${curDepth} 层，进入 ${newDepth} 层`);
-
-                        store.commit('mining/updateKey', { key: 'depth', value: newDepth });
-
-                        // 重置耐久
-                        newDurability = store.getters['mining/currentDurability'];
-                        store.commit('mining/updateKey', { key: 'durability', value: newDurability });
-
-                        // 更新自动挖硝状态
-                        store.commit('mining/updateKey', {
-                            key: 'niterAutomation',
-                            value: {
-                                ...store.state.mining.niterAutomation,
-                                currentDepth: newDepth,
-                                completedDepths: completedDepths,
-                                progress: `0/${breaksPerDepth}`,
-                                remainingBreaks: breaksPerDepth
-                            }
-                        });
-                        // 继续正常的挖矿循环，处理剩余的secondsLeft
-                        continue;
-                    } else {
-                        // 秒数不足以完成当前层目标，消耗所有剩余秒数
-                       //console.log(`[自动挖硝] 秒数不足以完成当前层目标，消耗所有剩余秒数`);
-                        const possibleBreaks = Math.floor(secondsLeft / hitsPerBreak);
-                        const remainingHits = secondsLeft % hitsPerBreak;
-
-                        if (possibleBreaks > 0) {
-                            // 奖励掉落
-                            awardLoot(possibleBreaks, remainingHits, secondsLeft);
-                        } else {
-                            // 连一次都挖不破，只奖励点击次数
-                            awardLoot(0, secondsLeft, secondsLeft);
-                        }
-
-                        // 更新耐久度
-                        newDurability = store.getters['mining/currentDurability'] - store.getters['mining/currentDamage'] * remainingHits;
-                        store.commit('mining/updateKey', { key: 'durability', value: newDurability });
-
-                        // 更新自动挖硝状态
-                        const updatedBreaks = store.getters['mining/currentBreaks'];
-                        store.commit('mining/updateKey', {
-                            key: 'niterAutomation',
-                            value: {
-                                ...store.state.mining.niterAutomation,
-                                progress: `${updatedBreaks}/${breaksPerDepth}`,
-                                remainingBreaks: breaksPerDepth - updatedBreaks
-                            }
-                        });
-
-                        // 消耗所有秒数
-                        secondsLeft = 0;
-                    }
-                } else {
-                    // 不在任务范围内，停止自动挖硝
-                   //console.log('[自动挖硝] 不在任务范围内，停止自动挖硝');
-                    store.commit('mining/updateKey', { key: 'niterAutomation', value: null });
-                }
-            }
-
                     let isLatest = maxDepth === store.state.mining.depth;
                     if (isLatest) {
                         // Get gasses for the first time
@@ -375,6 +215,93 @@ export default {
                         newDurability = store.getters['mining/currentDurability'];
                         store.dispatch('mining/applyBeaconEffects');
                     } else {
+                        if (store.state.mining.autoMining && store.state.mining.autoMining.isRunning) {
+                            const { startDepth, targetDepth, breaksPerDepth } = store.state.mining.autoMining.config;
+                            let curDepth = store.state.mining.depth;
+                            let curBreaks = store.getters['mining/currentBreaks'];
+
+                            store.commit('mining/updateKey', {
+                                key: 'autoMining',
+                                value: {
+                                    ...store.state.mining.autoMining,
+                                    currentDepth: curDepth,
+                                    progress: `${curBreaks}/${breaksPerDepth}`,
+                                    remainingBreaks: breaksPerDepth - curBreaks
+                                }
+                            });
+
+                            if (curDepth >= startDepth && curDepth <= targetDepth) {
+                                const neededBreaks = breaksPerDepth - curBreaks;
+                                if (neededBreaks <= 0) {
+                                    const newDepth = curDepth + 1;
+
+                                    if (newDepth > targetDepth) {
+                                        const jumpToDepth = store.state.mining.autoMining.config.jumpToDepthAfterComplete || targetDepth;
+                                        store.commit('mining/updateKey', { key: 'depth', value: jumpToDepth });
+                                        store.commit('mining/updateKey', { key: 'durability', value: store.getters['mining/currentDurability'] });
+                                        store.commit('mining/updateKey', { key: 'autoMining', value: null });
+                                        continue;
+                                    }
+
+                                    const completedDepths = [...store.state.mining.autoMining.completedDepths, curDepth];
+
+                                    awardLoot(breaks, loots, preHits);
+                                    store.commit('mining/updateKey', { key: 'depth', value: newDepth });
+                                    store.commit('mining/updateKey', {key: 'durability', value: store.getters['mining/currentDurability']});
+
+                                    store.commit('mining/updateKey', {
+                                        key: 'autoMining',
+                                        value: {
+                                            ...store.state.mining.autoMining,
+                                            currentDepth: newDepth,
+                                            completedDepths: completedDepths,
+                                            progress: `0/${breaksPerDepth}`,
+                                            remainingBreaks: breaksPerDepth
+                                        }
+                                    });
+                                    continue;
+                                } else {
+                                    const hitsPerBreak = store.getters['mining/hitsNeeded'];
+                                    const secondsNeeded = hitsPerBreak * neededBreaks;
+                                    if (secondsLeft >= secondsNeeded) {
+                                        store.commit('stat/add', {feature: 'mining', name: 'totalDamage', value: secondsNeeded * store.getters['mining/currentDamage']});
+                                        breaks += neededBreaks;
+                                        loots += secondsNeeded;
+                                        secondsLeft -= secondsNeeded;
+                                        awardLoot(breaks, loots, loots);
+
+                                        const completedDepths = [...store.state.mining.autoMining.completedDepths, curDepth];
+
+                                        const newDepth = curDepth + 1;
+
+                                        if (newDepth > targetDepth) {
+                                            const jumpToDepth = store.state.mining.autoMining.config.jumpToDepthAfterComplete || targetDepth;
+                                            store.commit('mining/updateKey', { key: 'depth', value: jumpToDepth });
+                                            store.commit('mining/updateKey', { key: 'durability', value: store.getters['mining/currentDurability'] });
+                                            store.commit('mining/updateKey', { key: 'autoMining', value: null });
+                                            continue;
+                                        }
+
+                                        store.commit('mining/updateKey', { key: 'depth', value: newDepth });
+                                        store.commit('mining/updateKey', {key: 'durability', value: store.getters['mining/currentDurability']});
+
+                                        store.commit('mining/updateKey', {
+                                            key: 'autoMining',
+                                            value: {
+                                                ...store.state.mining.autoMining,
+                                                currentDepth: newDepth,
+                                                completedDepths: completedDepths,
+                                                progress: `0/${breaksPerDepth}`,
+                                                remainingBreaks: breaksPerDepth
+                                            }
+                                        });
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                store.commit('mining/updateKey', { key: 'autoMining', value: null });
+                            }
+                        }
                         store.commit('stat/add', {feature: 'mining', name: 'totalDamage', value: secondsLeft * store.getters['mining/currentDamage']});
                         breaks += Math.floor(secondsLeft / store.getters['mining/hitsNeeded']);
                         loots += secondsLeft;
@@ -640,12 +567,11 @@ export default {
             pickaxePower: store.state.mining.pickaxePower,
         };
 
-        // 保存自动挖硝状态
-        if (store.state.mining.niterAutomation) {
-            obj.niterAutomation = store.state.mining.niterAutomation;
+        if (store.state.mining.autoMining) {
+            obj.autoMining = store.state.mining.autoMining;
         }
-        if (store.state.mining.niterAutomationStatus) {
-            obj.niterAutomationStatus = store.state.mining.niterAutomationStatus;
+        if (store.state.mining.autoMiningStatus) {
+            obj.autoMiningStatus = store.state.mining.autoMiningStatus;
         }
 
         if (store.state.mining.breaks.length > 0) {
@@ -698,11 +624,19 @@ export default {
         return obj;
     },
     loadGame(data) {
-        ['depth', 'durability', 'pickaxePower', 'breaks', 'ingredientList', 'enhancementBars', 'enhancementIngredient', 'resin', 'beaconPlaced', 'beaconCooldown', 'niterAutomation', 'niterAutomationStatus', 'smelteryQueue'].forEach(elem => {
+        ['depth', 'durability', 'pickaxePower', 'breaks', 'ingredientList', 'enhancementBars', 'enhancementIngredient', 'resin', 'beaconPlaced', 'beaconCooldown', 'autoMining', 'autoMiningStatus', 'smelteryQueue'].forEach(elem => {
             if (data[elem] !== undefined) {
                 store.commit('mining/updateKey', {key: elem, value: data[elem]});
             }
         });
+
+        // 向后兼容：处理旧版本的niterAutomation数据
+        if (data.niterAutomation !== undefined) {
+            store.commit('mining/updateKey', {key: 'autoMining', value: data.niterAutomation});
+        }
+        if (data.niterAutomationStatus !== undefined) {
+            store.commit('mining/updateKey', {key: 'autoMiningStatus', value: data.niterAutomationStatus});
+        }
         if (data.smeltery !== undefined) {
             for (const [key, elem] of Object.entries(data.smeltery)) {
                 if (store.state.mining.smeltery[key] !== undefined) {

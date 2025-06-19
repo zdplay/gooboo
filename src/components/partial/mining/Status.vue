@@ -33,29 +33,30 @@
 <template>
   <div class="ma-1">
     <div class="d-flex justify-center align-center ma-1">
-      <v-btn icon :disabled="depth <= 1 || isFrozen" @click="depthMin"><v-icon>mdi-skip-backward</v-icon></v-btn>
-      <v-btn icon :disabled="depth <= 1 || isFrozen" @click="depthPrev10"><v-icon>mdi-step-backward-2</v-icon></v-btn>
-      <v-btn icon :disabled="depth <= 1 || isFrozen" @click="depthPrev"><v-icon>mdi-step-backward</v-icon></v-btn>
+      <v-btn icon :disabled="depth <= 1 || isFrozen || isAutoMiningRunning" @click="depthMin"><v-icon>mdi-skip-backward</v-icon></v-btn>
+      <v-btn icon :disabled="depth <= 1 || isFrozen || isAutoMiningRunning" @click="depthPrev10"><v-icon>mdi-step-backward-2</v-icon></v-btn>
+      <v-btn icon :disabled="depth <= 1 || isFrozen || isAutoMiningRunning" @click="depthPrev"><v-icon>mdi-step-backward</v-icon></v-btn>
       <span class="mx-1">{{ depth }}m</span>
-      <v-btn icon :disabled="isDeepest || isFrozen" @click="depthNext"><v-icon>mdi-step-forward</v-icon></v-btn>
-      <v-btn icon :disabled="isDeepest || isFrozen" @click="depthNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
-      <v-btn icon :disabled="isDeepest || isFrozen" @click="depthMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
+      <v-btn icon :disabled="isDeepest || isFrozen || isAutoMiningRunning" @click="depthNext"><v-icon>mdi-step-forward</v-icon></v-btn>
+      <v-btn icon :disabled="isDeepest || isFrozen || isAutoMiningRunning" @click="depthNext10"><v-icon>mdi-step-forward-2</v-icon></v-btn>
+      <v-btn icon :disabled="isDeepest || isFrozen || isAutoMiningRunning" @click="depthMax"><v-icon>mdi-skip-forward</v-icon></v-btn>
       
-      <v-tooltip bottom v-if="canShowNiterAutomation">
+      <v-tooltip bottom v-if="canShowAutoMining">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn 
-            icon 
-            color="primary" 
-            class="ml-2" 
-            :class="{'amber lighten-1': isNiterAutoRunning}"
-            v-bind="attrs" 
+          <v-btn
+            icon
+            color="primary"
+            class="ml-2"
+            :class="{'amber lighten-1': isAutoMiningRunning}"
+            :disabled="isFrozen"
+            v-bind="attrs"
             v-on="on"
-            @click="showNiterAutomationPanel = !showNiterAutomationPanel"
+            @click="showAutoMiningPanel = !showAutoMiningPanel"
           >
             <v-icon>mdi-robot</v-icon>
           </v-btn>
         </template>
-        <span>自动挖烧硝</span>
+        <span>{{ isFrozen ? '冻结时无法使用自动挖掘' : '自动挖掘' }}</span>
       </v-tooltip>
     </div>
     <gb-tooltip :title-text="$vuetify.lang.t('$vuetify.mining.durability')">
@@ -185,115 +186,230 @@
     </div>
     <alert-text v-if="showScrapHint" class="ma-1" type="info">{{ $vuetify.lang.t('$vuetify.mining.scrapGainHint') }}</alert-text>
     
-    <!-- 自动挖烧硝设置面板 -->
-    <v-card v-if="canShowNiterAutomation && showNiterAutomationPanel" class="ma-1 pa-2 position-relative">
-      <div class="d-flex flex-column">
-        <v-card-title class="text-h6 justify-center">
-          <v-icon class="mr-2">mdi-cogs</v-icon>
-          自动挖烧硝
+    <!-- 全新自动挖掘界面 -->
+    <v-dialog v-model="showAutoMiningPanel" v-if="canShowAutoMining" max-width="800" @click:outside="closeAutoMiningPanel">
+      <v-card class="default-card auto-mining-dialog">
+        <!-- 头部 -->
+        <v-card-title>
+          <v-icon class="mr-3">mdi-robot</v-icon>
+          <span class="text-h5">智能自动挖掘</span>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeAutoMiningPanel">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </v-card-title>
-        
-        <v-card-subtitle class="text-center">
-          自动挖掘指定次数后切换到下一层，直到目标层。支持离线运行。
-        </v-card-subtitle>
-      </div>
 
-      <v-card-text>
-        <v-alert v-if="!canUseNiter" type="warning" dense>
-          必须达到第 {{ MINING_NITER_DEPTH }} 层才能挖掘烧硝
-        </v-alert>
-        
-        <div v-else>
-          <v-text-field
-            v-model.number="niterAutoStartDepth"
-            type="number"
-            min="130"
-            :max="maxDepth"
-            label="起始深度"
-            outlined
-            dense
-            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
-            :hint="`起始挖掘层，最小 130，最大 ${maxDepth}`"
-            persistent-hint
-            class="hint-text"
-          ></v-text-field>
 
-          <v-text-field
-            v-model.number="niterAutoTargetDepth"
-            type="number"
-            min="130"
-            :max="maxDepth"
-            label="目标深度"
-            outlined
-            dense
-            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
-            :hint="`挖掘到此深度后停止，最小 130，最大 ${maxDepth}`"
-            persistent-hint
-            class="hint-text"
-          ></v-text-field>
 
-          <v-radio-group
-            v-model="niterAutoBreaksPerDepth"
-            row
-            :disabled="isNiterAutoRunning || niterAutoStoppingInProgress"
-            label="每层目标挖破次数"
-            class="mt-3 py-2 px-3 rounded"
-            :class="$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-4'"
+        <v-card-text class="pa-6">
+          <!-- 警告提示 -->
+          <v-alert v-if="maxDepth < 10" type="warning" outlined class="mb-4">
+            <v-icon slot="prepend">mdi-alert</v-icon>
+            建议达到第10层后再使用自动挖掘功能
+          </v-alert>
+
+          <!-- 主要配置区域 -->
+          <v-container fluid class="pa-0" v-else>
+            <!-- 深度配置 (运行时隐藏) -->
+            <v-row v-if="!isAutoMiningRunning">
+              <v-col cols="12" md="6">
+                <v-card outlined class="depth-config">
+                  <v-card-subtitle class="pb-2">
+                    <v-icon small class="mr-2" color="primary">mdi-map-marker-distance</v-icon>
+                    深度范围
+                  </v-card-subtitle>
+                  <v-card-text class="pt-0">
+                    <v-text-field
+                      v-model.number="autoMiningStartDepth"
+                      type="number"
+                      min="1"
+                      :max="maxDepth"
+                      label="起始深度"
+                      outlined
+                      dense
+                      :disabled="isAutoMiningRunning || autoMiningStoppingInProgress"
+                      prepend-inner-icon="mdi-flag-checkered"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model.number="autoMiningTargetDepth"
+                      type="number"
+                      :min="autoMiningStartDepth"
+                      :max="maxDepth"
+                      label="目标深度"
+                      outlined
+                      dense
+                      :disabled="isAutoMiningRunning || autoMiningStoppingInProgress"
+                      prepend-inner-icon="mdi-flag"
+                    ></v-text-field>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-card outlined class="breaks-config">
+                  <v-card-subtitle class="pb-2">
+                    <v-icon small class="mr-2" color="orange">mdi-hammer</v-icon>
+                    挖破配置
+                  </v-card-subtitle>
+                  <v-card-text class="pt-0">
+                    <v-btn-toggle
+                      v-model="autoMiningBreaksPerDepth"
+                      mandatory
+                      :disabled="isAutoMiningRunning || autoMiningStoppingInProgress"
+                      class="d-flex flex-column"
+                    >
+                      <v-btn :value="1" small class="mb-1">1次</v-btn>
+                      <v-btn :value="10" small class="mb-1">10次</v-btn>
+                      <v-btn :value="100" small class="mb-1">100次</v-btn>
+                      <v-btn :value="1000" small>1000次</v-btn>
+                    </v-btn-toggle>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+
+            <!-- 预算估算 (始终显示) -->
+            <v-card outlined class="mt-4">
+              <v-card-subtitle class="pb-2">
+                <v-icon small class="mr-2" color="success">mdi-calculator</v-icon>
+                预算估算
+              </v-card-subtitle>
+              <v-card-text class="pt-0">
+                <div class="d-flex" style="gap: 8px;">
+                  <div class="flex-grow-1 text-center">
+                    <v-avatar size="36" color="primary" class="mb-1">
+                      <v-icon color="white" size="20">mdi-clock</v-icon>
+                    </v-avatar>
+                    <div class="caption grey--text">预计用时</div>
+                    <div class="body-2 primary--text font-weight-bold">{{ $formatTime(estimatedTime) }}</div>
+                  </div>
+                  <div class="flex-grow-1 text-center">
+                    <div v-if="autoMiningTargetDepth >= MINING_NITER_DEPTH && estimatedNiter > 0">
+                      <v-avatar size="36" color="success" class="mb-1">
+                        <v-icon color="white" size="20">mdi-diamond</v-icon>
+                      </v-avatar>
+                      <div class="caption grey--text">预计硝石</div>
+                      <div class="body-2 success--text font-weight-bold">{{ $formatNum(estimatedNiter) }}</div>
+                    </div>
+                    <div v-else>
+                      <v-avatar size="36" color="grey" class="mb-1">
+                        <v-icon color="white" size="20">mdi-diamond-outline</v-icon>
+                      </v-avatar>
+                      <div class="caption grey--text">预计硝石</div>
+                      <div class="body-2 grey--text">无硝石收益</div>
+                    </div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+
+            <!-- 跳转配置 (运行时隐藏) -->
+            <v-card v-if="!isAutoMiningRunning" outlined class="mt-4">
+              <v-card-subtitle class="pb-2">
+                <v-icon small class="mr-2" color="info">mdi-map-marker</v-icon>
+                完成跳转
+              </v-card-subtitle>
+              <v-card-text class="pt-0">
+                <v-text-field
+                  v-model.number="autoMiningJumpToDepth"
+                  type="number"
+                  min="1"
+                  :max="maxDepth"
+                  label="跳转层数"
+                  outlined
+                  dense
+                  :disabled="isAutoMiningRunning || autoMiningStoppingInProgress"
+                  prepend-inner-icon="mdi-target"
+                ></v-text-field>
+              </v-card-text>
+            </v-card>
+
+            <!-- 运行状态详情 (始终显示) -->
+            <v-card v-if="isAutoMiningRunning" outlined class="mt-4 status-detail">
+              <v-card-subtitle class="pb-2">
+                <v-icon small class="mr-2" color="success">mdi-information</v-icon>
+                运行状况
+              </v-card-subtitle>
+              <v-card-text class="pt-0">
+                <!-- 深度和跳转信息 -->
+                <v-row class="mb-3">
+                  <v-col cols="12" md="4">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2" color="primary">mdi-flag-checkered</v-icon>
+                      <span>当前深度: <strong class="primary--text">{{ autoMiningStatus.currentDepth }}m</strong></span>
+                    </div>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2" color="orange">mdi-flag</v-icon>
+                      <span>目标深度: <strong class="orange--text">{{ autoMiningTargetDepth }}m</strong></span>
+                    </div>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2" color="info">mdi-target</v-icon>
+                      <span>完成跳转: <strong class="info--text">{{ autoMiningJumpToDepth }}m</strong></span>
+                    </div>
+                  </v-col>
+                </v-row>
+
+                <v-divider class="mb-3"></v-divider>
+
+                <!-- 运行状态信息 -->
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2">mdi-progress-check</v-icon>
+                      <span>当前进度: <strong>{{ autoMiningStatus.breaksThisSession }}/{{ autoMiningBreaksPerDepth }}</strong></span>
+                    </div>
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2">mdi-timer</v-icon>
+                      <span>还需: <strong>{{ autoMiningStatus.breaksNeeded }} 次</strong></span>
+                    </div>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2">mdi-check-all</v-icon>
+                      <span>已完成: <strong>{{ autoMiningStatus.completedDepths.length }} 层</strong></span>
+                    </div>
+                    <div class="d-flex align-center mb-2">
+                      <v-icon small class="mr-2">mdi-hammer</v-icon>
+                      <span>每层目标: <strong>{{ autoMiningBreaksPerDepth }} 次</strong></span>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-container>
+        </v-card-text>
+
+        <!-- 操作按钮 -->
+        <v-card-actions class="pa-6 pt-0">
+          <v-spacer></v-spacer>
+          <v-btn
+            v-if="!isAutoMiningRunning"
+            large
+            color="primary"
+            :disabled="!canStartAutoMining || autoMiningStoppingInProgress"
+            @click="startAutoMining"
           >
-            <v-radio label="10次" :value="10"></v-radio>
-            <v-radio label="100次" :value="100"></v-radio>
-            <v-radio label="1000次" :value="1000"></v-radio>
-          </v-radio-group>
-
-          <v-divider class="my-4"></v-divider>
-
-          <div v-if="isNiterAutoRunning" class="text-center mb-4">
-            <div class="subtitle-1">当前状态: 
-              <span v-if="niterAutoStatus.currentState === 'starting'" class="primary--text">正在开始</span>
-              <span v-else-if="niterAutoStatus.currentState === 'mining'" class="success--text">挖掘中</span>
-              <span v-else-if="niterAutoStatus.currentState === 'finished'" class="info--text">已完成</span>
-              <span v-else class="grey--text">空闲</span>
-            </div>
-            
-            <div class="subtitle-1">当前深度: {{ niterAutoStatus.currentDepth }}m</div>
-            <div class="subtitle-1">当前层进度: {{ niterAutoStatus.breaksThisSession }}/{{ niterAutoBreaksPerDepth }} 被挖破次数</div>
-            <div class="subtitle-1">还需: {{ niterAutoStatus.breaksNeeded }} 次挖破</div>
-            
-            <v-progress-linear
-              :value="niterAutoStatus.progress"
-              height="20"
-              color="success"
-              class="my-2"
-            >
-              {{ niterAutoStatus.progress }}%
-            </v-progress-linear>
-            
-            <div class="subtitle-2">已完成层数: {{ niterAutoStatus.completedDepths.length }}</div>
-          </div>
-
-          <div class="d-flex justify-center mt-2">
-            <v-btn
-              color="primary"
-              :disabled="isNiterAutoRunning || !canStartNiterAuto || niterAutoStoppingInProgress"
-              @click="startNiterAutomation"
-            >
-              <v-icon left>mdi-play</v-icon>
-              开始挖掘
-            </v-btn>
-            <v-btn
-              color="error"
-              class="ml-4"
-              :loading="niterAutoStoppingInProgress"
-              :disabled="!isNiterAutoRunning && !niterAutoStoppingInProgress"
-              @click="stopNiterAutomation"
-            >
-              <v-icon left>mdi-stop</v-icon>
-              停止
-            </v-btn>
-          </div>
-        </div>
-      </v-card-text>
-    </v-card>
+            <v-icon left>mdi-play</v-icon>
+            开始挖掘
+          </v-btn>
+          <!-- 运行时只显示停止按钮 -->
+          <v-btn
+            v-if="isAutoMiningRunning"
+            large
+            color="error"
+            :loading="autoMiningStoppingInProgress"
+            @click="stopAutoMining"
+          >
+            <v-icon left>mdi-stop</v-icon>
+            停止挖掘
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     
     <div class="d-flex justify-space-around mt-8 mt-lg-12">
       <gb-tooltip v-if="unlock.miningPickaxeCrafting.see" :min-width="0">
@@ -393,13 +509,14 @@ export default {
       glowshard: MINING_GLOWSHARD_DEPTH,
     },
     showBeacons: false,
-    showNiterAutomationPanel: false,
-    niterAutoStatusTimer: null,
-    niterAutoStartDepth: MINING_NITER_DEPTH,
-    niterAutoTargetDepth: MINING_NITER_DEPTH + 20,
-    niterAutoBreaksPerDepth: 10,
-    niterAutoStoppingInProgress: false,
-    showMiningOverview: false // 添加控制矿层总览显示的数据
+    showAutoMiningPanel: false,
+    autoMiningStatusTimer: null,
+    autoMiningStartDepth: 1,
+    autoMiningTargetDepth: 50,
+    autoMiningBreaksPerDepth: 100,
+    autoMiningJumpToDepth: 1,
+    autoMiningStoppingInProgress: false,
+    showMiningOverview: false
   }),
   computed: {
     ...mapState({
@@ -412,7 +529,7 @@ export default {
       subfeature: state => state.system.features.mining.currentSubfeature,
       beacon: state => state.mining.beacon,
       isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.mining.active || state.cryolab.mining.freeze) : state.cryolab.mining.active,
-      niterAutomation: state => state.mining.niterAutomation
+      autoMining: state => state.mining.autoMining
     }),
     ...mapGetters({
       damage: 'mining/damage',
@@ -513,14 +630,14 @@ export default {
         return [];
       }
     },
-    canShowNiterAutomation() {
+    canShowAutoMining() {
       return true;
     },
-    isNiterAutoRunning() {
-      return this.niterAutomation && this.niterAutomation.isRunning;
+    isAutoMiningRunning() {
+      return this.autoMining && this.autoMining.isRunning;
     },
-    niterAutoStatus() {
-      if (!this.niterAutomation) {
+    autoMiningStatus() {
+      if (!this.autoMining) {
         return {
           isRunning: false,
           currentState: 'idle',
@@ -531,61 +648,125 @@ export default {
           progress: 0
         };
       }
-      
-      const breaksNeeded = Math.max(0, 
-        (this.niterAutomation.config.breaksPerDepth || 10) - this.currentBreaks);
-      
-      const progress = Math.min(100, Math.round((this.currentBreaks / 
-        (this.niterAutomation.config.breaksPerDepth || 10)) * 100));
-        
+
+      const breaksNeeded = Math.max(0,
+        (this.autoMining.config.breaksPerDepth || 10) - this.currentBreaks);
+
+      const progress = Math.min(100, Math.round((this.currentBreaks /
+        (this.autoMining.config.breaksPerDepth || 10)) * 100));
+
       return {
-        isRunning: this.niterAutomation.isRunning,
-        currentState: this.niterAutomation.currentState || 'mining',
-        config: this.niterAutomation.config,
-        currentDepth: this.niterAutomation.currentDepth || this.depth,
+        isRunning: this.autoMining.isRunning,
+        currentState: this.autoMining.currentState || 'mining',
+        config: this.autoMining.config,
+        currentDepth: this.autoMining.currentDepth || this.depth,
         maxDepth: this.maxDepth,
         currentBreaks: this.currentBreaks,
         breaksThisSession: this.currentBreaks,
-        breaksNeeded: this.niterAutomation.remainingBreaks || breaksNeeded,
-        completedDepths: this.niterAutomation.completedDepths || [],
+        breaksNeeded: this.autoMining.remainingBreaks || breaksNeeded,
+        completedDepths: this.autoMining.completedDepths || [],
         progress: progress
       };
     },
-    canStartNiterAuto() {
-      return this.niterAutoStartDepth <= this.maxDepth && this.niterAutoTargetDepth <= this.maxDepth;
+    canStartAutoMining() {
+      return !this.isFrozen && this.autoMiningStartDepth <= this.maxDepth && this.autoMiningTargetDepth <= this.maxDepth && this.autoMiningStartDepth <= this.autoMiningTargetDepth;
     },
-    canUseNiter() {
-      return this.maxDepth >= MINING_NITER_DEPTH;
+    // 计算默认目标深度（深度降序击破时间为1的第一个）
+    calculateDefaultTargetDepth() {
+      for (let depth = this.maxDepth; depth >= this.autoMiningStartDepth; depth--) {
+        const hitsNeeded = this.$store.getters['mining/depthHitsNeeded'](depth);
+        if (hitsNeeded <= 1) {
+          return depth;
+        }
+      }
+      return Math.min(this.maxDepth, this.autoMiningStartDepth + 10); // 默认值
+    },
+
+    // 预计用时和硝石计算（过滤已符合条件的层数）
+    estimatedTime() {
+      let neededTime = 0;
+      for (let i = 0; i < this.maxDepth - 1; i++) {
+        const breaks = this.$store.state.mining.breaks[i] || 0;
+        const time = this.$store.getters['mining/depthHitsNeeded'](i + 1);
+        if (i >= this.autoMiningStartDepth - 1 && i < this.autoMiningTargetDepth) {
+          // 只计算还需要挖掘的次数，如果已经达到或超过目标则跳过
+          if (breaks < this.autoMiningBreaksPerDepth) {
+            neededTime += (this.autoMiningBreaksPerDepth - breaks) * time;
+          }
+        }
+      }
+      return neededTime;
+    },
+    estimatedNiter() {
+      let niter = 0;
+      for (let i = 0; i < this.maxDepth - 1; i++) {
+        const depth = i + 1;
+        const currentBreaks = this.$store.state.mining.breaks[i] || 0;
+
+        // 只计算130层以上且在范围内的层数
+        if (depth >= MINING_NITER_DEPTH &&
+            i >= this.autoMiningStartDepth - 1 &&
+            i < this.autoMiningTargetDepth) {
+          // 只计算还需要挖掘的层数，过滤掉已经符合条件的
+          if (currentBreaks < this.autoMiningBreaksPerDepth) {
+            // 计算从当前挖掘次数到目标次数之间能获得多少次硝石
+            const niterCount = this.calculateNiterGains(currentBreaks, this.autoMiningBreaksPerDepth);
+            if (niterCount > 0) {
+              const base = 100 + (depth - MINING_NITER_DEPTH) * 5;
+              const final = this.$store.getters['mult/get']('currencyMiningNiterGain', base);
+              niter += niterCount * final;
+            }
+          }
+        }
+      }
+      return Math.floor(niter);
     },
   },
   created() {
-    this.niterAutoStatusTimer = setInterval(() => {
+    this.autoMiningStatusTimer = setInterval(() => {
       this.$forceUpdate();
     }, 500);
-    
-    // 初始化自动挖硝设置，如果有现有任务则使用任务配置的值
-    if (this.niterAutomation && this.niterAutomation.config) {
-      this.niterAutoStartDepth = this.niterAutomation.config.startDepth;
-      this.niterAutoTargetDepth = this.niterAutomation.config.targetDepth;
-      this.niterAutoBreaksPerDepth = this.niterAutomation.config.breaksPerDepth;
-    }
+
+    // 初始化自动挖掘设置
+    this.initializeAutoMiningSettings();
   },
   beforeDestroy() {
-    if (this.niterAutoStatusTimer) {
-      clearInterval(this.niterAutoStatusTimer);
-      this.niterAutoStatusTimer = null;
+    if (this.autoMiningStatusTimer) {
+      clearInterval(this.autoMiningStatusTimer);
+      this.autoMiningStatusTimer = null;
     }
   },
   watch: {
-    niterAutomation: {
+    autoMining: {
       handler(newVal) {
         if (newVal && newVal.config) {
-          this.niterAutoStartDepth = newVal.config.startDepth;
-          this.niterAutoTargetDepth = newVal.config.targetDepth;
-          this.niterAutoBreaksPerDepth = newVal.config.breaksPerDepth;
+          this.autoMiningStartDepth = newVal.config.startDepth;
+          this.autoMiningTargetDepth = newVal.config.targetDepth;
+          this.autoMiningBreaksPerDepth = newVal.config.breaksPerDepth;
         }
       },
       deep: true
+    },
+    maxDepth: {
+      handler() {
+        this.initializeAutoMiningSettings();
+      }
+    },
+    showAutoMiningPanel: {
+      handler(newVal) {
+        if (newVal && !this.isAutoMiningRunning) {
+          // 面板打开且没有运行任务时，重新计算设置
+          this.calculateOptimalSettings();
+        }
+      }
+    },
+    isFrozen: {
+      handler(newVal) {
+        if (newVal && this.isAutoMiningRunning) {
+          // 如果挖矿被冻结且自动挖矿正在运行，则停止自动挖矿
+          this.stopAutoMining();
+        }
+      }
     }
   },
   methods: {
@@ -628,41 +809,128 @@ export default {
       this.$store.commit('system/updateTutorialKey', {name: 'miningDepth', key: 'completed', value: true});
       this.resetDurability();
     },
-    startNiterAutomation() {
-      if (!this.canStartNiterAuto || this.isNiterAutoRunning || this.niterAutoStoppingInProgress) {
+    initializeAutoMiningSettings() {
+      if (this.autoMining && this.autoMining.config) {
+        // 如果已经开启任务，显示任务开始时设定的数据
+        this.autoMiningStartDepth = this.autoMining.config.startDepth;
+        this.autoMiningTargetDepth = this.autoMining.config.targetDepth;
+        this.autoMiningBreaksPerDepth = this.autoMining.config.breaksPerDepth;
+        this.autoMiningJumpToDepth = this.autoMining.config.jumpToDepthAfterComplete || this.autoMining.config.targetDepth;
+      } else {
+        // 如果没有开启任务，每次点开功能则计算一次各个框的数据
+        this.calculateOptimalSettings();
+      }
+    },
+    calculateOptimalSettings() {
+      // 智能起始深度逻辑
+      if (this.maxDepth < 130) {
+        this.autoMiningStartDepth = 1;
+      } else {
+        this.autoMiningStartDepth = 130; // 恢复130层逻辑
+      }
+
+      // 计算默认目标深度
+      this.autoMiningTargetDepth = this.calculateDefaultTargetDepth;
+
+      // 默认跳转到当前层
+      this.autoMiningJumpToDepth = this.depth;
+    },
+
+    // 精确计算从startBreaks到endBreaks之间能获得多少次硝石
+    calculateNiterGains(startBreaks, endBreaks) {
+      if (startBreaks >= endBreaks) {
+        return 0;
+      }
+
+      let niterCount = 0;
+
+      // 硝石获得条件：当 log10(breaks + 1) 为整数时获得硝石
+      // 即当 breaks + 1 = 10^n 时，也就是 breaks = 10^n - 1
+
+      // 找到起始点之后的第一个硝石获得点
+      let currentPower = Math.floor(Math.log10(startBreaks + 1)) + 1;
+
+      // 设置合理上限，防止无限循环
+      const maxPower = 10;
+
+      while (currentPower <= maxPower) {
+        const niterBreaks = Math.pow(10, currentPower) - 1;
+
+        // 如果这个硝石获得点超过了目标挖掘次数，停止计算
+        if (niterBreaks >= endBreaks) {
+          break;
+        }
+
+        // 如果这个硝石获得点在我们的范围内，计数
+        if (niterBreaks > startBreaks) {
+          niterCount++;
+        }
+
+        currentPower++;
+      }
+
+      return niterCount;
+    },
+    startAutoMining() {
+      if (!this.canStartAutoMining || this.isAutoMiningRunning || this.autoMiningStoppingInProgress) {
         return;
       }
-      
-      const startDepth = parseInt(this.niterAutoStartDepth) || MINING_NITER_DEPTH;
-      const targetDepth = parseInt(this.niterAutoTargetDepth) || (MINING_NITER_DEPTH + 20);
-      const breaksPerDepth = parseInt(this.niterAutoBreaksPerDepth) || 10;
-      
-      // 保存当前设置值
-      this.niterAutoStartDepth = startDepth;
-      this.niterAutoTargetDepth = targetDepth;
-      this.niterAutoBreaksPerDepth = breaksPerDepth;
-      
+
+      const startDepth = parseInt(this.autoMiningStartDepth) || 1;
+      const targetDepth = parseInt(this.autoMiningTargetDepth) || 50;
+      const breaksPerDepth = parseInt(this.autoMiningBreaksPerDepth) || 10;
+      const jumpToDepth = parseInt(this.autoMiningJumpToDepth) || this.depth;
+
+      this.autoMiningStartDepth = startDepth;
+      this.autoMiningTargetDepth = targetDepth;
+      this.autoMiningBreaksPerDepth = breaksPerDepth;
+      this.autoMiningJumpToDepth = jumpToDepth;
+
       const config = {
         startDepth: startDepth,
         targetDepth: targetDepth,
-        breaksPerDepth: breaksPerDepth
+        breaksPerDepth: breaksPerDepth,
+        jumpToDepthAfterComplete: jumpToDepth
       };
-      
-      this.$store.dispatch('mining/startNiterAutomation', config);
+
+      this.$store.dispatch('mining/startAutoMining', config);
     },
-    stopNiterAutomation() {
-      if (!this.isNiterAutoRunning) {
+    stopAutoMining() {
+      if (!this.isAutoMiningRunning) {
         return;
       }
-      
-      this.niterAutoStoppingInProgress = true;
-      
-      this.$store.commit('mining/updateKey', {key: 'niterAutomation', value: null});
-      
+
+      this.autoMiningStoppingInProgress = true;
+
+      // 执行跳转逻辑（如果启用）
+      if (this.autoMining && this.autoMining.config && this.autoMining.config.jumpToDepthAfterComplete) {
+        const jumpToDepth = this.autoMining.config.jumpToDepthAfterComplete;
+        this.$store.commit('mining/updateKey', { key: 'depth', value: jumpToDepth });
+        this.$store.commit('mining/updateKey', { key: 'durability', value: this.$store.getters['mining/currentDurability'] });
+      }
+
+      this.$store.commit('mining/updateKey', {key: 'autoMining', value: null});
+
       setTimeout(() => {
-        this.niterAutoStoppingInProgress = false;
+        this.autoMiningStoppingInProgress = false;
       }, 500);
+    },
+    closeAutoMiningPanel() {
+      this.showAutoMiningPanel = false;
     }
   }
 }
 </script>
+
+<style scoped>
+.auto-mining-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.v-btn-toggle .v-btn {
+  width: 100% !important;
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+}
+</style>

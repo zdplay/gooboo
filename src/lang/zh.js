@@ -508,7 +508,7 @@ export default {
     villageFrozenWarning: '村庄被冻结',
     noIceMakerHint: '可以通过村庄工种【搬冰工】恢复可用冷冻时间',
     iceClawsBonus: '冰爪装备加成',
-    iceClawsHint: '可通过部落装备【冰爪】获得可用冷冻时间'
+    iceClawsHint: '可通过部落装备【冰爪】获得可用冷冻时间（部落声望需要达到2小时后才会显示该装备）'
   },
   general: {
     completionReward: '完成奖励',

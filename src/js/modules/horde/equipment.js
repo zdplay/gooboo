@@ -51,7 +51,7 @@ export default {
     },
     iceClaws: {
         findZone: 5,
-        findChance: 1,
+
         price(lvl) {
             return Math.pow(2, lvl - 1) * 120;
         },
