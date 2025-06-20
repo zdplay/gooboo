@@ -33,6 +33,14 @@
 .crop-name-small {
   font-size: 8px;
 }
+.watered-crop {
+  filter: brightness(1.2) saturate(1.3);
+  transition: filter 0.3s ease;
+}
+
+.theme--dark .watered-crop {
+  filter: brightness(1.3) saturate(1.4);
+}
 </style>
 
 <template>
@@ -46,7 +54,7 @@
         <div :class="{'crop-headline-small': $vuetify.breakpoint.smAndDown}" v-else>
           <span>{{ $formatTime(Math.ceil(60 * (1 - item.grow) / item.cache.grow)) }}</span>
         </div>
-        <v-icon :size="iconSize" :color="crop.color">{{ crop.icon }}</v-icon>
+        <v-icon :size="iconSize" :color="crop.color" :class="wateringClasses">{{ crop.icon }}</v-icon>
         <div class="crop-name" :class="{'crop-name-small': $vuetify.breakpoint.smAndDown}" v-if="showCropName && item.crop">
           {{ $vuetify.lang.t(`$vuetify.farm.crop.${ item.crop }`) }}
         </div>
@@ -58,6 +66,7 @@
           <v-icon :size="buildingIconSize" v-if="item.cache.flag" class="mr-05">mdi-flag</v-icon>
           <v-icon :size="buildingIconSize" v-if="item.cache.gnome" class="mr-05">mdi-human-child</v-icon>
           <v-icon :size="buildingIconSize" v-if="item.cache.lonely" class="mr-05">mdi-circle-expand</v-icon>
+          <v-icon :size="buildingIconSize" v-if="$store.state.system.settings.experiment.items.farmWatering.value && isWatered" class="mr-05" color="blue">mdi-water</v-icon>
         </div>
       </div>
     </template>
@@ -65,6 +74,10 @@
       <div>下一阶段: {{ $formatTime(nextStage) }}</div>
       <div v-if="item.fertilizer">肥料: {{ item.fertilizer ? $vuetify.lang.t(`$vuetify.consumable.farm_${ item.fertilizer }.name`) : '无' }}</div>
       <div v-if="isGrown">已成熟，可以收获</div>
+      <div v-if="$store.state.system.settings.experiment.items.farmWatering.value && isWatered" class="text--primary">
+        <v-icon small color="blue">mdi-water</v-icon>
+        浇水剩余时间: {{ $formatTime(Math.max(0, (item.wateringBuff.endTime - Date.now()) / 1000)) }}
+      </div>
     </div>
   </gb-tooltip>
 </template>
@@ -113,6 +126,18 @@ export default {
       const time = left * stageMult * 60 / this.item.cache.grow;
       return time;
     },
+    wateringClasses() {
+      const classes = [];
+      if (this.isWatered) {
+        classes.push('watered-crop');
+      }
+      return classes;
+    },
+    isWatered() {
+      return this.$store.state.system.settings.experiment.items.farmWatering.value &&
+             this.item.wateringBuff && this.item.wateringBuff.active &&
+             Date.now() < this.item.wateringBuff.endTime;
+    }
   }
 }
 </script>

@@ -295,6 +295,7 @@ export default {
       { category: '农场', color: 'brown', content: '增加农场离线汇总功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加旧农场UI的等级显示，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '农场', color: 'brown', content: '增加农场统计按钮。', isCurrentUpdate: true },
+      { category: '农场', color: 'brown', content: '增加浇水功能，可以12小时内提速15%生长速度，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面卡包购买预测功能。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },

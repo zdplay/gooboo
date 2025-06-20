@@ -59,6 +59,7 @@ export default {
     farm_premiumLectern: 'Premium lecterns quintuple experience',
     farm_premiumPinwheel: 'Premium pinwheels provide double the drop chance bonus',
     farm_premiumFlag: 'Premium flags provide double the crop gain bonus',
+    farm_wateringCan: 'Upgrade watering can to expand watering range, providing plants with 12-hour +15% growth speed buff',
 
     gallery_recycling: 'Conversion allows you to create new colors',
     gallery_redLuck: 'You\'ll need to upgrade luck first before you can find drums in packages',
@@ -580,6 +581,7 @@ export default {
   farm_bigFertilizerBag: 'Big fertilizer bag',
   farm_openSesame: 'Open sesame',
   farm_flowerPainting: 'Flower painting',
+  farm_wateringCan: 'Watering can',
 
   // Farm premium upgrades
   farm_biggerVegetables: 'Bigger vegetables',

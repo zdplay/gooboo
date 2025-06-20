@@ -78,7 +78,9 @@ export default {
       selectedFertilizerName: state => state.farm.selectedFertilizerName,
       selectedColor: state => state.farm.selectedColor,
       deleting: state => state.farm.deleting,
-      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active,
+      wateringTool: state => state.farm.wateringTool,
+      farmWateringEnabled: state => state.system.settings.experiment.items.farmWatering.value
     })
   },
   methods: {
@@ -91,7 +93,9 @@ export default {
             this.colorCell(x, y);
           }
         } else {
-          if (this.deleting && field.type !== null) {
+          if (this.farmWateringEnabled && this.wateringTool.active) {
+            this.$store.dispatch('farm/applyWatering', {x, y});
+          } else if (this.deleting && field.type !== null) {
             this.$store.dispatch('farm/deleteTile', {x, y});
           } else if (this.selectedColor !== null) {
             this.colorCell(x, y);

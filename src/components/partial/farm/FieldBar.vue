@@ -42,6 +42,16 @@
         </template>
         <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.farm.button.stats`) }}</div>
       </gb-tooltip>
+      <gb-tooltip v-if="farmWateringEnabled" :min-width="0">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="ma-1" min-width="36" :disabled="isFrozen" :color="wateringTool.active ? 'primary' : 'secondary'" @click="toggleWateringMode" v-bind="attrs" v-on="on">
+            <v-icon>mdi-watering-can</v-icon>
+          </v-btn>
+        </template>
+        <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.farm.button.watering`) }}</div>
+        <div>{{ $vuetify.lang.t(`$vuetify.farm.button.wateringLevel`) }}: {{ wateringTool.level }}</div>
+        <div>{{ $vuetify.lang.t(`$vuetify.farm.button.wateringRange`) }}: {{ wateringRangeText }}</div>
+      </gb-tooltip>
     </div>
     <div v-if="showColors" class="d-flex flex-wrap justify-center ma-1">
       <v-btn x-small min-width="24" v-for="color in colors" :key="color" class="mr-1" :color="color" @click="selectColor(color)"></v-btn>
@@ -77,8 +87,14 @@ export default {
       deleting: state => state.farm.deleting,
       showColors: state => state.farm.showColors,
       unlock: state => state.unlock,
-      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active
+      isFrozen: (state) => state.system.settings.experiment.items.doubleDoorFridge.value ? (state.cryolab.farm.active || state.cryolab.farm.freeze) : state.cryolab.farm.active,
+      wateringTool: state => state.farm.wateringTool,
+      farmWateringEnabled: state => state.system.settings.experiment.items.farmWatering.value
     }),
+    wateringRangeText() {
+      const rangeMap = {1: '1x1', 2: '3x3', 3: '5x5'};
+      return rangeMap[this.wateringTool.level] || '1x1';
+    },
     canSeeBuildings() {
       return this.$store.state.upgrade.item.farm_gardenGnome.level >= 1;
     }
@@ -140,6 +156,9 @@ export default {
     toggleStats() {
       this.showStats = !this.showStats;
       this.$emit('stats-toggle', this.showStats);
+    },
+    toggleWateringMode() {
+      this.$store.dispatch('farm/toggleWateringMode');
     }
   }
 }

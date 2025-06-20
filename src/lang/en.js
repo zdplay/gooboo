@@ -1456,6 +1456,10 @@ export default {
           name: 'Idea Configs',
           description: 'Enable the gallery idea configuration feature, allowing you to save and switch between different idea combinations'
         },
+        farmWatering: {
+          name: 'Farm Watering',
+          description: 'Enable the farm watering tool system, allowing you to water plants for a 12-hour +15% growth speed buff, with upgradeable watering can range'
+        },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',
           description: 'Show the level of the farm icon'
@@ -2335,6 +2339,9 @@ export default {
       color: 'Tiles can be colored to make managing large fields easier. Select a color and click a tile to paint it. While you have a color selected, mass actions only affect tiles of the same color',
       colorFilter: 'Only affecting tiles of this color',
       stats: 'Show farm harvest statistics and estimates',
+      watering: 'Watering mode: Click plants to give 12-hour +15% growth speed buff',
+      wateringLevel: 'Watering can level',
+      wateringRange: 'Watering range',
     },
     timeDescription: 'Time required to grow',
     overgrowDescription: 'After fully growing, your plants can grow again, but need {0}x (1 / overgrow + 1)x time to grow. Each completed growth cycle counts as an extra harvest with all benefits.',

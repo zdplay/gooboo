@@ -1495,6 +1495,10 @@ export default {
         ideaConfigs: {
           name: '创意配置',
           description: '启用画廊模块的创意配置功能，可以保存和切换不同的创意组合'
+        },
+        farmWatering: {
+          name: '农场浇水',
+          description: '启用农场浇水工具系统，可以给植物浇水提供12小时生长速度+15%的buff，浇水壶可升级扩大范围'
         }
       }
   },
@@ -2372,6 +2376,9 @@ export default {
       color: '地块可以着色，以便更轻松地管理大片土地。 选择一种颜色并单击地块来绘制它。 当您选择颜色时，批量操作仅影响相同颜色的地块',
       colorFilter: '仅影响该颜色的地块',
       stats: '显示农场收获统计和预估',
+      watering: '浇水模式：点击植物给予12小时生长速度+15%的buff',
+      wateringLevel: '浇水壶等级',
+      wateringRange: '浇水范围',
     },
     timeDescription: '成长所需时间',
     overgrowDescription: '完全生长后，您的植物可以再次生长，但需要 {0}x (1 / 过度生长 + 1)x 时间才能生长。 每个完成的生长周期都算作一次额外的收获，具有所有好处。',

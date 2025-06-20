@@ -130,6 +130,7 @@ export default {
   farmAllGain: 'All harvest gain',
   farmCropCost: 'Crop cost',
   farmFertilizerCost: 'Fertilizer cost',
+  wateringCanLevel: 'Watering can level',
   farmLuckyHarvestMult: 'Lucky harvest gain',
   farmHuntChance: 'Hunt chance',
   galleryInspirationBase: 'Inspiration time base',

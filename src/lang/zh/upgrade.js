@@ -59,6 +59,7 @@ export default {
     farm_premiumLectern: '高级讲台提供五倍经验',
     farm_premiumPinwheel: '高级风车提供双倍的掉落几率奖励',
     farm_premiumFlag: '高级旗帜提供双倍作物增益奖励',
+    farm_wateringCan: '升级浇水壶可以扩大浇水范围',
 
     gallery_recycling: '转换允许您创建新的颜色',
     gallery_redLuck: '您需要先提升运气才能在包裹中找到鼓',
@@ -581,6 +582,7 @@ export default {
   farm_bigFertilizerBag: '大肥料袋',
   farm_openSesame: '芝麻开门',
   farm_flowerPainting: '花卉绘画',
+  farm_wateringCan: '浇水壶',
 
   // Farm premium upgrades
   farm_biggerVegetables: '更大的蔬菜',

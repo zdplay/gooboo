@@ -285,4 +285,13 @@ export default {
         {name: 'currencyFarmFlowerGain', type: 'mult', value: lvl => lvl * 0.05 + 1},
         {name: 'currencyFarmBeeCap', type: 'base', value: lvl => lvl * 150},
     ]},
+    wateringCan: {cap: 2, hasDescription: true, requirement() {
+        return store.state.system.settings.experiment.items.farmWatering.value && store.state.upgrade.item.farm_seedBox.level >= 5;
+    }, price(lvl) {
+        return {farm_gold: [100, 500][lvl]};
+    }, effect: [
+        {name: 'wateringCanLevel', type: 'farmWateringTool', value: lvl => lvl + 1}
+    ], onBuy() {
+        store.commit('farm/updateWateringToolKey', {key: 'level', value: store.state.upgrade.item.farm_wateringCan.level + 1});
+    }},
 }

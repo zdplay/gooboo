@@ -54,7 +54,11 @@ export default {
         selectedFertilizerName: null,
         selectedColor: null,
         deleting: false,
-        showColors: false
+        showColors: false,
+        wateringTool: {
+            level: 1,
+            active: false
+        }
     },
     getters: {
         expNeeded: (state) => (name) => {
@@ -451,6 +455,27 @@ export default {
         },
         huntCropRareDrop(state, o) {
             Vue.set(state.crop[o.name].rareDrop[o.index], 'hunter', o.value);
+        },
+        updateWateringToolKey(state, o) {
+            Vue.set(state.wateringTool, o.key, o.value);
+        },
+        addWateringBuff(state, o) {
+            if (state.field[o.y] && state.field[o.y][o.x] && state.field[o.y][o.x].type === 'crop') {
+                Vue.set(state.field[o.y][o.x], 'wateringBuff', {
+                    active: true,
+                    endTime: Date.now() + 12 * 60 * 60 * 1000,
+                    appliedAt: Date.now()
+                });
+            }
+        },
+        removeWateringBuff(state, o) {
+            if (state.field[o.y] && state.field[o.y][o.x] && state.field[o.y][o.x].wateringBuff) {
+                Vue.set(state.field[o.y][o.x], 'wateringBuff', {
+                    active: false,
+                    endTime: 0,
+                    appliedAt: 0
+                });
+            }
         }
     },
     actions: {
@@ -462,6 +487,10 @@ export default {
             commit('updateKey', {key: 'selectedColor', value: null});
             commit('updateKey', {key: 'deleting', value: false});
             commit('updateKey', {key: 'showColors', value: false});
+            commit('updateKey', {key: 'wateringTool', value: {
+                level: 1,
+                active: false
+            }});
 
             for (const [key, elem] of Object.entries(state.crop)) {
                 commit('updateCropKey', {name: key, key: 'exp', value: 0});
@@ -527,7 +556,12 @@ export default {
                     time: 0,
                     rng: rootState.system.rng[`farmCrop_${ o.crop }`] ?? 0,
                     buildingEffect: {},
-                    cache: {}
+                    cache: {},
+                    wateringBuff: {
+                        active: false,
+                        endTime: 0,
+                        appliedAt: 0
+                    }
                 }});
                 commit('system/nextRng', {name: `farmCrop_${ o.crop }`, amount: 1}, {root: true});
 
@@ -1032,7 +1066,7 @@ export default {
                 dispatch('mult/setMult', {name: 'farmCropGain', key: 'farmEarlyGame', value: 1 / 8}, {root: true});
             }
         },
-        updateFieldCaches({ state, getters, rootGetters, commit }) {
+        updateFieldCaches({ state, getters, rootState, rootGetters, commit }) {
             let gnomes = [];
             let sprinklerRows = [];
             let lecternColumns = [];
@@ -1111,6 +1145,11 @@ export default {
                                 commit('updateFieldCache', {x, y, key: 'lonely', value: true});
                             }
                         }
+                        if (rootState.system.settings.experiment.items.farmWatering.value &&
+                            cell.wateringBuff && cell.wateringBuff.active &&
+                            Date.now() < cell.wateringBuff.endTime) {
+                            growSpeed *= 1.15;
+                        }
                         const growTime = rootGetters['mult/get']('farmGrow', crop.grow + geneStats.mult.farmGrow.baseValue, geneStats.mult.farmGrow.multValue);
                         const overgrow = rootGetters['mult/get']('farmOvergrow', sprinklers * 1.5 + geneStats.mult.farmOvergrow.baseValue, geneStats.mult.farmOvergrow.multValue);
                         commit('updateFieldCache', {x, y, key: 'grow', value: 1 / (growTime / growSpeed)});
@@ -1182,6 +1221,58 @@ export default {
                 const split = key.split('_');
                 const capName = `currency${ capitalize(split[0]) + capitalize(split[1]) }Cap`;
                 dispatch('mult/setBase', {name: capName, key: 'farmGene_hunter', value: Math.round(rootState.mult.items[capName].baseValue / 10) * elem}, {root: true});
+            }
+        },
+        toggleWateringMode({ state, commit }) {
+            commit('updateWateringToolKey', {key: 'active', value: !state.wateringTool.active});
+        },
+
+        handleWateringToggleOff({ state, commit, dispatch }) {
+            let hasChanges = false;
+            state.field.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    if (cell !== null && cell.type === 'crop' &&
+                        cell.wateringBuff && cell.wateringBuff.active) {
+                        commit('updateFieldKey', {x, y, key: 'wateringBuff', value: {
+                            active: false,
+                            endTime: 0,
+                            appliedAt: cell.wateringBuff.appliedAt
+                        }});
+                        hasChanges = true;
+                    }
+                });
+            });
+
+            if (hasChanges) {
+                dispatch('updateFieldCaches');
+            }
+        },
+
+        applyWatering({ state, commit, dispatch }, o) {
+            if (state.wateringTool.active) {
+                const rangeMap = {1: 1, 2: 3, 3: 5};
+                const range = rangeMap[state.wateringTool.level] || 1;
+                const halfRange = Math.floor(range / 2);
+                let wateredCount = 0;
+
+                for (let dy = -halfRange; dy <= halfRange; dy++) {
+                    for (let dx = -halfRange; dx <= halfRange; dx++) {
+                        const x = o.x + dx;
+                        const y = o.y + dy;
+
+                        if (x >= 0 && x < fieldWidth && y >= 0 && y < fieldHeight &&
+                            state.field[y] && state.field[y][x] &&
+                            state.field[y][x].type === 'crop') {
+
+                            commit('addWateringBuff', {x, y});
+                            wateredCount++;
+                        }
+                    }
+                }
+
+                if (wateredCount > 0) {
+                    dispatch('updateFieldCaches');
+                }
             }
         }
     }

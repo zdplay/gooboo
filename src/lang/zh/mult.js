@@ -129,6 +129,7 @@ export default {
   farmCropGain: '作物增益',
   farmAllGain: '全部收获增益',
   farmCropCost: '作物成本',
+  wateringCanLevel: '浇水壶等级',
   farmFertilizerCost: '肥料成本',
   farmLuckyHarvestMult: '幸运收获增益',
   farmHuntChance: '狩猎几率',

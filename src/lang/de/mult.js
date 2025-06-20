@@ -130,6 +130,7 @@ export default {
   farmAllGain: 'Sämtlicher Pflanzenertrag',
   farmCropCost: 'Pflanzenkosten',
   farmFertilizerCost: 'Düngerkosten',
+  wateringCanLevel: 'Wasserkanne-Stufe',
   farmLuckyHarvestMult: 'Glücksernte-Einkommen',
   farmHuntChance: 'Jagdchance',
   galleryInspirationBase: 'Inspiration-Grundzeit',

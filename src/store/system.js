@@ -474,6 +474,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    farmWatering: {
+                        unlock: 'farmFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             },
             automation: {
@@ -1266,6 +1273,9 @@ export default {
             }
             if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
                 dispatch('cryolab/clearFreezeStates', null, {root: true});
+            }
+            if (o.category === 'experiment' && o.name === 'farmWatering' && !o.value) {
+                dispatch('farm/handleWateringToggleOff', null, {root: true});
             }
             if (o.category === 'experiment' && o.name === 'mechanicalMine' && !o.value) {
                 dispatch('village/setWorkerCount', {name: 'remoteMiner', amount: 0}, {root: true});
