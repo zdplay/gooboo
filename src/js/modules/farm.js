@@ -166,6 +166,14 @@ export default {
             obj.selectedColor = store.state.farm.selectedColor;
         }
 
+        // Save watering tool data
+        if (store.state.farm.wateringTool.level > 1 || store.state.farm.wateringTool.active) {
+            obj.wateringTool = {
+                level: store.state.farm.wateringTool.level,
+                active: store.state.farm.wateringTool.active
+            };
+        }
+
         store.state.farm.field.forEach((row, y) => {
             row.forEach((cell, x) => {
                 if (cell !== null && (cell.type !== null || cell.color !== null)) {
@@ -250,6 +258,19 @@ export default {
         if (data.selectedColor) {
             store.commit('farm/updateKey', {key: 'selectedColor', value: data.selectedColor});
         }
+
+        // Load watering tool data
+        if (data.wateringTool) {
+            store.commit('farm/updateWateringToolKey', {key: 'level', value: data.wateringTool.level});
+            store.commit('farm/updateWateringToolKey', {key: 'active', value: data.wateringTool.active});
+        } else {
+            // Fix for existing saves: sync watering tool level with upgrade level
+            const wateringCanUpgradeLevel = store.state.upgrade.item.farm_wateringCan?.level || 0;
+            if (wateringCanUpgradeLevel > 0) {
+                store.commit('farm/updateWateringToolKey', {key: 'level', value: wateringCanUpgradeLevel + 1});
+            }
+        }
+
         store.commit('farm/calculateCropBuildingCaches');
         store.dispatch('farm/applyGeneEffects');
         store.dispatch('farm/applyCropPrestige');
