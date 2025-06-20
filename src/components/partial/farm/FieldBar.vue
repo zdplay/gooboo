@@ -36,20 +36,39 @@
         </template>
         <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.farm.button.color`) }}</div>
       </gb-tooltip>
+      <gb-tooltip :min-width="0">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn class="ma-1" min-width="36" :color="showStats ? 'primary' : 'secondary'" @click="toggleStats" v-bind="attrs" v-on="on"><v-icon>mdi-chart-bar</v-icon></v-btn>
+        </template>
+        <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.farm.button.stats`) }}</div>
+      </gb-tooltip>
     </div>
     <div v-if="showColors" class="d-flex flex-wrap justify-center ma-1">
       <v-btn x-small min-width="24" v-for="color in colors" :key="color" class="mr-1" :color="color" @click="selectColor(color)"></v-btn>
       <v-btn x-small min-width="24" class="ml-2 px-0" :color="selectedColor === 0 ? 'error' : 'secondary'" @click="selectColor(0)"><v-icon small>mdi-delete</v-icon></v-btn>
     </div>
+    <div v-if="showStats" class="d-flex justify-center ma-2">
+      <div class="stats-container">
+        <harvest-estimation></harvest-estimation>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.stats-container {
+  max-width: 800px;
+  width: 100%;
+}
+</style>
 
 <script>
 import { mapState } from 'vuex';
 import AlertText from '../render/AlertText.vue';
+import HarvestEstimation from './HarvestEstimation.vue';
 
 export default {
-  components: { AlertText },
+  components: { AlertText, HarvestEstimation },
   computed: {
     ...mapState({
       selectedCropName: state => state.farm.selectedCropName,
@@ -65,7 +84,8 @@ export default {
     }
   },
   data: () => ({
-    colors: ['brown', 'green', 'light-green', 'yellow', 'orange', 'red', 'pink', 'purple', 'indigo', 'blue']
+    colors: ['brown', 'green', 'light-green', 'yellow', 'orange', 'red', 'pink', 'purple', 'indigo', 'blue'],
+    showStats: false
   }),
   methods: {
     deleteMode() {
@@ -116,6 +136,10 @@ export default {
     },
     toggleColors() {
       this.$store.commit('farm/updateKey', {key: 'showColors', value: !this.showColors});
+    },
+    toggleStats() {
+      this.showStats = !this.showStats;
+      this.$emit('stats-toggle', this.showStats);
     }
   }
 }

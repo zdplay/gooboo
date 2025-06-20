@@ -2339,6 +2339,19 @@ export default {
       description: 'Hier kannst du temporär Ausrüstungsplätze opfern, um dafür starke Effekte zu erhalten'
     }
   },
+  farm: {
+    button: {
+      plantAll: 'Pflanze die ausgewählte Pflanze ({0}) auf alle leeren Felder. Du kannst auch eine einzelne Pflanze pflanzen, indem du auf das leere Feld klickst',
+      replant: 'Alle gewachsenen Pflanzen werden geerntet und wieder auf demselben Feld gepflanzt',
+      replantFertilizer: 'Der gleiche Dünger wird ebenfalls verwendet (falls möglich)',
+      harvestAll: 'Alle gewachsenen Pflanzen werden geerntet. Du kannst auch eine einzelne Pflanze ernten, indem du darauf klickst',
+      delete: 'Entferne eine Pflanze von einem Feld. Verbrauchte Ressourcen werden nicht erstattet',
+      deleteBuilding: 'Gebäude können auch auf diese Weise entfernt und in dein Inventar zurückgegeben werden',
+      color: 'Felder können eingefärbt werden, um große Felder einfacher zu verwalten. Wähle eine Farbe und klicke auf ein Feld, um es zu bemalen. Während du eine Farbe ausgewählt hast, betreffen Massenaktionen nur Felder derselben Farbe',
+      colorFilter: 'Betrifft nur Felder dieser Farbe',
+      stats: 'Zeige Bauernhof-Erntestatistiken und -schätzungen',
+    },
+  },
   gallery: {
     gallery: 'Gallerie',
     auction: 'Auktion',

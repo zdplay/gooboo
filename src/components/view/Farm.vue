@@ -1,8 +1,8 @@
 <template>
   <v-row v-if="isCustomXlOnly" no-gutters>
     <v-col class="scroll-container" cols="6">
-      <field-bar></field-bar>
-      <field class="mx-auto"></field>
+      <field-bar @stats-toggle="onStatsToggle"></field-bar>
+      <field class="mx-auto" :class="{ 'field-compact': showStats }"></field>
     </v-col>
     <v-col class="scroll-container" cols="3">
       <inventory></inventory>
@@ -17,8 +17,8 @@
       <v-tab href="#inventory"><tab-icon-text name="inventory"></tab-icon-text></v-tab>
     </v-tabs>
     <div v-if="tab === 'farm'" class="scroll-container-tab">
-      <field-bar></field-bar>
-      <field class="mx-auto"></field>
+      <field-bar @stats-toggle="onStatsToggle"></field-bar>
+      <field class="mx-auto" :class="{ 'field-compact': showStats }"></field>
     </div>
     <div v-else-if="tab === 'inventory'">
       <v-row no-gutters>
@@ -38,13 +38,47 @@
       <v-tab href="#upgrades"><tab-icon-text name="upgrades"></tab-icon-text></v-tab>
     </v-tabs>
     <div v-if="tab === 'farm'">
-      <field-bar></field-bar>
-      <field class="mx-auto"></field>
+      <field-bar @stats-toggle="onStatsToggle"></field-bar>
+      <field class="mx-auto" :class="{ 'field-compact': showStats }"></field>
     </div>
     <inventory v-else-if="tab === 'inventory'"></inventory>
     <upgrade-list v-else-if="tab === 'upgrades'" feature="farm" :requirementCustom="upgradeNextRequired" key="farm-regular"></upgrade-list>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 959px) {
+  .field-compact {
+    margin-top: -25px !important;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1903px) {
+  .field-compact {
+    margin-top: -70px !important;
+  }
+}
+
+@media (min-width: 1904px) {
+  .field-compact {
+    margin-top: -70px !important;
+  }
+}
+
+@supports (margin-top: -5vh) {
+  @media (max-width: 959px) {
+    .field-compact {
+      margin-top: max(-25px, -3vh) !important;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .field-compact {
+      margin-top: max(-70px, -8vh) !important;
+    }
+  }
+}
+</style>
 
 <script>
 import Field from '../partial/farm/Field.vue';
@@ -58,7 +92,8 @@ export default {
   components: { UpgradeList, Field, FieldBar, Inventory, TabIconText },
   mixins: [screenLayoutMixin],
   data: () => ({
-    tab: 'farm'
+    tab: 'farm',
+    showStats: false
   }),
   computed: {
     upgradeNextRequired() {
@@ -75,6 +110,11 @@ export default {
         this.$vuetify.lang.t('$vuetify.upgrade.farm_seedBox') + ' ' +
         this.$vuetify.lang.t('$vuetify.gooboo.levelSuffix') + ' ' + this.$formatNum(next)
       }] : [];
+    }
+  },
+  methods: {
+    onStatsToggle(isVisible) {
+      this.showStats = isVisible;
     }
   }
 }

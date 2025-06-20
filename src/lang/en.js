@@ -2334,6 +2334,7 @@ export default {
       deleteBuilding: 'Buildings can also be removed this way and are returned to your inventory',
       color: 'Tiles can be colored to make managing large fields easier. Select a color and click a tile to paint it. While you have a color selected, mass actions only affect tiles of the same color',
       colorFilter: 'Only affecting tiles of this color',
+      stats: 'Show farm harvest statistics and estimates',
     },
     timeDescription: 'Time required to grow',
     overgrowDescription: 'After fully growing, your plants can grow again, but need {0}x (1 / overgrow + 1)x time to grow. Each completed growth cycle counts as an extra harvest with all benefits.',
