@@ -1,12 +1,13 @@
 <template>
   <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.gallery.idea.${name}`)">
     <template v-slot:activator="{ on, attrs }">
-      <div :class="$vnode.data.staticClass" v-bind="attrs" v-on="on">
+      <div :class="[$vnode.data.staticClass, { 'idea-selected': isInSelectedConfig }]" v-bind="attrs" v-on="on">
         <v-btn width="56" height="56" min-width="56" :disabled="!canUpgrade || disabled" :color="idea.color" @click="buy">
           <v-badge overlap bottom left offset-x="45" color="grey" :disabled="!canUpgrade" :content="$formatNum(idea.level)">
             <v-icon large>{{ idea.icon }}</v-icon>
           </v-badge>
         </v-btn>
+        <v-icon v-if="isInSelectedConfig" class="selected-indicator" color="primary" small>mdi-check-circle</v-icon>
       </div>
     </template>
     <div class="text-center">{{ $vuetify.lang.t(`$vuetify.gallery.idea.tier`, idea.tier) }}</div>
@@ -46,6 +47,15 @@ export default {
           after: elem.value(lvl + 1)
         };
       }).filter(elem => elem.before !== elem.after);
+    },
+    isInSelectedConfig() {
+      const selectedLoadoutIndex = this.$store.state.gallery.selectedIdeaLoadout;
+      if (selectedLoadoutIndex === null) return false;
+
+      const selectedLoadout = this.$store.state.gallery.ideaLoadout[selectedLoadoutIndex];
+      if (!selectedLoadout) return false;
+
+      return selectedLoadout.content.includes(this.name);
     }
   },
   methods: {
@@ -57,3 +67,22 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.idea-selected {
+  position: relative;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme--dark .selected-indicator {
+  background: #424242;
+}
+</style>

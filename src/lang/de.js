@@ -1484,6 +1484,10 @@ export default {
         name: 'Mechanische Mine',
         description: 'Aktiviert das mechanische Minengebäude im Dorf. Bei Deaktivierung wird die Gebäudeoption ausgeblendet und gebaute Mengen gelöscht'
       },
+      ideaConfigs: {
+        name: 'Ideen-Konfigurationen',
+        description: 'Aktiviert die Galerie-Ideen-Konfigurationsfunktion, mit der Sie verschiedene Ideenkombinationen speichern und zwischen ihnen wechseln können'
+      },
       showFarmIconLevel: {
         name: 'Show Farm Icon Level',
         description: 'Show the level of the farm icon'

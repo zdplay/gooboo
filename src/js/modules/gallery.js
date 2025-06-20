@@ -196,6 +196,17 @@ export default {
             store.state.gallery.ideaResetData.hasPrestiged) {
             obj.ideaResetData = store.state.gallery.ideaResetData;
         }
+        if (store.state.gallery.ideaLoadout.length > 0) {
+            obj.ideaLoadout = store.state.gallery.ideaLoadout.map(loadout => ({
+                id: loadout.id,
+                name: encodeURIComponent(loadout.name),
+                content: loadout.content
+            }));
+            obj.nextIdeaLoadoutId = store.state.gallery.nextIdeaLoadoutId;
+        }
+        if (store.state.gallery.selectedIdeaLoadout !== null) {
+            obj.selectedIdeaLoadout = store.state.gallery.selectedIdeaLoadout;
+        }
         if (store.state.unlock.galleryCanvas.see) {
             let colorData = {};
             for (const [key, elem] of Object.entries(store.state.gallery.colorData)) {
@@ -267,6 +278,22 @@ export default {
                 resetCount: 0,
                 hasPrestiged: false
             }});
+        }
+        if (data.ideaLoadout) {
+            let nextId = 1;
+            data.ideaLoadout.forEach(elem => {
+                const id = elem.id || nextId;
+                store.commit('gallery/addExistingIdeaLoadout', {
+                    id,
+                    name: decodeURIComponent(elem.name),
+                    content: elem.content
+                });
+                nextId = Math.max(nextId, id) + 1;
+            });
+            store.commit('gallery/updateKey', {key: 'nextIdeaLoadoutId', value: data.nextIdeaLoadoutId || nextId});
+        }
+        if (data.selectedIdeaLoadout !== undefined) {
+            store.commit('gallery/setSelectedIdeaLoadout', data.selectedIdeaLoadout);
         }
     }
 }

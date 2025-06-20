@@ -21,7 +21,10 @@ export default {
             lastResetTime: 0,
             resetCount: 0,
             hasPrestiged: false
-        }
+        },
+        ideaLoadout: [],
+        nextIdeaLoadoutId: 1,
+        selectedIdeaLoadout: null
     },
     getters: {
         availableColors: (state, getters, rootState) => {
@@ -189,6 +192,22 @@ export default {
             for (let y = 0; y < GALLERY_SHAPES_GRID_HEIGHT; y++) {
                 state.shapeGrid.push(buildArray(GALLERY_SHAPES_GRID_WIDTH).map(() => randomElem(arr)));
             }
+        },
+        addEmptyIdeaLoadout(state) {
+            state.ideaLoadout.push({id: state.nextIdeaLoadoutId, name: '#' + (state.ideaLoadout.length + 1), content: []});
+            Vue.set(state, 'nextIdeaLoadoutId', state.nextIdeaLoadoutId + 1);
+        },
+        addExistingIdeaLoadout(state, o) {
+            state.ideaLoadout.push(o);
+        },
+        updateIdeaLoadoutKey(state, o) {
+            Vue.set(state.ideaLoadout[o.id], o.key, o.value);
+        },
+        deleteIdeaLoadout(state, index) {
+            state.ideaLoadout.splice(index, 1);
+        },
+        setSelectedIdeaLoadout(state, index) {
+            Vue.set(state, 'selectedIdeaLoadout', index);
         }
     },
     actions: {
@@ -669,6 +688,13 @@ export default {
                 commit('currency/add', {feature: 'gallery', name: 'motivation', amount: GALLERY_MOTIVATION_BUY_AMOUNT}, {root: true});
                 commit('stat/add', {feature: 'gallery', name: 'motivation', value: GALLERY_MOTIVATION_BUY_AMOUNT}, {root: true});
                 dispatch('currency/spend', {feature: 'gem', name: 'sapphire', amount: GALLERY_MOTIVATION_BUY_COST}, {root: true});
+            }
+        },
+        applyIdeaLoadout({ state, commit }, index) {
+            const loadout = state.ideaLoadout[index];
+            if (loadout) {
+                // 只设置选中的配置，不改变实际的创意等级
+                commit('setSelectedIdeaLoadout', index);
             }
         }
     }

@@ -467,6 +467,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    ideaConfigs: {
+                        unlock: 'galleryFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                 }
             },
             automation: {

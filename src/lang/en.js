@@ -1452,6 +1452,10 @@ export default {
           name: 'Mechanical Mine',
           description: 'Enable the village mechanical mine building. When disabled, hides the building option and clears built amounts'
         },
+        ideaConfigs: {
+          name: 'Idea Configs',
+          description: 'Enable the gallery idea configuration feature, allowing you to save and switch between different idea combinations'
+        },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',
           description: 'Show the level of the farm icon'

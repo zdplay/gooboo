@@ -1491,6 +1491,10 @@ export default {
         mechanicalMine: {
           name: '机械矿场',
           description: '启用村庄机械矿场建筑。关闭时会隐藏建筑选项并清空已建成数量'
+        },
+        ideaConfigs: {
+          name: '创意配置',
+          description: '启用画廊模块的创意配置功能，可以保存和切换不同的创意组合'
         }
       }
   },
