@@ -30,7 +30,7 @@
             icon
             :color="canResetIdeas ? 'warning' : 'grey'"
             :disabled="!canResetIdeas || isFrozen"
-            @click="resetIdeas"
+            @click="showResetConfirmDialog"
             v-bind="attrs"
             v-on="on"
           >
@@ -39,12 +39,17 @@
         </template>
         <div class="tooltip-text-container">
           <div>重置所有创意等级和灵感点数到初始状态</div>
+          <div class="mt-2">重置后将获得 {{ startingInspiration }} 点起始灵感</div>
 
           <div class="text-center mt-2">
             <div class="mb-1">已拥有灵感点数: {{ inspirationTotal }}</div>
           </div>
 
           <div class="text-center mt-2">
+            <div class="text-caption">
+              <v-icon small class="mr-1">mdi-diamond-stone</v-icon>
+              消耗: 200 蓝宝石
+            </div>
             <div class="text-caption">
               本轮声望剩余重置次数: {{ Math.max(0, 3 - resetData.resetCount) }}/3
             </div>
@@ -104,6 +109,36 @@
         :class="item"
       ></div>
     </div>
+    <v-dialog v-model="resetConfirmDialog" max-width="500">
+      <v-card class="default-card">
+        <v-card-title class="headline">确认重置灵感</v-card-title>
+        <v-card-text>
+          <div class="mb-3">
+            <v-icon color="warning" class="mr-2">mdi-alert</v-icon>
+            确定要重置所有创意等级和灵感点数吗？
+          </div>
+          <div class="mb-2">
+            <strong>消耗：</strong>
+            <v-icon small class="mx-1">mdi-diamond-stone</v-icon>
+            200 蓝宝石
+          </div>
+          <div class="mb-2">
+            <strong>当前灵感：</strong> {{ inspirationTotal }} 点
+          </div>
+          <div class="mb-2">
+            <strong>重置后获得：</strong> {{ startingInspiration }} 点起始灵感
+          </div>
+          <div class="text-caption text--secondary">
+            重置后将有1天冷却时间，本轮声望还可重置 {{ Math.max(0, 3 - resetData.resetCount) }} 次
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey" text @click="resetConfirmDialog = false">取消</v-btn>
+          <v-btn color="warning" @click="confirmReset">确认重置</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -119,7 +154,8 @@ import IdeaLoadout from './IdeaLoadout.vue';
 export default {
   components: { Currency, IdeaItem, CurrencyIcon, StatBreakdown, TierProgress, IdeaLoadout },
   data: () => ({
-    showLoadouts: false
+    showLoadouts: false,
+    resetConfirmDialog: false
   }),
   computed: {
     ...mapState({
@@ -174,6 +210,10 @@ export default {
         return false;
       }
 
+      if (!this.canAffordReset) {
+        return false;
+      }
+
       const hasInspirationToReset = this.$store.getters['currency/value']('gallery_inspiration') > 0;
       const hasIdeaLevelsToReset = Object.values(this.$store.state.gallery.idea).some(idea => idea.level > 0);
 
@@ -202,9 +242,26 @@ export default {
     },
     selectedLoadoutIndex() {
       return this.$store.state.gallery.selectedIdeaLoadout;
+    },
+    startingInspiration() {
+      const total = this.$store.getters['mult/get']('galleryInspirationStart');
+      const thinkHarder = this.$store.state.gallery.idea.thinkHarder;
+      return Math.max(0, total - thinkHarder.level * 2);
+    },
+    canAffordReset() {
+      return this.$store.getters['currency/canAfford']({gem_sapphire: 200});
     }
   },
   methods: {
+    showResetConfirmDialog() {
+      if (this.canResetIdeas) {
+        this.resetConfirmDialog = true;
+      }
+    },
+    confirmReset() {
+      this.resetConfirmDialog = false;
+      this.$store.dispatch('gallery/resetIdeas');
+    },
     resetIdeas() {
       if (this.canResetIdeas) {
         this.$store.dispatch('gallery/resetIdeas');

@@ -253,7 +253,6 @@ export default {
                 commit('updateColorDataKey', {name: key, key: 'cacheSpace', value: 0});
             }
 
-            // 重置灵感重置数据，并标记已进行过声望
             commit('updateIdeaResetDataKey', {key: 'resetCount', value: 0});
             commit('updateIdeaResetDataKey', {key: 'hasPrestiged', value: true});
 
@@ -308,6 +307,7 @@ export default {
             const SECONDS_PER_DAY = 86400;
             const RESET_COOLDOWN = SECONDS_PER_DAY;
             const MAX_RESETS_PER_PRESTIGE = 3;
+            const SAPPHIRE_COST = 200;
 
             if (!rootState.system.settings.experiment.items.enableGalleryIdeaReset.value) {
                 return;
@@ -325,12 +325,18 @@ export default {
                 return;
             }
 
+            if (!rootGetters['currency/canAfford']({gem_sapphire: SAPPHIRE_COST})) {
+                return;
+            }
+
             const hasInspirationToReset = rootGetters['currency/value']('gallery_inspiration') > 0;
             const hasIdeaLevelsToReset = Object.values(state.idea).some(idea => idea.level > 0);
 
             if (!hasInspirationToReset && !hasIdeaLevelsToReset) {
                 return;
             }
+
+            dispatch('currency/spend', {feature: 'gem', name: 'sapphire', amount: SAPPHIRE_COST}, {root: true});
 
             for (const [key, elem] of Object.entries(state.idea)) {
                 if (elem.level > 0) {
@@ -346,6 +352,11 @@ export default {
 
             commit('updateKey', {key: 'inspirationTime', value: 0});
             commit('updateKey', {key: 'inspirationAmount', value: 0});
+
+            const inspirationStart = rootGetters['mult/get']('galleryInspirationStart');
+            if (inspirationStart > 0) {
+                dispatch('currency/gain', {feature: 'gallery', name: 'inspiration', amount: inspirationStart}, {root: true});
+            }
 
             commit('updateIdeaResetDataKey', {key: 'lastResetTime', value: now});
             commit('updateIdeaResetDataKey', {key: 'resetCount', value: state.ideaResetData.resetCount + 1});
@@ -693,7 +704,6 @@ export default {
         applyIdeaLoadout({ state, commit }, index) {
             const loadout = state.ideaLoadout[index];
             if (loadout) {
-                // 只设置选中的配置，不改变实际的创意等级
                 commit('setSelectedIdeaLoadout', index);
             }
         }
