@@ -1460,6 +1460,10 @@ export default {
           name: 'Farm Watering',
           description: 'Enable the farm watering tool system, allowing you to water plants for a 12-hour +15% growth speed buff, with upgradeable watering can range'
         },
+        enhancedAutocast: {
+          name: 'Enhanced Autocast',
+          description: 'Enable enhanced autocast system with combat/utility skill classification, allowing utility skills to be cast outside of combat'
+        },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',
           description: 'Show the level of the farm icon'

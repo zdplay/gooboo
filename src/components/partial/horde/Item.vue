@@ -54,7 +54,20 @@
     <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
   <v-card v-else>
-    <v-card-title class="pa-2 justify-center"><v-icon class="mr-2">{{ item.icon }}</v-icon>{{ $vuetify.lang.t(`$vuetify.horde.items.${name}`) }}</v-card-title>
+    <v-card-title class="pa-2 justify-center">
+      <v-icon class="mr-2">{{ item.icon }}</v-icon>
+      {{ $vuetify.lang.t(`$vuetify.horde.items.${name}`) }}
+      <v-btn
+        v-if="canShowAutocastSettings"
+        icon
+        small
+        class="ml-2"
+        color="teal"
+        @click="openAutocastSettings"
+      >
+        <v-icon small>mdi-cog</v-icon>
+      </v-btn>
+    </v-card-title>
     <v-card-subtitle v-if="canSeeMastery" class="pa-2 d-flex justify-center align-center">
       <gb-tooltip>
         <template v-slot:activator="{ on, attrs }">
@@ -132,6 +145,10 @@
       </gb-tooltip>
     </v-card-actions>
     <v-btn class="item-collapse" icon @click="toggleCollapse"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
+    <equipment-autocast-settings
+      v-model="showAutocastSettings"
+      :equipment-name="name"
+    ></equipment-autocast-settings>
   </v-card>
 </template>
 
@@ -144,8 +161,9 @@ import StatBreakdown from '../../render/StatBreakdown.vue';
 import MultStat from '../render/MultStat.vue';
 import DisplayRow from '../upgrade/DisplayRow.vue';
 import Active from './Active.vue';
+import EquipmentAutocastSettings from './EquipmentAutocastSettings.vue';
 export default {
-  components: { Active, MultStat, DisplayRow, MultName, PriceTag, StatBreakdown },
+  components: { Active, MultStat, DisplayRow, MultName, PriceTag, StatBreakdown, EquipmentAutocastSettings },
   props: {
     name: {
       type: String,
@@ -161,6 +179,11 @@ export default {
       required: false,
       default: false
     }
+  },
+  data() {
+    return {
+      showAutocastSettings: false
+    };
   },
   computed: {
     ...mapState({
@@ -292,6 +315,14 @@ export default {
     },
     masteryMinibossMult() {
       return HORDE_MASTERY_MINIBOSS_MULT;
+    },
+    canShowAutocastSettings() {
+      const isEnhancedAutocastEnabled = this.$store.state.system.settings.experiment.items.enhancedAutocast.value;
+      const isCombatEquipment = this.item.activeType === 'combat';
+      const isNotCollapsed = !this.item.collapse;
+      const isUnlocked = this.item.unlock === null || this.$store.getters['horde/itemUnlock'](this.name);
+
+      return isEnhancedAutocastEnabled && isUnlocked && isCombatEquipment && isNotCollapsed;
     }
   },
   methods: {
@@ -308,6 +339,9 @@ export default {
     },
     togglePassive() {
       this.$store.dispatch('horde/toggleItemPassive', this.name);
+    },
+    openAutocastSettings() {
+      this.showAutocastSettings = true;
     }
   }
 }

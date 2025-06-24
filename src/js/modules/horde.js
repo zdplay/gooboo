@@ -32,6 +32,7 @@ import boss from "./horde/boss";
 import scholar from "./horde/fighterClass/scholar";
 import trinket from "./horde/trinket";
 import sigil_boss from "./horde/sigil_boss";
+import { isEnhancedAutocastEnabled, legacyAutocastLogic, enhancedAutocastLogic } from "./horde/enhancedAutocast";
 
 function playerDie() {
     if (store.state.horde.player.revive) {
@@ -300,6 +301,11 @@ export default {
                 if (store.state.horde.player.health > 0) {
                     const isStunned = store.state.horde.player.stun > 0;
 
+                    // 先调用增强自动释放（在usedAttack检查之前）
+                    if (store.state.horde.chosenActive === null && isEnhancedAutocastEnabled(store)) {
+                        enhancedAutocastLogic(store, playerStats, subfeature, true); // inCombat = true
+                    }
+
                     // determine if the chosen attack can be used
                     let usedAttack = null;
                     let item = null;
@@ -459,6 +465,12 @@ export default {
                             if (playerStats.firstStrike > 0 && store.state.horde.player.hits <= 0) {
                                 damage += getDamage(playerStats.attack * playerStats.firstStrike / divisionShieldMult, 'magic', playerStats, enemyStats);
                             }
+
+                            if (store.state.horde.pendingAfterFirstStrike && store.state.horde.chosenActive === null && isEnhancedAutocastEnabled(store)) {
+                                console.log(`[增强自动释放] 执行先发制人后技能: ${store.state.horde.pendingAfterFirstStrike}`);
+                                store.dispatch('horde/useActive', store.state.horde.pendingAfterFirstStrike);
+                                store.commit('horde/updateKey', {key: 'pendingAfterFirstStrike', value: null});
+                            }
                             if (store.state.horde.player.spells > 0) {
                                 if (playerStats.spellblade > 0) {
                                     damage += getDamage(playerStats.attack * playerStats.spellblade / divisionShieldMult, 'magic', playerStats, enemyStats);
@@ -493,60 +505,9 @@ export default {
                         }
                     }
 
-                    // select autocast
-                    if (store.state.horde.chosenActive === null && store.state.horde.autocast.length > 0) {
-                        const sources = store.state.horde.autocast.map(name => {
-                            if (subfeature === 0) {
-                                const item = store.state.horde.items[name];
-                                return {ready: item.cooldownLeft <= 0, type: item.activeType, effect: item.active(item.level), cost: item.activeCost(item.level), name};
-                            } else if (subfeature === 1) {
-                                const split = name.split('_');
-                                if (split[0] === 'skill') {
-                                    const skill = store.state.horde.fighterClass[store.state.horde.selectedClass].skills[split[1]];
-                                    return {ready: store.state.horde.skillActive[name] <= 0, type: skill.activeType, effect: skill.active(skill.level), cost: skill.activeCost(skill.level), name};
-                                } else if (split[0] === 'trinket') {
-                                    const trinket = store.state.horde.trinket[split[1]];
-                                    return {ready: store.state.horde.skillActive[name] <= 0, type: trinket.activeType, effect: trinket.active(trinket.level), cost: trinket.activeCost(trinket.level), name};
-                                }
-                            }
-                            return {};
-                        }).filter(elem => elem.ready &&
-                            (elem.cost.health === undefined || (store.state.horde.player.health >= elem.cost.health) && (store.state.horde.player.health / playerStats.health) >= 0.5) &&
-                            (elem.cost.energy === undefined || (store.state.horde.player.energy >= elem.cost.energy) && (store.state.horde.player.energy / playerStats.energy) >= 0.5) &&
-                            (elem.cost.mana === undefined || (store.state.horde.player.mana >= elem.cost.mana) && (store.state.horde.player.mana / playerStats.mana) >= 0.5) &&
-                            (elem.cost.mysticalShard === undefined || (store.state.currency.horde_mysticalShard.value >= elem.cost.mysticalShard && store.state.currency.horde_mysticalShard.value >= store.state.currency.horde_mysticalShard.cap))
-                        );
-                        sources.forEach(elem => {
-                            if (store.state.horde.chosenActive === null) {
-                                let usePositive = false;
-                                let useNegative = false;
-                                elem.effect.forEach(el => {
-                                    let condition = null;
-                                    if (el.type === 'heal') {
-                                        condition = (store.state.horde.player.health / playerStats.health) <= (1 - el.value);
-                                    } else if (el.type === 'stun') {
-                                        condition = store.state.horde.enemy.stun <= 0;
-                                    } else if (el.type === 'silence') {
-                                        condition = store.state.horde.enemy.silence <= 0;
-                                    } else if (el.type === 'divisionShield') {
-                                        condition = store.state.horde.player.divisionShield <= 0;
-                                    } else if (el.type === 'antidote') {
-                                        condition = store.state.horde.player.poison > 0;
-                                    } else if (el.type === 'removeStun') {
-                                        condition = store.state.horde.player.stun > 0;
-                                    }
-
-                                    if (condition === true) {
-                                        usePositive = true;
-                                    } else if (condition === false) {
-                                        useNegative = true;
-                                    }
-                                    if (usePositive || !useNegative) {
-                                        store.commit('horde/updateKey', {key: 'chosenActive', value: elem.name});
-                                    }
-                                });
-                            }
-                        });
+                    // 原版自动释放：在玩家攻击后（包括先发制人）进行判断
+                    if (store.state.horde.chosenActive === null && !isEnhancedAutocastEnabled(store)) {
+                        legacyAutocastLogic(store, playerStats, subfeature);
                     }
                 }
                 if ((enemyHealth / enemyStats.maxHealth) <= playerStats.execute) {
@@ -806,6 +767,9 @@ export default {
             } else if (subfeature === 0 && store.state.horde.taunt && !store.state.horde.bossAvailable && store.state.horde.zone === store.state.stat.horde_maxZone.value) {
                 store.dispatch('horde/updateEnemyStats');
             } else {
+                if (store.state.horde.chosenActive === null && isEnhancedAutocastEnabled(store)) {
+                    enhancedAutocastLogic(store, playerStats, subfeature, false); // inCombat = false
+                }
                 secondsSpent = Math.max(Math.min(secondsLeft, HORDE_ENEMY_RESPAWN_TIME - store.state.horde.enemyTimer), 1);
                 tickEnemyRespawn(secondsSpent);
                 if (simulation.dead) {
@@ -1189,6 +1153,10 @@ export default {
             obj.sacrificeLevel = store.state.horde.sacrificeLevel;
         }
 
+        if (Object.keys(store.state.horde.enhancedAutocastSettings).length > 0) {
+            obj.enhancedAutocastSettings = store.state.horde.enhancedAutocastSettings;
+        }
+
         for (const [key, elem] of Object.entries(store.state.horde.tower)) {
             if (elem.highest > 0) {
                 if (obj.tower === undefined) {
@@ -1251,7 +1219,7 @@ export default {
             'zone', 'combo', 'respawn', 'maxRespawn', 'bossAvailable', 'bossFight', 'fightTime', 'fightRampage', 'enemyTimer',
             'playerBuff', 'minibossTimer', 'nostalgiaLost', 'chosenActive', 'currentTower', 'towerFloor', 'taunt',
             'selectedClass', 'selectedArea', 'expLevel', 'skillPoints', 'bossStage', 'trinketDrop', 'bossBonusDifficulty',
-            'autocast', 'sacrificeLevel'
+            'autocast', 'sacrificeLevel', 'enhancedAutocastSettings'
         ].forEach(elem => {
             if (data[elem] !== undefined) {
                 store.commit('horde/updateKey', {key: elem, value: data[elem]});

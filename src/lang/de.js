@@ -1491,6 +1491,10 @@ export default {
       showFarmIconLevel: {
         name: 'Show Farm Icon Level',
         description: 'Show the level of the farm icon'
+      },
+      enhancedAutocast: {
+        name: 'Enhanced Autocast',
+        description: 'Enable enhanced autocast system with combat/utility skill classification, allowing utility skills to be cast outside of combat'
       }
     }
   },

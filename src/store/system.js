@@ -481,6 +481,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    enhancedAutocast: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
+                    },
                 }
             },
             automation: {

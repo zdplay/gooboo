@@ -10,6 +10,15 @@
 .loadout-header-reduce-minheight {
   min-height: 32px !important;
 }
+.config-textarea {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+.config-textarea .v-input__control .v-input__slot textarea {
+  font-family: 'Courier New', monospace !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
 </style>
 
 <template>
@@ -22,6 +31,18 @@
         </template>
         <stat-breakdown name="hordeMaxItems"></stat-breakdown>
       </gb-tooltip>
+      <v-btn
+        small
+        class="ml-3 pa-1"
+        color="primary"
+        min-width="20"
+        min-height="20"
+        style="height: 24px;"
+        @click="openBatchConfigDialog"
+        v-if="hasEnhancedAutocastSettings"
+      >
+        <v-icon small>mdi-cog</v-icon>
+      </v-btn>
     </div>
     <div class="d-flex flex-column align-center bg-tile-default rounded-b elevation-2 ma-2 pa-1" v-if="showLoadouts">
       <div class="d-flex justify-space-between align-center w-100">
@@ -58,6 +79,57 @@
       <v-pagination v-model="page" :length="pages"></v-pagination>
     </div>
     <item v-for="item in finalItems" :key="'item-' + item.name" :name="item.name" :disabled="itemsBlocked" :active-disabled="isFrozen" class="ma-2"></item>
+
+    <!-- 批量配置编辑弹窗 -->
+    <v-dialog v-model="batchConfigDialog" max-width="800" @click:outside="closeBatchConfigDialog">
+      <v-card class="default-card pa-2">
+        <v-card-title class="pa-2 justify-center">
+          增强自动释放批量配置
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeBatchConfigDialog">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-2">
+          <div class="mb-3">
+            <v-alert type="info" dense outlined>
+              <div class="text-body-2">
+                <strong>使用说明：</strong><br>
+                • 下方显示所有已配置的装备设置<br>
+                • 可以直接编辑JSON文本进行批量修改<br>
+                • 保存前请确保JSON格式正确<br>
+                • 删除某个装备的配置可将其整个对象删除
+              </div>
+            </v-alert>
+          </div>
+
+          <v-textarea
+            v-model="configJsonText"
+            label="配置JSON"
+            outlined
+            rows="20"
+            :error="jsonError !== null"
+            :error-messages="jsonError"
+            @input="validateJson"
+            class="config-textarea"
+          ></v-textarea>
+        </v-card-text>
+
+        <v-card-actions class="px-2 pb-2">
+          <v-btn color="secondary" @click="resetToOriginal">重置</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" @click="closeBatchConfigDialog">取消</v-btn>
+          <v-btn
+            color="success"
+            @click="saveBatchConfig"
+            :disabled="jsonError !== null || configJsonText.trim() === ''"
+          >
+            保存
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -72,7 +144,11 @@ export default {
   data: () => ({
     page: 1,
     cacheKey: 'horde_0_equipment',
-    showLoadouts: false
+    showLoadouts: false,
+    batchConfigDialog: false,
+    configJsonText: '',
+    originalConfigJson: '',
+    jsonError: null
   }),
   mounted() {
     const cachePage = this.$store.state.system.cachePage[this.cacheKey];
@@ -113,6 +189,10 @@ export default {
     },
     itemsBlocked() {
       return this.isFrozen || this.$store.state.horde.currentTower !== null;
+    },
+    hasEnhancedAutocastSettings() {
+      const settings = this.$store.state.horde.enhancedAutocastSettings || {};
+      return Object.keys(settings).length > 0;
     }
   },
   methods: {
@@ -130,6 +210,58 @@ export default {
     },
     unequipLoadout(index) {
       this.$store.dispatch('horde/unequipLoadout', index);
+    },
+    openBatchConfigDialog() {
+      const settings = this.$store.state.horde.enhancedAutocastSettings || {};
+      this.originalConfigJson = JSON.stringify(settings, null, 2);
+      this.configJsonText = this.originalConfigJson;
+      this.jsonError = null;
+      this.batchConfigDialog = true;
+    },
+    closeBatchConfigDialog() {
+      this.batchConfigDialog = false;
+      this.configJsonText = '';
+      this.originalConfigJson = '';
+      this.jsonError = null;
+    },
+    validateJson() {
+      try {
+        if (this.configJsonText.trim() === '') {
+          this.jsonError = null;
+          return;
+        }
+        JSON.parse(this.configJsonText);
+        this.jsonError = null;
+      } catch (error) {
+        this.jsonError = `JSON格式错误: ${error.message}`;
+      }
+    },
+    resetToOriginal() {
+      this.configJsonText = this.originalConfigJson;
+      this.jsonError = null;
+    },
+    saveBatchConfig() {
+      try {
+        if (this.configJsonText.trim() === '') {
+          // 清空所有配置
+          this.$store.commit('horde/updateKey', {
+            key: 'enhancedAutocastSettings',
+            value: {}
+          });
+        } else {
+          const newConfig = JSON.parse(this.configJsonText);
+          this.$store.commit('horde/updateKey', {
+            key: 'enhancedAutocastSettings',
+            value: newConfig
+          });
+        }
+
+        console.log('批量配置保存成功');
+        this.closeBatchConfigDialog();
+      } catch (error) {
+        console.error('批量配置保存失败:', error);
+        this.jsonError = `保存失败: ${error.message}`;
+      }
     }
   },
   watch: {

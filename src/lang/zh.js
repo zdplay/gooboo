@@ -1499,6 +1499,10 @@ export default {
         farmWatering: {
           name: '农场浇水',
           description: '启用农场浇水工具系统，可以给植物浇水提供12小时生长速度+15%的buff，浇水壶可升级扩大范围'
+        },
+        enhancedAutocast: {
+          name: '增强自动释放（测试）',
+          description: '启用增强版自动释放系统，支持战斗/非战斗技能分类，非战斗技能可在非战斗状态下释放，部落2不支持自定义释放'
         }
       }
   },

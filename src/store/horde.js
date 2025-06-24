@@ -66,6 +66,7 @@ export default {
         minibossTimer: 0,
         nostalgiaLost: 0,
         chosenActive: null,
+        pendingAfterFirstStrike: null,
         itemStatMult: {},
         tower: {},
         currentTower: null,
@@ -96,6 +97,7 @@ export default {
         sacrificeLevel: 0,
         nextSacrificeLevel: 0,
         hordeAutomation: null,
+        enhancedAutocastSettings: {},
     },
     getters: {
         playerBaseStats: (state, getters, rootState) => {
