@@ -2,13 +2,16 @@
 .price-tag-highlight {
   box-shadow: 0 1px 8px var(--v-amber-base);
 }
+.price-tag-over-abundant {
+  opacity: 0.5;
+}
 </style>
 
 <template>
   <gb-tooltip v-if="add || curr.alwaysVisible || stat.total > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ currency }.name`)">
     <template v-slot:activator="{ on, attrs }">
       <v-badge dot overlap bordered :color="curr.color" :value="multWarning">
-        <div class="v-chip v-chip--label v-size--small px-2 balloon-text-dynamic" :class="[{'price-tag-highlight': highlight}, $vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', curr.color, $vnode.data.staticClass]" v-bind="attrs" v-on="on" @click="handleClick">
+        <div class="v-chip v-chip--label v-size--small px-2 balloon-text-dynamic" :class="[{'price-tag-highlight': highlight, 'price-tag-over-abundant': isOverAbundant}, $vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', curr.color, $vnode.data.staticClass]" v-bind="attrs" v-on="on" @click="handleClick">
           <v-icon size="16" class="mr-2" :aria-label="$vuetify.lang.t(`$vuetify.currency.${ currency }.name`)">{{ curr.icon }}</v-icon>
           <span :class="costClass">{{ (add && amount >= 0) ? '+' : '' }}{{ $formatNum(amount) }}<slot name="suffix"></slot></span>
         </div>
@@ -72,6 +75,13 @@ export default {
         return true;
       }
       return false;
+    },
+    isOverAbundant() {
+      if (this.add || this.amount <= 0 || !this.$store.state.system.settings.experiment.items.lowCostMaterialFade.value) {
+        return false;
+      }
+      const neededPercent = 100 * this.curr.value / this.amount;
+      return neededPercent > 1000;
     }
   },
   methods: {

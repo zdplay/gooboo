@@ -1495,6 +1495,10 @@ export default {
       enhancedAutocast: {
         name: 'Enhanced Autocast',
         description: 'Enable enhanced autocast system with combat/utility skill classification, allowing utility skills to be cast outside of combat'
+      },
+      lowCostMaterialFade: {
+        name: 'Low Cost Material Fade',
+        description: 'When material abundance percentage is over 1000%, price tag becomes semi-transparent'
       }
     }
   },

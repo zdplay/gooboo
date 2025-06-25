@@ -193,7 +193,7 @@ export default {
         'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
         'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
         'mobileHordeLoadoutLayout', 'enableMenuShortcuts', 'tierProgress', 'showFarmIconLevel', 'showFarmHarvestNotify',
-        'showFarmOfflineSummary'
+        'showFarmOfflineSummary', 'lowCostMaterialFade', 'upgradeBuyProgress', 'upgradeFilterFeature', 'canvasPreview'
       ];
     },
     uiExperimentSettings() {

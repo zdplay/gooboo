@@ -1467,6 +1467,10 @@ export default {
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',
           description: 'Show the level of the farm icon'
+        },
+        lowCostMaterialFade: {
+          name: 'Low Cost Material Fade',
+          description: 'When material abundance percentage is over 1000%, price tag becomes semi-transparent'
         }
       }
   },

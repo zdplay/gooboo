@@ -1503,6 +1503,10 @@ export default {
         enhancedAutocast: {
           name: '增强自动释放（测试）',
           description: '启用增强版自动释放系统，支持战斗/非战斗技能分类，非战斗技能可在非战斗状态下释放，部落2不支持自定义释放'
+        },
+        lowCostMaterialFade: {
+          name: '低耗材料半隐藏',
+          description: '当材料充足百分比超过1000%时，价格标签显示为半透明效果'
         }
       }
   },

@@ -488,6 +488,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    lowCostMaterialFade: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    }
                 }
             },
             automation: {
