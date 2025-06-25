@@ -108,6 +108,40 @@
     <v-card class="ma-2">
       <v-card-title class="justify-center">改动声明</v-card-title>
       <v-card-text>本版修改属于改善自己游戏的体验，如感不适可玩官服。</v-card-text>
+      <v-card-text>
+        <div class="text-subtitle-1 mb-3 d-flex align-center">
+          <v-icon small class="mr-2">mdi-web</v-icon>
+          本服地址
+          <v-chip x-small color="success" class="ml-2">存档互通</v-chip>
+        </div>
+        <v-row>
+          <v-col v-for="(site, index) in websites" :key="index" cols="12" sm="4">
+            <v-card
+              :href="site.url"
+              target="_blank"
+              class="site-card pa-3 text-center"
+              outlined
+              hover
+            >
+              <div class="d-flex justify-space-between align-start mb-2">
+                <v-chip x-small color="grey" dark>{{ index + 1 }}</v-chip>
+                <div class="ping-indicator">
+                  <v-icon
+                    x-small
+                    :color="getPingColor(site.ping)"
+                    class="mr-1"
+                  >mdi-circle</v-icon>
+                  <span class="text-caption" :class="getPingColor(site.ping) + '--text'">
+                    {{ site.ping === null ? '测试中...' : site.ping + 'ms' }}
+                  </span>
+                </div>
+              </div>
+              <div class="text-body-2 font-weight-medium">{{ site.name }}</div>
+              <div class="text-caption grey--text">{{ site.url.replace('https://', '') }}</div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
       <v-card-text>本版改动如下：</v-card-text>
       <v-card-text>
         <v-expansion-panels>
@@ -262,6 +296,11 @@ export default {
   components: { AlertText },
   data: () => ({
     timeUnits: ['s', 'm', 'h', 'd'],
+    websites: [
+      { name: 'Gooboo 腾讯', url: 'https://gooboo.0nz.de', ping: null },
+      { name: 'Gobo VERCEL', url: 'https://gobo.0nz.de', ping: null },
+      { name: 'Gobo 阿里', url: 'https://gobo.maozi.io', ping: null }
+    ],
     // 当前更新版本号从constants.js导入，只需在那里修改一处
     // 发布新更新时请同步修改：
     // 1. constants.js中的UPDATE_VERSION常量
@@ -276,7 +315,7 @@ export default {
       { category: '部落', color: 'red', content: '增加显示玩家名称功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加装备最大化升级按钮，只能非折叠状态显示。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，完善自动升级、装备、技能。', isCurrentUpdate: false },
-      { category: '部落', color: 'red', content: '增加手机装备布局功能，在【设置】-【实验性】设置，只有小屏幕和手机才会显示。', isCurrentUpdate: true },
+      { category: '部落', color: 'red', content: '增加手机装备布局功能，在【设置】-【实验性】设置，只有小屏幕和手机才会显示。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加神秘碎片额外获得途径，在【设置】-【实验性】设置。', isCurrentUpdate: true },
       { category: '部落', color: 'red', content: '调整装备配置能同步保存装备自动施法和禁用主动技能状态。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊的形状游戏显示各个形状的个数。', isCurrentUpdate: false },
@@ -293,8 +332,8 @@ export default {
       { category: '农场', color: 'brown', content: '增加农场基因阻断跳过功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场物品收获和使用通知功能。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加农场离线汇总功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
-      { category: '农场', color: 'brown', content: '增加旧农场UI的等级显示，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
-      { category: '农场', color: 'brown', content: '增加农场统计按钮。', isCurrentUpdate: true },
+      { category: '农场', color: 'brown', content: '增加旧农场UI的等级显示，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
+      { category: '农场', color: 'brown', content: '增加农场统计按钮。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '增加浇水功能，可以12小时内提速15%生长速度，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面在目录和卡片选择下拉框增加对应卡包显示。在【设置】-【实验性】设置使用', isCurrentUpdate: false },
       { category: '卡片', color: 'deep-purple', content: '增加卡片页面卡包购买预测功能。', isCurrentUpdate: false },
@@ -305,7 +344,7 @@ export default {
       { category: '事件', color: 'dark-blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志，互动钓鱼小游戏。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
-      { category: '事件', color: 'dark-blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '事件', color: 'dark-blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加攻略按钮。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加沙漏快捷时间选择和自动使用考试券功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加部分地方计时显示。', isCurrentUpdate: false },
@@ -389,12 +428,59 @@ export default {
       return APP_TESTING;
     }
   },
+
   methods: {
     toPatchnote() {
       this.$store.commit('system/updateKey', {key: 'screen', value: 'patchnote'});
     },
     toStatOverview() {
       this.$store.commit('system/updateKey', {key: 'screen', value: 'statOverview'});
+    },
+    getPingColor(ping) {
+      if (ping === null) return 'grey';
+      if (ping < 100) return 'success';
+      if (ping < 300) return 'warning';
+      return 'error';
+    },
+
+    async testPing(index) {
+      const site = this.websites[index];
+      const testCount = 3;
+      const results = [];
+
+      for (let i = 0; i < testCount; i++) {
+        try {
+          const startTime = performance.now();
+
+          await fetch(site.url, {
+            mode: 'no-cors',
+            cache: 'no-cache',
+            signal: AbortSignal.timeout(3000)
+          });
+
+          const endTime = performance.now();
+          const ping = Math.round(endTime - startTime);
+          results.push(ping);
+
+        } catch (error) {
+          results.push(999);
+        }
+
+        if (i < testCount - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+
+      const validResults = results.filter(ping => ping < 999);
+      let averagePing;
+
+      if (validResults.length > 0) {
+        averagePing = Math.round(validResults.reduce((sum, ping) => sum + ping, 0) / validResults.length);
+      } else {
+        averagePing = 999;
+      }
+
+      this.$set(this.websites[index], 'ping', Math.min(averagePing, 999));
     },
     markUpdateAsRead() {
       this.$store.commit('system/updateKey', {key: 'updateNoticeVersion', value: UPDATE_VERSION});
@@ -412,6 +498,26 @@ export default {
   },
   mounted() {
     this.markUpdateAsRead();
+    this.websites.forEach((_, index) => {
+      this.testPing(index);
+    });
   }
 }
 </script>
+
+<style scoped>
+.site-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.site-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.ping-indicator {
+  display: flex;
+  align-items: center;
+}
+</style>
