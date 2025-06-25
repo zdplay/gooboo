@@ -92,12 +92,12 @@ export default {
   watch: {
     loadoutName(newVal, oldVal) {
       if (oldVal !== null) {
-        this.$store.commit('gallery/updateIdeaLoadoutKey', {id: this.name, key: 'name', value: newVal});
+        this.$store.commit('gallery/updateIdeaLoadoutKey', {index: this.name, key: 'name', value: newVal});
       }
     },
     contentList(newVal, oldVal) {
       if (oldVal !== null) {
-        this.$store.commit('gallery/updateIdeaLoadoutKey', {id: this.name, key: 'content', value: newVal});
+        this.$store.commit('gallery/updateIdeaLoadoutKey', {index: this.name, key: 'content', value: newVal});
       }
     }
   }

@@ -201,7 +201,7 @@ export default {
             state.ideaLoadout.push(o);
         },
         updateIdeaLoadoutKey(state, o) {
-            Vue.set(state.ideaLoadout[o.id], o.key, o.value);
+            Vue.set(state.ideaLoadout[o.index], o.key, o.value);
         },
         deleteIdeaLoadout(state, index) {
             state.ideaLoadout.splice(index, 1);
