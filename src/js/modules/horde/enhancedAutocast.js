@@ -676,12 +676,12 @@ export function enhancedAutocastLogic(store, playerStats, subfeature, inCombat) 
         if (candidateSkills.length > 0 && store.state.horde.chosenActive === null) {
             candidateSkills.sort((a, b) => b.priority - a.priority);
             const selectedSkill = candidateSkills[0];
-            const configType = selectedSkill.elem.useOldLogic ? '旧逻辑' :
+/*             const configType = selectedSkill.elem.useOldLogic ? '旧逻辑' :
                               (selectedSkill.elem.config?.type === 'custom' ? '自定义配置' : '新逻辑');
 
             const timing = selectedSkill.beforeFirstStrike ? '先发制人前' : '先发制人后';
             const conditionsText = selectedSkill.reasons.join(', ').replace(/条件逻辑: (\w+) - 所有条件满足, /, '$1 - ').replace(/\(满足\)/g, '(满足)').replace(/\(不满足\)/g, '(不满足)');
-            console.log(`[增强自动释放] 释放 ${selectedSkill.elem.name} (${configType})|${timing}|优先级: ${selectedSkill.priority}|条件: ${conditionsText}`);
+            console.log(`[增强自动释放] 释放 ${selectedSkill.elem.name} (${configType})|${timing}|优先级: ${selectedSkill.priority}|条件: ${conditionsText}`); */
 
             if (selectedSkill.beforeFirstStrike) {
                 store.dispatch('horde/useActive', selectedSkill.elem.name);

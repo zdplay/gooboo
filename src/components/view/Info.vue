@@ -128,11 +128,11 @@
                 <div class="ping-indicator">
                   <v-icon
                     x-small
-                    :color="getPingColor(site.ping)"
+                    :color="getStatusColor(site)"
                     class="mr-1"
-                  >mdi-circle</v-icon>
-                  <span class="text-caption" :class="getPingColor(site.ping) + '--text'">
-                    {{ site.ping === null ? '测试中...' : site.ping + 'ms' }}
+                  >{{ getStatusIcon(site) }}</v-icon>
+                  <span class="text-caption" :class="getStatusColor(site) + '--text'">
+                    {{ getStatusText(site) }}
                   </span>
                 </div>
               </div>
@@ -297,9 +297,9 @@ export default {
   data: () => ({
     timeUnits: ['s', 'm', 'h', 'd'],
     websites: [
-      { name: 'Gooboo 腾讯', url: 'https://gooboo.0nz.de', ping: null },
-      { name: 'Gobo VERCEL', url: 'https://gobo.0nz.de', ping: null },
-      { name: 'Gobo 阿里', url: 'https://gobo.maozi.io', ping: null }
+      { name: 'Gooboo 腾讯', url: 'https://gooboo.0nz.de', ping: null, iconUrl: 'https://gooboo.0nz.de/gooboo/favicon-32x32.png', accessible: null },
+      { name: 'Gobo vercel', url: 'https://gobo.0nz.de', ping: null, iconUrl: 'https://gobo.0nz.de/gooboo/favicon-32x32.png', accessible: null },
+      { name: 'Gobo 阿里', url: 'https://gobo.maozi.io', ping: null, iconUrl: 'https://gobo.maozi.io/favicon-32x32.png', accessible: null }
     ],
     // 当前更新版本号从constants.js导入，只需在那里修改一处
     // 发布新更新时请同步修改：
@@ -443,6 +443,44 @@ export default {
       return 'error';
     },
 
+    getStatusColor(site) {
+      if (site.ping === null || site.accessible === null) {
+        return 'grey';
+      }
+
+      if (site.accessible === false) {
+        return 'error';
+      }
+
+      return this.getPingColor(site.ping);
+    },
+
+    getStatusIcon(site) {
+      if (site.ping === null || site.accessible === null) {
+        return 'mdi-loading mdi-spin';
+      }
+
+      if (site.accessible === false) {
+        return 'mdi-close-circle';
+      }
+
+      if (site.ping < 100) return 'mdi-check-circle';
+      if (site.ping < 300) return 'mdi-minus-circle';
+      return 'mdi-alert-circle';
+    },
+
+    getStatusText(site) {
+      if (site.ping === null || site.accessible === null) {
+        return '测试中...';
+      }
+
+      if (site.accessible === false) {
+        return '无法访问';
+      }
+
+      return site.ping + 'ms';
+    },
+
     async testPing(index) {
       const site = this.websites[index];
       const testCount = 3;
@@ -450,17 +488,27 @@ export default {
 
       for (let i = 0; i < testCount; i++) {
         try {
+          const img = new Image();
           const startTime = performance.now();
 
-          await fetch(site.url, {
-            mode: 'no-cors',
-            cache: 'no-cache',
-            signal: AbortSignal.timeout(3000)
+          const loadPromise = new Promise((resolve, reject) => {
+            img.onload = () => {
+              const loadTime = Math.round(performance.now() - startTime);
+              resolve(loadTime);
+            };
+            img.onerror = () => {
+              reject(new Error('Icon load failed'));
+            };
           });
 
-          const endTime = performance.now();
-          const ping = Math.round(endTime - startTime);
-          results.push(ping);
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout')), 5000);
+          });
+
+          img.src = site.iconUrl + '?' + Math.random(); // 避免缓存
+
+          const loadTime = await Promise.race([loadPromise, timeoutPromise]);
+          results.push(loadTime);
 
         } catch (error) {
           results.push(999);
@@ -471,16 +519,16 @@ export default {
         }
       }
 
-      const validResults = results.filter(ping => ping < 999);
-      let averagePing;
+      const validResults = results.filter(time => time < 999);
 
       if (validResults.length > 0) {
-        averagePing = Math.round(validResults.reduce((sum, ping) => sum + ping, 0) / validResults.length);
+        const averageTime = Math.round(validResults.reduce((sum, time) => sum + time, 0) / validResults.length);
+        this.$set(this.websites[index], 'ping', averageTime);
+        this.$set(this.websites[index], 'accessible', true);
       } else {
-        averagePing = 999;
+        this.$set(this.websites[index], 'ping', 999);
+        this.$set(this.websites[index], 'accessible', false);
       }
-
-      this.$set(this.websites[index], 'ping', Math.min(averagePing, 999));
     },
     markUpdateAsRead() {
       this.$store.commit('system/updateKey', {key: 'updateNoticeVersion', value: UPDATE_VERSION});
@@ -519,5 +567,14 @@ export default {
 .ping-indicator {
   display: flex;
   align-items: center;
+}
+
+.mdi-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

@@ -467,7 +467,7 @@ export default {
                             }
 
                             if (store.state.horde.pendingAfterFirstStrike && store.state.horde.chosenActive === null && isEnhancedAutocastEnabled(store)) {
-                                console.log(`[增强自动释放] 执行先发制人后技能: ${store.state.horde.pendingAfterFirstStrike}`);
+                                //console.log(`[增强自动释放] 执行先发制人后技能: ${store.state.horde.pendingAfterFirstStrike}`);
                                 store.dispatch('horde/useActive', store.state.horde.pendingAfterFirstStrike);
                                 store.commit('horde/updateKey', {key: 'pendingAfterFirstStrike', value: null});
                             }
