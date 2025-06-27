@@ -180,6 +180,22 @@ export function legacyAutocastLogic(store, playerStats, subfeature) {
         
         sources.forEach(elem => {
             if (store.state.horde.chosenActive === null) {
+                let isEquipped = true;
+                if (subfeature === 0) {
+                    const item = store.state.horde.items[elem.name];
+                    isEquipped = item && item.equipped;
+                } else if (subfeature === 1) {
+                    const split = elem.name.split('_');
+                    if (split[0] === 'trinket') {
+                        const trinket = store.state.horde.trinket[split[1]];
+                        isEquipped = trinket && trinket.equipped;
+                    }
+                }
+
+                if (!isEquipped) {
+                    return;
+                }
+
                 let usePositive = false;
                 let useNegative = false;
                 elem.effect.forEach(el => {
@@ -203,10 +219,10 @@ export function legacyAutocastLogic(store, playerStats, subfeature) {
                     } else if (condition === false) {
                         useNegative = true;
                     }
-                    if (usePositive || !useNegative) {
-                        store.commit('horde/updateKey', {key: 'chosenActive', value: elem.name});
-                    }
                 });
+                if (usePositive || !useNegative) {
+                    store.dispatch('horde/useActive', elem.name);
+                }
             }
         });
     }
@@ -514,6 +530,22 @@ export function enhancedAutocastLogic(store, playerStats, subfeature, inCombat) 
 
             sources.forEach(elem => {
                 if (store.state.horde.chosenActive === null) {
+                    let isEquipped = true;
+                    if (subfeature === 0) {
+                        const item = store.state.horde.items[elem.name];
+                        isEquipped = item && item.equipped;
+                    } else if (subfeature === 1) {
+                        const split = elem.name.split('_');
+                        if (split[0] === 'trinket') {
+                            const trinket = store.state.horde.trinket[split[1]];
+                            isEquipped = trinket && trinket.equipped;
+                        }
+                    }
+
+                    if (!isEquipped) {
+                        return;
+                    }
+
                     let usePositive = false;
                     let useNegative = false;
                     elem.effect.forEach(el => {
@@ -664,12 +696,26 @@ export function enhancedAutocastLogic(store, playerStats, subfeature, inCombat) 
             }
 
             if (shouldRelease) {
-                candidateSkills.push({
-                    elem,
-                    reasons: releaseReasons,
-                    priority: skillPriority,
-                    beforeFirstStrike: getBeforeFirstStrikeSetting(elem.name)
-                });
+                let isEquipped = true;
+                if (subfeature === 0) {
+                    const item = store.state.horde.items[elem.name];
+                    isEquipped = item && item.equipped;
+                } else if (subfeature === 1) {
+                    const split = elem.name.split('_');
+                    if (split[0] === 'trinket') {
+                        const trinket = store.state.horde.trinket[split[1]];
+                        isEquipped = trinket && trinket.equipped;
+                    }
+                }
+
+                if (isEquipped) {
+                    candidateSkills.push({
+                        elem,
+                        reasons: releaseReasons,
+                        priority: skillPriority,
+                        beforeFirstStrike: getBeforeFirstStrikeSetting(elem.name)
+                    });
+                }
             }
         });
 
