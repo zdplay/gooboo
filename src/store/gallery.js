@@ -225,6 +225,9 @@ export default {
                 commit('updateColorDataKey', {name: key, key: 'progress', value: 0});
                 commit('updateColorDataKey', {name: key, key: 'cacheSpace', value: 0});
             }
+            commit('updateKey', {key: 'ideaLoadout', value: []});
+            commit('updateKey', {key: 'nextIdeaLoadoutId', value: 1});
+            commit('updateKey', {key: 'selectedIdeaLoadout', value: null});
             commit('updateKey', {key: 'shapeGrid', value: null});
             commit('updateKey', {key: 'hourglassCombo', value: 0});
             commit('updateKey', {key: 'canvasSpace', value: []});
