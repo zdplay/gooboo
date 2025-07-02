@@ -132,7 +132,10 @@ const loadLatestFileData = async (userId = null, tokenId = null) => {
         //console.log('saveFileData res:', res.save_data);
         if (res.save_data) {
             cleanStore();
-            loadGame(res.save_data);
+            for (const key of Object.keys(store.state.system.features)) {
+                store.commit('system/updateNextSubfeature', {key, value: 0});
+            }
+            loadGame(res.save_data, true, false);
         } else {
             addCloudNotification('error', 'load', { message: '没找到云存档' });
         }
@@ -173,8 +176,10 @@ const loadSelectedFileData = async (selectedSavefile) => {
         console.log('saveFileData res:', saveData);
         if (saveData) {
             cleanStore();
-            loadGame(saveData);
-            //addCloudNotification('load', 'cloud');
+            for (const key of Object.keys(store.state.system.features)) {
+                store.commit('system/updateNextSubfeature', {key, value: 0});
+            }
+            loadGame(saveData, true, false);
         } else {
             addCloudNotification('error', 'download', { message: '加载云存档失败' });
         }
@@ -257,6 +262,28 @@ function cleanStore() {
     store.commit('mining/updateKey', {key: 'durability', value: store.getters['mining/currentDurability']});
     store.dispatch('horde/updatePlayerStats');
     store.dispatch('horde/updateEnemyStats');
+
+    cleanSubfeatureFields();
+}
+
+function cleanSubfeatureFields() {
+    const subfeatureFields = {
+        village: ['crafting', 'explorerProgress', 'offeringGen'],
+        horde: ['expLevel', 'skillPoints', 'skillLevel', 'skillActive', 'trinket', 'battlePassEffect', 'sacrificeLevel', 'enhancedAutocastSettings'],
+        mining: ['autoMining', 'autoMiningStatus', 'smelteryQueue']
+    };
+
+    for (const [module, fields] of Object.entries(subfeatureFields)) {
+        if (store.state[module]) {
+            fields.forEach(field => {
+                if (store.state[module][field] !== undefined) {
+                    const defaultValue = typeof store.state[module][field] === 'object' ?
+                        (Array.isArray(store.state[module][field]) ? [] : {}) : 0;
+                    store.commit(`${module}/updateKey`, {key: field, value: defaultValue});
+                }
+            });
+        }
+    }
 }
 
 function migrate(file) {
@@ -370,7 +397,7 @@ function decodeFile(file, showErrors = true) {
     return file;
 }
 
-function loadFile(file) {
+function loadFile(file, importNextSubfeature = true) {
     // Try to run migrations
     let save = null;
     try {
@@ -417,7 +444,8 @@ function loadFile(file) {
             store.commit('system/updateSubfeature', {key, value: elem});
         }
     }
-    if (save.nextSubfeature) {
+
+    if (importNextSubfeature && save.nextSubfeature) {
         for (const [key, elem] of Object.entries(save.nextSubfeature)) {
             store.commit('system/updateNextSubfeature', {key, value: elem});
         }

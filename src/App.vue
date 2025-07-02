@@ -1070,8 +1070,10 @@ export default {
           const data = decodeFile(e.target.result);
           if (data) {
             cleanStore();
-            if (loadGame(e.target.result)) {
-              // Apply theme
+            for (const key of Object.keys(that.$store.state.system.features)) {
+              that.$store.commit('system/updateNextSubfeature', {key, value: 0});
+            }
+            if (loadGame(e.target.result, true, false)) {
               ['light', 'dark'].forEach(brightness => {
                 for (const [key, elem] of Object.entries({...that.$store.state.system.themes.default[brightness], ...that.$store.state.system.themes[data.theme][brightness]})) {
                   that.$vuetify.theme.themes[brightness][key] = elem;

@@ -49,14 +49,14 @@ function newGame(startTick = true) {
     }
 }
 
-function loadGame(file, runPrepare = true) {
+function loadGame(file, runPrepare = true, importNextSubfeature = true) {
     const decodedFile = decodeFile(file);
     if (decodedFile) {
         if (runPrepare) {
             prepare();
         }
 
-        const parsedFile = loadFile(decodedFile);
+        const parsedFile = loadFile(decodedFile, importNextSubfeature);
 
         store.commit('system/updateKey', {key: 'currentDay', value: getDay(new Date(store.state.system.timestamp * 1000))});
         store.commit('system/generatePlayerId');

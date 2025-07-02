@@ -168,6 +168,16 @@ export default {
             for (const [key] of Object.entries(state.policy)) {
                 commit('updatePolicyKey', {name: key, key: 'value', value: 0});
             }
+
+            for (const [key] of Object.entries(state.crafting)) {
+                commit('updateSubkey', {key: 'crafting', name: key, subkey: 'isCrafting', value: false});
+                commit('updateSubkey', {key: 'crafting', name: key, subkey: 'isSelling', value: false});
+                commit('updateSubkey', {key: 'crafting', name: key, subkey: 'progress', value: 0});
+                commit('updateSubkey', {key: 'crafting', name: key, subkey: 'owned', value: 0});
+                commit('updateSubkey', {key: 'crafting', name: key, subkey: 'crafted', value: 0});
+            }
+            commit('updateKey', {key: 'explorerProgress', value: 0});
+            commit('updateKey', {key: 'offeringGen', value: 0});
             for (const [key, elem] of Object.entries(state.crafting)) {
                 commit('updateSubkey', {key: 'crafting', name: key, subkey: 'value', value: elem.baseValue});
                 commit('updateSubkey', {key: 'crafting', name: key, subkey: 'timeNeeded', value: elem.baseTimeNeeded});

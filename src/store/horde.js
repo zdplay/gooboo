@@ -608,6 +608,15 @@ export default {
             commit('updateKey', {key: 'loadout', value: []});
             commit('updateKey', {key: 'loadoutExtended', value: {}});
             commit('updateKey', {key: 'nextLoadoutId', value: 1});
+
+            commit('updateKey', {key: 'expLevel', value: 0});
+            commit('updateKey', {key: 'skillPoints', value: 0});
+            commit('updateKey', {key: 'skillLevel', value: {}});
+            commit('updateKey', {key: 'skillActive', value: {}});
+            commit('updateKey', {key: 'trinket', value: {}});
+            commit('updateKey', {key: 'battlePassEffect', value: {}});
+            commit('updateKey', {key: 'sacrificeLevel', value: 0});
+            commit('updateKey', {key: 'enhancedAutocastSettings', value: {}});
             commit('updateKey', {key: 'enemyTimer', value: 0});
             commit('updateKey', {key: 'minibossTimer', value: 0});
             commit('updateKey', {key: 'nostalgiaLost', value: 0});
