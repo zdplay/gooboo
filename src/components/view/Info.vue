@@ -362,6 +362,7 @@ export default {
       { category: '其他', color: 'cyan', content: '增加升级队列功能。在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加低耗材料半隐藏功能，当材料充足百分比超过1000%时价格标签显示半透明效果。', isCurrentUpdate: true },
       { category: '冰冻实验室', color: 'blue', content: '增加双开门冰箱功能，扩展为冷藏和冷冻双系统，同时使用时1.3倍效果。', isCurrentUpdate: false },
+      { category: '事件', color: 'dark-blue', content: '增加【指定赌场事件】功能，开启后可手动选择进入宾果或转盘，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
     ],
     categoryIcons: {
       '设置': 'mdi-cog',

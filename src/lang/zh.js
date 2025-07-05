@@ -1065,6 +1065,12 @@ export default {
         3: '3x 宾果'
       }
     },
+    casinoTypeSelection: {
+      title: '选择赌场游戏',
+      description: '请选择您想要进入的赌场游戏类型：',
+      bingo: '宾果',
+      wheel: '转盘'
+    },
     bank: {
       name: '银行',
       description: '通过 3 个选项之一管理您的黄玉。 使用一个选项会禁用所有其他选项。 偿还贷款不需要或消耗任何行动。',
@@ -1507,6 +1513,10 @@ export default {
         lowCostMaterialFade: {
           name: '低耗材料半隐藏',
           description: '当材料充足百分比超过1000%时，价格标签显示为半透明效果'
+        },
+        customCasinoEvent: {
+          name: '指定赌场事件',
+          description: '启用后，每次进入赌场事件时可以手动选择宾果或转盘，而不是随机决定'
         }
       }
   },

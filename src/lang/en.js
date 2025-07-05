@@ -1033,6 +1033,12 @@ export default {
         3: '3x Bingo'
       }
     },
+    casinoTypeSelection: {
+      title: 'Select casino game',
+      description: 'Please select the type of casino game you want to play:',
+      bingo: 'Bingo',
+      wheelOfFortune: 'Wheel of Fortune'
+    },
     bank: {
       name: 'Bank',
       description: 'Manage your topaz in 1 of 3 options. Using one option disables all other ones. Paying back loans does not require or consume an action.',

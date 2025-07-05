@@ -1065,6 +1065,12 @@ export default {
         3: '3x Bingo'
       }
     },
+    casinoTypeSelection: {
+      title: 'Casino-Spiel auswählen',
+      description: 'Bitte wähle den Typ des Casinospiels, das du spielen möchtest:',
+      bingo: 'Bingo',
+      wheelOfFortune: 'Rad der Glücksspiele'
+    },
     bank: {
       name: 'Bank',
       description: 'Verwalte deinen Topaz mit 1 von 3 Optionen. Das Verwenden einer Option sperrt die anderen. Das Zurückzahlen von Krediten benötigt und verbraucht keine Aktion.',
