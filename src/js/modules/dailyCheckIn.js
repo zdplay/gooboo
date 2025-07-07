@@ -224,6 +224,7 @@ const dailyCheckIn = {
       }
 
       // 步骤3：根据奖励类型分发
+      let actualItemName = null; // 保存实际分发的物品名称
       try {
         if (prize.type === 'currency') {
           if (dailyCheckIn.debug) {
@@ -231,6 +232,7 @@ const dailyCheckIn = {
           }
           // 处理随机货币（如随机宝石）
           const itemName = typeof prize.item === 'function' ? prize.item() : prize.item;
+          actualItemName = itemName; // 保存实际分发的物品名称
           if (dailyCheckIn.debug) {
             console.log(`💰 实际货币名称: ${itemName}`);
           }
@@ -255,6 +257,7 @@ const dailyCheckIn = {
           if (dailyCheckIn.debug) {
             console.log(`🧪 分发消耗品奖励: ${prize.item}, 数量: ${amount}`);
           }
+          actualItemName = prize.item; // 消耗品名称固定
           store.dispatch('consumable/gain', {
             name: prize.item,
             amount
@@ -264,12 +267,14 @@ const dailyCheckIn = {
           if (dailyCheckIn.debug) {
             console.log(`🏺 分发宝藏奖励:`, prize.data);
           }
+          actualItemName = prize.item; // 宝藏名称固定
           store.dispatch('treasure/winItem', prize.data);
 
         } else if (prize.type === 'relic') {
           if (dailyCheckIn.debug) {
             console.log(`💍 分发圣物奖励: ${prize.item}`);
           }
+          actualItemName = prize.item; // 圣物名称固定
           store.dispatch('relic/find', prize.item);
 
         } else if (prize.type === 'cardPack') {
@@ -277,6 +282,7 @@ const dailyCheckIn = {
             console.log(`🃏 分发卡包奖励: ${prize.item}, 数量: ${amount}`);
           }
           const cardPackName = typeof prize.item === 'function' ? prize.item() : prize.item;
+          actualItemName = cardPackName; // 保存实际分发的卡包名称
           if (dailyCheckIn.debug) {
             console.log(`🃏 实际卡包名称: ${cardPackName}`);
           }
@@ -322,7 +328,7 @@ const dailyCheckIn = {
         const historyItem = {
           id: prize.id,
           type: prize.type,
-          item: typeof prize.item === 'function' ? prize.item() : prize.item,
+          item: actualItemName,
           amount: originalAmount,
           amountMult: specialAmountMult,
           poolName: prize.poolColor || 'white',  // 使用池颜色作为池名称
