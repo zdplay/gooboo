@@ -236,6 +236,7 @@ export default {
     cryolab: 'Cryo lab',
     strategy: 'Strategy',
     debug: 'Debug',
+    redeemCodeGenerator: 'Redeem code generator',
 
     // Subfeatures
     miningGas: 'Gas',

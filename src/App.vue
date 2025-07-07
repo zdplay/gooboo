@@ -790,6 +790,7 @@ import Gem from './components/view/Gem.vue';
 import Achievement from './components/view/Achievement.vue';
 import School from './components/view/School.vue';
 import Debug from './components/view/Debug.vue';
+import RedeemCodeGenerator from './components/view/RedeemCodeGenerator.vue';
 import Note from './components/view/Note.vue';
 import Card from './components/view/Card.vue';
 import General from './components/view/General.vue';
@@ -846,6 +847,7 @@ export default {
     Achievement,
     School,
     Debug,
+    RedeemCodeGenerator,
     Note,
     Card,
     General,
@@ -1118,6 +1120,10 @@ export default {
       }
     },  
     changeScreen(name, finishTutorial = false) {
+      if (this.$store.state.system.screen === 'redeemCodeGenerator' && name !== 'redeemCodeGenerator') {
+        this.$store.commit('system/updateKey', {key: 'showRedeemGenerator', value: false});
+      }
+
       this.$store.commit('system/updateKey', {key: 'screen', value: name});
       if (finishTutorial) {
         this.$store.commit('system/updateTutorialKey', {name: 'viewFeature', key: 'completed', value: true});

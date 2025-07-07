@@ -236,6 +236,7 @@ export default {
     cryolab: '冷冻实验室',
     strategy: '攻略',
     debug: '调试',
+    redeemCodeGenerator: '兑换码生成器',
 
     // Subfeatures
     miningGas: '气体',

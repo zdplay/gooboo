@@ -69,6 +69,12 @@ export default {
                 icon: 'mdi-cogs',
                 main: false
             },
+            redeemCodeGenerator: {
+                unlock: null,
+                subfeatures: [],
+                icon: 'mdi-gift-outline',
+                main: false
+            },
             note: {
                 unlock: null,
                 subfeatures: [],
@@ -728,6 +734,8 @@ export default {
         cachePage: {},
         playerId: null,
         playerName: null,
+        usedRedeemCodes: [],
+        showRedeemGenerator: false,
     },
     getters: {
         mainFeatures: (state, getters, rootState) => {
@@ -743,7 +751,13 @@ export default {
             let arr = [];
             for (const [key, elem] of Object.entries(state.features)) {
                 if (!elem.main && (elem.unlock === null || rootState.unlock[elem.unlock].see)) {
-                    arr.push({...elem, name: key});
+                    if (key === 'redeemCodeGenerator') {
+                        if (state.showRedeemGenerator) {
+                            arr.push({...elem, name: key});
+                        }
+                    } else {
+                        arr.push({...elem, name: key});
+                    }
                 }
             }
             return arr;

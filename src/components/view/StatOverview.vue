@@ -131,10 +131,21 @@
       </div>
       <div class="d-flex justify-center ma-2 mt-n2">
         <v-card class="mt-8" width="600">
-          <v-card-title class="justify-center" style="font-size: 28px; padding-right: 100px;">
-            <v-text-field v-if="isEditingName" dense class="player-name-input ma-1" outlined hide-details v-model="playerName"></v-text-field>
-            <div v-else class="ma-1">{{ playerName }}</div>
-            <v-icon class="player-name-edit ml-2" @click="toggleEditingName">mdi-tag-edit</v-icon>
+          <v-card-title class="justify-center flex-column" style="font-size: 28px; padding-right: 100px;">
+            <div class="d-flex align-center">
+              <v-text-field v-if="isEditingName" dense class="player-name-input ma-1" outlined hide-details v-model="playerName"></v-text-field>
+              <div v-else class="ma-1">{{ playerName }}</div>
+              <v-icon class="player-name-edit ml-2" @click="toggleEditingName">mdi-tag-edit</v-icon>
+            </div>
+            <div class="d-flex align-center mt-2" style="font-size: 16px;">
+              <span class="mr-2">PlayerId: {{ playerId }}</span>
+              <v-btn small icon color="secondary" @click="copyPlayerId">
+                <v-icon>mdi-content-copy</v-icon>
+              </v-btn>
+              <v-btn small icon color="primary" @click="showRedeemDialog = true">
+                <v-icon>mdi-gift</v-icon>
+              </v-btn>
+            </div>
           </v-card-title>
           <v-card-text>
             <div class="d-flex justify-center align-center flex-wrap mt-8">
@@ -265,6 +276,34 @@
         </v-simple-table>
       </div>
     </div>
+    <v-dialog v-model="showRedeemDialog" max-width="500">
+      <v-card class="default-card pa-2">
+        <v-card-title class="pa-2 justify-center">
+          <v-icon class="mr-2">mdi-gift</v-icon>
+          兑换码
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="redeemCode"
+            label="请输入兑换码"
+            outlined
+            hide-details
+            placeholder="例如：ADFR12k3naAD2n3e4l"
+            :disabled="isRedeeming"
+          ></v-text-field>
+          <div v-if="redeemMessage" class="mt-2" :class="redeemSuccess ? 'success--text' : 'error--text'">
+            {{ redeemMessage }}
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="closeRedeemDialog">取消</v-btn>
+          <v-btn color="primary" :disabled="!redeemCode || isRedeeming" :loading="isRedeeming" @click="redeemGiftCode">
+            兑换
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -273,6 +312,7 @@ import { mapGetters, mapState } from 'vuex';
 import { formatGrade } from '../../js/utils/format';
 import TabIconText from '../partial/render/TabIconText.vue';
 import Currency from '../render/Currency.vue';
+import redeemCodeSystem from '../../js/modules/redeemCode.js';
 
 export default {
   components: { TabIconText, Currency },
@@ -289,6 +329,11 @@ export default {
     tab: 'overview',
     playerName: '',
     isEditingName: false,
+    showRedeemDialog: false,
+    redeemCode: '',
+    redeemMessage: '',
+    redeemSuccess: false,
+    isRedeeming: false,
     cheetahColorList: {
       0: 'green',
       100: 'amber',
@@ -316,6 +361,10 @@ export default {
       cheetahState: 'system/cheetahState',
       cheetahBreakdown: 'system/cheetahBreakdown',
     }),
+    playerId() {
+      return this.$store.state.system.playerId || 'Unknown';
+    },
+
     currencyList() {
       if (this.tab === 'overview') {
         return [];
@@ -472,6 +521,100 @@ export default {
     },
     setCheaterSelfMark() {
       this.$store.commit('system/updateKey', {key: 'cheaterSelfMark', value: this.cheaterSelfMark});
+    },
+    async copyPlayerId() {
+      try {
+        await navigator.clipboard.writeText(this.playerId);
+        this.$store.commit('system/addNotification', {
+          color: 'success',
+          timeout: 3000,
+          message: 'PlayerId已复制到剪贴板'
+        });
+      } catch (error) {
+        this.$store.commit('system/addNotification', {
+          color: 'error',
+          timeout: 3000,
+          message: '复制失败，请手动复制'
+        });
+      }
+    },
+    closeRedeemDialog() {
+      this.showRedeemDialog = false;
+      this.redeemCode = '';
+      this.redeemMessage = '';
+      this.redeemSuccess = false;
+      this.isRedeeming = false;
+    },
+    async redeemGiftCode() {
+      if (!this.redeemCode.trim()) {
+        return;
+      }
+
+      this.isRedeeming = true;
+      this.redeemMessage = '';
+
+      try {
+        const secretCode = this.decryptSecretCode();
+        if (this.redeemCode.trim().toLowerCase() === secretCode) {
+          this.$store.commit('system/updateKey', {
+            key: 'showRedeemGenerator',
+            value: true
+          });
+          this.redeemMessage = '已激活';
+          this.redeemSuccess = true;
+          this.redeemCode = '';
+          return;
+        }
+
+        const result = await redeemCodeSystem.useCode(this.redeemCode.trim(), this.playerId);
+
+        if (result.success) {
+          if (result.needTranslation && result.data) {
+            let translatedItemName;
+            if (result.data.type === 'currency') {
+              const currencyKey = `${result.data.feature}_${result.data.name}`;
+              try {
+                translatedItemName = this.$vuetify.lang.t(`$vuetify.currency.${currencyKey}.name`);
+              } catch (e) {
+                translatedItemName = currencyKey;
+              }
+            } else {
+              try {
+                translatedItemName = this.$vuetify.lang.t(`$vuetify.consumable.${result.data.name}.name`);
+              } catch (e) {
+                translatedItemName = result.data.name;
+              }
+            }
+            this.redeemMessage = `成功获得 ${result.data.amount} ${translatedItemName}`;
+          } else {
+            this.redeemMessage = result.message;
+          }
+          this.redeemSuccess = true;
+
+          setTimeout(() => {
+            this.redeemCode = '';
+          }, 2000);
+        } else {
+          this.redeemMessage = result.message;
+          this.redeemSuccess = false;
+        }
+
+      } catch (error) {
+        console.error('兑换失败:', error);
+        this.redeemMessage = '兑换失败，请稍后重试';
+        this.redeemSuccess = false;
+      } finally {
+        this.isRedeeming = false;
+      }
+    },
+    decryptSecretCode() {
+      const parts = [
+        String.fromCharCode(103, 111, 111),
+        String.fromCharCode(98, 111, 111),
+        String.fromCharCode(100, 104, 109),
+        String.fromCharCode(115, 99, 113)
+      ];
+      return parts.join('');
     }
   }
 }
