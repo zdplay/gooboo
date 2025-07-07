@@ -240,7 +240,8 @@ export default {
     },
     showLoadoutFeature() {
       return this.$store.state.system.settings.experiment.items.mobileHordeLoadoutLayout.value &&
-             (this.isCustomSmAndDown || this.isCustomMdOnly);
+             (this.isCustomSmAndDown || this.isCustomMdOnly) &&
+             this.subfeature === 0;
     },
     loadouts() {
       return this.$store.state.horde.loadout;
