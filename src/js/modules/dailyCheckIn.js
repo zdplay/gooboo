@@ -19,12 +19,15 @@ const dailyCheckIn = {
       store.commit('system/updateKey', {
         key: 'dailyCheckIn',
         value: {
-          available: this.debug ? 999 : 1,
+          available: this.debug ? 999 : null,
           timestamp: now,
           history: []
         }
       });
     } else {
+      if (store.state.system.dailyCheckIn.available === undefined) {
+        store.state.system.dailyCheckIn.available = null;
+      }
 
       const lastTime = store.state.system.dailyCheckIn.timestamp;
       const isNewDay = new Date(now * 1000).toDateString() !== new Date(lastTime * 1000).toDateString();
@@ -78,7 +81,9 @@ const dailyCheckIn = {
   },
   
   selectPrizePool() {
-    const rngGen = store.getters['system/getRng']('dailyCheckIn_pool');
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD格式
+    const totalCount = store.state.system.rng['dailyCheckIn_pool'] || 0;
+    const rngGen = store.getters['system/getRngById']('dailyCheckIn_pool', totalCount + '_' + today);
 
     const rand = rngGen() * 100;
 
@@ -128,7 +133,9 @@ const dailyCheckIn = {
     
     if (availablePrizes.length === 0) return null;
 
-    const rngGen = store.getters['system/getRng']('dailyCheckIn_prize');
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD格式
+    const totalCount = store.state.system.rng['dailyCheckIn_prize'] || 0;
+    const rngGen = store.getters['system/getRngById']('dailyCheckIn_prize', totalCount + '_' + today);
 
     const rand = rngGen() * totalWeight;
 
@@ -437,10 +444,14 @@ const dailyCheckIn = {
           if (dailyCheckIn.debug) {
             console.log(`🏺 生成宝藏: ${prizeData.item}, bonusTier: ${prizeData.bonusTier || 0}`);
           }
-          store.commit('system/nextRng', {name: 'treasure_' + prizeData.item, amount: 1}, {root: true});
+          const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD格式
+          const totalCount = store.state.system.rng['dailyCheckIn_treasure'] || 0;
+          const dailyTreasureRng = store.getters['system/getRngById']('dailyCheckIn_treasure', totalCount + '_' + today);
+          const rngSkip = Math.floor(dailyTreasureRng() * 1000); // 使用总次数+日期相关的随机数作为跳跃值
+          store.commit('system/nextRng', {name: 'dailyCheckIn_treasure', amount: 1}, {root: true});
 
           const bonusTier = prizeData.bonusTier || 0;
-          prize.data = store.getters['treasure/generateItem'](prizeData.item, 0, true, 0, bonusTier);
+          prize.data = store.getters['treasure/generateItem'](prizeData.item, 0, true, rngSkip, bonusTier);
 
           if (!prize.data) {
             throw new Error(`生成宝藏数据失败: ${prizeData.item}`);

@@ -1171,17 +1171,21 @@ export default {
     },
     initDailyCheckIn() {
       const now = Math.floor(Date.now() / 1000);
-      
+
       if (!this.$store.state.system.dailyCheckIn) {
         this.$store.commit('system/updateKey', {
           key: 'dailyCheckIn',
           value: {
-            available: 1,
+            available: null,
             timestamp: now,
             history: []
           }
         });
       } else {
+        if (this.$store.state.system.dailyCheckIn.available === undefined) {
+          this.$store.state.system.dailyCheckIn.available = null;
+        }
+
         const lastTime = this.$store.state.system.dailyCheckIn.timestamp;
         const isNewDay = new Date(now * 1000).toDateString() !== new Date(lastTime * 1000).toDateString();
         

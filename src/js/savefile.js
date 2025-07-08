@@ -664,13 +664,16 @@ function loadFile(file, importNextSubfeature = true) {
         store.commit('system/updateKey', {
             key: 'dailyCheckIn',
             value: {
-                available: 0,
+                available: null,
                 timestamp: now,
                 history: [],
                 playerId: currentPlayerId
             }
         });
     } else {
+        if (save.dailyCheckIn.available === undefined) {
+            save.dailyCheckIn.available = null;
+        }
         store.commit('system/updateKey', {key: 'dailyCheckIn', value: save.dailyCheckIn});
     }
 
