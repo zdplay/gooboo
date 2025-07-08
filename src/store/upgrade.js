@@ -489,30 +489,37 @@ export default {
                 }
             }
         },
-        processModuleQueue({ state, getters, dispatch }, moduleName) {
-            // 检查队列是否存在且不为空
+        processModuleQueue({ state, getters, rootState, dispatch }, moduleName) {
             if (state.moduleQueue[moduleName] === undefined || state.moduleQueue[moduleName].length === 0) {
                 return false;
             }
 
-            let upgraded = false;
             const queue = state.moduleQueue[moduleName];
-            
-            // 遍历队列中的所有项目
-            for (let i = 0; i < queue.length; i++) {
-                const item = queue[i];
-                const feature = item.split('_')[0];
+            const feature = moduleName.split('_')[0];
+            const currentSubfeature = rootState.system.features[feature]?.currentSubfeature;
+
+            const currentSubfeatureItems = queue.filter(item => {
+                const upgrade = state.item[item];
+                return upgrade && upgrade.subfeature === currentSubfeature;
+            });
+
+            if (currentSubfeatureItems.length === 0) {
+                return false;
+            }
+
+            let upgraded = false;
+
+            for (let i = 0; i < currentSubfeatureItems.length; i++) {
+                const item = currentSubfeatureItems[i];
+                const itemFeature = item.split('_')[0];
                 const name = item.split('_')[1];
-                
-                // 检查是否可以购买
-                if (getters.canAfford(feature, name)) {
-                    // 使用buyMax购买这个升级
-                    dispatch('buyMax', { feature, name });
+
+                if (getters.canAfford(itemFeature, name)) {
+                    dispatch('buyMax', { feature: itemFeature, name });
                     upgraded = true;
                 }
             }
-            
-            // 返回是否有任何项目被升级
+
             return upgraded;
         },
         toggleModuleQueue({ state, commit }, o) {

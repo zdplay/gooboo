@@ -119,10 +119,14 @@ export default {
     queue() {
       let arr = [];
       const moduleQueue = this.$store.state.upgrade.moduleQueue[this.queueKey];
-      
       if (!moduleQueue) return arr;
 
-      moduleQueue.forEach(elem => {
+      const currentSubfeature = this.$store.state.system.features[this.moduleName]?.currentSubfeature;
+      const currentSubfeatureItems = moduleQueue.filter(item => {
+        const upgrade = this.$store.state.upgrade.item[item];
+        return upgrade && upgrade.subfeature === currentSubfeature;
+      });
+      currentSubfeatureItems.forEach(elem => {
         if (arr.length > 0 && elem === arr[arr.length - 1].name) {
           arr[arr.length - 1].amount++;
         } else {
@@ -136,8 +140,16 @@ export default {
       return this.queue.length - 1;
     },
     showQueue() {
-      return this.$store.state.upgrade.moduleQueue[this.queueKey] && 
-             this.$store.state.upgrade.moduleQueue[this.queueKey].length > 0;
+      const moduleQueue = this.$store.state.upgrade.moduleQueue[this.queueKey];
+      if (!moduleQueue || moduleQueue.length === 0) {
+        return false;
+      }
+      const currentSubfeature = this.$store.state.system.features[this.moduleName]?.currentSubfeature;
+      const hasCurrentSubfeatureItems = moduleQueue.some(item => {
+        const upgrade = this.$store.state.upgrade.item[item];
+        return upgrade && upgrade.subfeature === currentSubfeature;
+      });
+      return hasCurrentSubfeatureItems;
     },
     enabled() {
       return this.$store.state.system.settings.experiment.items.enableUpgradeQueue.value;
