@@ -56,7 +56,57 @@ export default {
       return this.prize.item;
     },
     amount() {
-      return this.prize.amount * this.prize.amountMult();
+      // 安全计算显示数量，避免 NaN 错误
+      try {
+        const prizeAmount = this.prize.amount;
+        const multiplier = this.prize.amountMult ? this.prize.amountMult() : 1;
+
+        // 检查 prizeAmount 是否有问题
+        if (isNaN(prizeAmount) || prizeAmount === null || prizeAmount === undefined) {
+          this.$store.commit('system/addNotification', {
+            color: 'warning',
+            timeout: 10000,
+            message: {
+              type: 'text',
+              text: `显示错误: ${this.prize.item || '未知物品'} - prize.amount 错误: ${prizeAmount}`
+            }
+          });
+          return 1;
+        }
+
+        // 检查 multiplier 是否有问题
+        if (isNaN(multiplier) || multiplier === null || multiplier === undefined) {
+          this.$store.commit('system/addNotification', {
+            color: 'warning',
+            timeout: 10000,
+            message: {
+              type: 'text',
+              text: `显示错误: ${this.prize.item || '未知物品'} - amountMult() 错误: ${multiplier}`
+            }
+          });
+          return 1;
+        }
+
+        const result = prizeAmount * multiplier;
+        return result;
+      } catch (error) {
+        console.error('🐛 [Prize Display] 奖品显示数量计算异常:', error, {
+          prizeId: this.prizeBase.prize,
+          pool: this.pool,
+          prizeData: this.prize
+        });
+
+        this.$store.commit('system/addNotification', {
+          color: 'warning',
+          timeout: 10000,
+          message: {
+            type: 'text',
+            text: `显示异常: ${this.prize.item || '未知物品'} - ${error.message}`
+          }
+        });
+
+        return 1; // 默认返回 1
+      }
     },
     cardPackAmount() {
       return this.prize.type === 'cardPack' ? this.$store.state.card.pack[this.resolvedItem].amount : 1;

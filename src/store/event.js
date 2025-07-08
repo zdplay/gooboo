@@ -917,7 +917,56 @@ export default {
             }
             const prizeBase = state.prize[o.prize.prize];
             const prize = {...prizeBase, ...prizeBase.pool[o.pool], ...o.prize};
-            let amount = (o.amount ?? 1) * prize.amount * prize.amountMult();
+            // 安全计算奖品数量，避免 NaN 错误
+            let amount;
+            try {
+                const baseAmount = o.amount ?? 1;
+                const prizeAmount = prize.amount;
+                const multiplier = prize.amountMult ? prize.amountMult() : 1;
+
+                // 检查 prizeAmount 是否有问题
+                if (isNaN(prizeAmount) || prizeAmount === null || prizeAmount === undefined) {
+                    commit('system/addNotification', {
+                        color: 'error',
+                        timeout: 15000,
+                        message: {
+                            type: 'text',
+                            text: `奖品计算错误: ${prize.item || '未知物品'} - prize.amount 错误: ${prizeAmount}`
+                        }
+                    }, {root: true});
+                    amount = 1;
+                } else if (isNaN(multiplier) || multiplier === null || multiplier === undefined) {
+                    // 检查 multiplier 是否有问题
+                    commit('system/addNotification', {
+                        color: 'error',
+                        timeout: 15000,
+                        message: {
+                            type: 'text',
+                            text: `奖品计算错误: ${prize.item || '未知物品'} - amountMult() 错误: ${multiplier}`
+                        }
+                    }, {root: true});
+                    amount = 1;
+                } else {
+                    amount = baseAmount * prizeAmount * multiplier;
+                }
+            } catch (error) {
+                console.error('🐛 [Event] 奖品数量计算异常:', error, {
+                    prize: o.prize,
+                    pool: o.pool,
+                    prizeData: prize
+                });
+
+                commit('system/addNotification', {
+                    color: 'error',
+                    timeout: 15000,
+                    message: {
+                        type: 'text',
+                        text: `奖品计算异常: ${prize.item || '未知物品'} - ${error.message}`
+                    }
+                }, {root: true});
+
+                amount = 1; // 默认返回 1
+            }
             if (prize.roundAmount) {
                 amount = Math.round(amount);
             }
