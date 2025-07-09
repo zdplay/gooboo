@@ -1,8 +1,15 @@
 import axios from 'axios';
 import store from "@/store";
 
+const CLOUD_SERVERS = [
+    "https://gamesaves.ggff.eu.org",
+    "https://gamesaves.zding.de"
+];
+
+let currentServerIndex = 0;
+
 const instance = axios.create({
-    baseURL: "https://gamesaves.ggff.eu.org",
+    baseURL: CLOUD_SERVERS[currentServerIndex],
     timeout: 30000
 });
 
@@ -17,9 +24,31 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
     (response) => {
+        if (currentServerIndex !== 0) {
+            currentServerIndex = 0;
+            instance.defaults.baseURL = CLOUD_SERVERS[currentServerIndex];
+        }
         return response.data;
     },
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
+
+        const isNetworkError = !error.response || error.code === 'ECONNABORTED' || error.code === 'NETWORK_ERROR';
+        const hasBackupServer = currentServerIndex < CLOUD_SERVERS.length - 1;
+        const shouldRetry = !originalRequest._retried && isNetworkError && hasBackupServer;
+
+        if (shouldRetry) {
+            originalRequest._retried = true;
+            currentServerIndex++;
+            instance.defaults.baseURL = CLOUD_SERVERS[currentServerIndex];
+            try {
+                const response = await instance(originalRequest);
+                return response;
+            } catch (retryError) {
+                addCloudNotification('error', 'server_failed', retryError, '所有云存档服务器都无法访问');
+                return Promise.reject(retryError);
+            }
+        }
 
         if (error.response) {
             return Promise.reject({
@@ -31,6 +60,15 @@ instance.interceptors.response.use(
         }
     }
 );
+
+export function getCurrentServerInfo() {
+    return {
+        currentServer: CLOUD_SERVERS[currentServerIndex],
+        serverIndex: currentServerIndex,
+        allServers: CLOUD_SERVERS,
+        isUsingBackup: currentServerIndex > 0
+    };
+}
 
 
 export function loadSaveFile(saveId, userId, tokenId) {
