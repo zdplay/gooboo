@@ -1369,6 +1369,7 @@ export default {
       warning: 'Diese Einstellungen sind noch experimentell und können fehlerhaft, unfertig, langsam oder verwirrend sein. Aktiviere sie auf eigene Gefahr, und bitte gebe Feedback, falls du sie benutzen solltest! Wenn diese Sektion leer ist, sind gerade keine experimentellen Einstellungen vorhanden oder dein Fortschritt reicht nicht aus, um sie zu sehen',
       layoutSettings: 'Layout-Einstellungen',
       featureSettings: 'Funktionseinstellungen',
+      generalSettings: 'Allgemeine Einstellungen',
       treasurePreview: {
         name: 'Schatzvorschau',
         description: 'Zeigt eine Vorschau der zukünftigen Schätze an, wenn ein Schatz gekauft wird'
@@ -1502,6 +1503,14 @@ export default {
       enhancedAutocast: {
         name: 'Enhanced Autocast',
         description: 'Enable enhanced autocast system with combat/utility skill classification, allowing utility skills to be cast outside of combat'
+      },
+      recommendedEquipment: {
+        name: 'Empfohlene Ausrüstung',
+        description: 'Zeigt [Empfohlene Ausrüstung] Schaltfläche in der Ausrüstungsliste, empfiehlt intelligent Ausrüstung basierend auf aktuellen Zonengegnerfähigkeiten'
+      },
+      equipmentFilter: {
+        name: 'Ausrüstungsfilter',
+        description: 'Zeigt [Ausgerüstet] und [Kategoriefilter] Schaltflächen in der Ausrüstungsliste, ermöglicht das Filtern von Ausrüstung nach Status und Funktionstyp'
       },
       lowCostMaterialFade: {
         name: 'Low Cost Material Fade',

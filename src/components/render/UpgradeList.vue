@@ -117,31 +117,31 @@
     
     <div class="filter-section" v-if="showFilterFeature">
       <div class="filter-container">
-        <v-btn 
-          small 
-          class="satisfy-button" 
-          @click="toggleSatisfyMode" 
-          :color="satisfyMode ? 'error' : 'primary'" 
+        <v-btn
+          small
+          class="satisfy-button"
+          @click="toggleSatisfyMode"
+          :color="satisfyMode ? 'orange' : 'primary'"
           v-if="availableMaterials.length > 0"
         >
           {{ satisfyMode ? '清空' : '满足' }}
         </v-btn>
-        
-        <v-btn 
-          small 
-          class="satisfy-button ml-2" 
-          @click="toggleUnsatisfyMode" 
-          :color="unsatisfyMode ? 'warning' : 'primary'" 
+
+        <v-btn
+          small
+          class="satisfy-button ml-2"
+          @click="toggleUnsatisfyMode"
+          :color="unsatisfyMode ? 'orange' : 'primary'"
           v-if="availableMaterials.length > 0"
         >
           {{ unsatisfyMode ? '清空' : '未满足' }}
         </v-btn>
-        
-        <v-btn 
-          small 
-          class="list-button ml-2" 
-          @click="toggleMaterialsRow" 
-          :color="showMaterialsRow ? 'info' : 'primary'"
+
+        <v-btn
+          small
+          class="list-button ml-2"
+          @click="toggleMaterialsRow"
+          :color="showMaterialsRow ? 'orange' : 'primary'"
         >
           {{ showMaterialsRow ? '隐藏' : '列表' }}
         </v-btn>

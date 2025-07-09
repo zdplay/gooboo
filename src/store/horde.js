@@ -1670,6 +1670,13 @@ export default {
                 dispatch('mult/removeKey', {name: 'hordeNostalgia', type: 'bonus', key: 'hordeNostalgiaLost'}, {root: true});
             }
         },
+        resetEquippedItemsCooldown({ state, commit }) {
+            for (const [key, elem] of Object.entries(state.items)) {
+                if (elem.equipped === true) {
+                    commit('updateItemKey', {name: key, key: 'cooldownLeft', value: 0});
+                }
+            }
+        },
         enterTower({ rootGetters, commit, dispatch }, name) {
             if (rootGetters['currency/value']('horde_towerKey') >= 1) {
                 dispatch('currency/spend', {feature: 'horde', name: 'towerKey', amount: 1}, {root: true});
@@ -1678,6 +1685,7 @@ export default {
                 commit('updateKey', {key: 'currentTower', value: name});
                 commit('updateKey', {key: 'towerFloor', value: 0});
                 dispatch('resetStats');
+                dispatch('resetEquippedItemsCooldown');
             }
         },
         updatePlayerCache({ state, rootState, getters, rootGetters, commit, dispatch }) {

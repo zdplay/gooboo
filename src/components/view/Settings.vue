@@ -76,21 +76,26 @@
         </v-col>
       </v-row>
       <div v-if="tab === 'experiment'">
-        <v-card class="ma-2 pa-2">
-          <v-card-title class="justify-center text-subtitle-1">{{ $vuetify.lang.t('$vuetify.settings.experiment.layoutSettings') }}</v-card-title>
-          <v-row no-gutters>
-            <v-col v-for="(item, key) in uiExperimentSettings" class="d-flex align-center" :key="'setting-ui-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
-              <setting-item class="ma-2" :category="tab" :name="key"></setting-item>
-            </v-col>
-          </v-row>
-        </v-card>
-        <v-card class="ma-2 pa-2">
-          <v-card-title class="justify-center text-subtitle-1">{{ $vuetify.lang.t('$vuetify.settings.experiment.featureSettings') }}</v-card-title>
-          <v-row no-gutters>
-            <v-col v-for="(item, key) in featureExperimentSettings" class="d-flex align-center" :key="'setting-feature-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
-              <setting-item class="ma-2" :category="tab" :name="key"></setting-item>
-            </v-col>
-          </v-row>
+        <v-card class="ma-2 pa-4 elevation-2">
+
+          <div class="px-2">
+            <div v-for="(group, groupName) in sortedExperimentSettings" :key="'group-' + groupName" class="mb-6">
+              <v-divider class="mb-3"></v-divider>
+              <div class="d-flex align-center mb-3">
+                <v-icon small class="mr-2" :color="getGroupColor(groupName)">{{ getGroupIcon(groupName) }}</v-icon>
+                <span class="text-subtitle-1 font-weight-medium primary--text">
+                  {{ getGroupDisplayName(groupName) }}
+                </span>
+              </div>
+              <v-card flat class="pa-3 bg-grey-lighten-5" style="border-radius: 8px;">
+                <v-row no-gutters>
+                  <v-col v-for="(item, key) in group" class="d-flex align-center" :key="'setting-' + key" cols="12" sm="6" md="4" lg="3" xl="2">
+                    <setting-item class="ma-1" :category="tab" :name="key"></setting-item>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </div>
+          </div>
         </v-card>
         <div class="d-flex justify-center ma-2">
           <alert-text type="warning" style="max-width: 600px;">{{ $vuetify.lang.t(`$vuetify.settings.experiment.warning`) }}</alert-text>
@@ -188,35 +193,116 @@ export default {
       }
       return obj;
     },
-    uiRelatedKeys() {
-      return [
-        'wallpaperPath', 'wallpaperBlur', 'mobileMenuAtBottom', 'screenLayoutMode',
-        'currencyLabel', 'currencynewLabel', 'card1newLabel', 'card2newLabel', 'enablePlayerName', 'showFarmCropName', 'showScientificNotation',
-        'mobileHordeLoadoutLayout', 'enableMenuShortcuts', 'tierProgress', 'showFarmIconLevel', 'showFarmHarvestNotify',
-        'showFarmOfflineSummary', 'lowCostMaterialFade', 'upgradeBuyProgress', 'upgradeFilterFeature', 'canvasPreview'
+    sortedExperimentSettings() {
+      const groups = {};
+
+      if (this.settings['experiment'] && this.settings['experiment'].items) {
+        for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
+          let unlock = item.unlock || 'general';
+
+          if (key === 'mechanicalMine' || unlock === 'villageBuildings6') {
+            unlock = 'hordeFeature';
+          } else if (['weatherChaosFeature', 'bingoFeature', 'rouletteFeature'].includes(unlock)) {
+            unlock = 'eventFeature';
+          }
+
+          if (!groups[unlock]) {
+            groups[unlock] = {};
+          }
+          groups[unlock][key] = item;
+        }
+      }
+
+      const sortOrder = [
+        'general',
+        'miningFeature',
+        'villageFeature',
+        'hordeFeature',
+        'farmFeature',
+        'galleryFeature',
+        'schoolFeature',
+        'cardFeature',
+        'eventFeature',
+        'gemFeature',
+        'treasureFeature',
+        'cryolabFeature',
+        'debugFeature'
       ];
-    },
-    uiExperimentSettings() {
-      let obj = {};
-      if (this.settings['experiment'] && this.settings['experiment'].items) {
-        for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
-          if (this.uiRelatedKeys.includes(key)) {
-            obj[key] = item;
-          }
+
+      const sortedGroups = {};
+      sortOrder.forEach(groupName => {
+        if (groups[groupName]) {
+          sortedGroups[groupName] = groups[groupName];
         }
-      }
-      return obj;
-    },
-    featureExperimentSettings() {
-      let obj = {};
-      if (this.settings['experiment'] && this.settings['experiment'].items) {
-        for (const [key, item] of Object.entries(this.settings['experiment'].items)) {
-          if (!this.uiRelatedKeys.includes(key)) {
-            obj[key] = item;
-          }
+      });
+
+      Object.keys(groups).forEach(groupName => {
+        if (!sortOrder.includes(groupName)) {
+          sortedGroups[groupName] = groups[groupName];
         }
-      }
-      return obj;
+      });
+
+      return sortedGroups;
+    }
+  },
+  methods: {
+    getGroupDisplayName(unlock) {
+      const groupNames = {
+        'general': this.$vuetify.lang.t('$vuetify.settings.experiment.generalSettings'),
+        'miningFeature': this.$vuetify.lang.t('$vuetify.feature.mining'),
+        'villageFeature': this.$vuetify.lang.t('$vuetify.feature.village'),
+        'hordeFeature': this.$vuetify.lang.t('$vuetify.feature.horde'),
+        'farmFeature': this.$vuetify.lang.t('$vuetify.feature.farm'),
+        'galleryFeature': this.$vuetify.lang.t('$vuetify.feature.gallery'),
+        'schoolFeature': this.$vuetify.lang.t('$vuetify.feature.school'),
+        'cardFeature': this.$vuetify.lang.t('$vuetify.feature.card'),
+        'gemFeature': this.$vuetify.lang.t('$vuetify.feature.gem'),
+        'eventFeature': this.$vuetify.lang.t('$vuetify.feature.event'),
+        'treasureFeature': this.$vuetify.lang.t('$vuetify.feature.treasure'),
+        'cryolabFeature': this.$vuetify.lang.t('$vuetify.feature.cryolab'),
+        'debugFeature': this.$vuetify.lang.t('$vuetify.feature.debug'),
+        'weatherChaosFeature': this.$vuetify.lang.t('$vuetify.feature.weatherChaos')
+      };
+
+      return groupNames[unlock] || unlock;
+    },
+    getGroupIcon(unlock) {
+      const groupIcons = {
+        'general': 'mdi-cog',
+        'miningFeature': 'mdi-pickaxe',
+        'villageFeature': 'mdi-home-group',
+        'hordeFeature': 'mdi-sword-cross',
+        'farmFeature': 'mdi-sprout',
+        'galleryFeature': 'mdi-palette',
+        'schoolFeature': 'mdi-school',
+        'cardFeature': 'mdi-cards',
+        'gemFeature': 'mdi-diamond-stone',
+        'eventFeature': 'mdi-calendar-star',
+        'treasureFeature': 'mdi-treasure-chest',
+        'cryolabFeature': 'mdi-snowflake',
+        'debugFeature': 'mdi-bug'
+      };
+
+      return groupIcons[unlock] || 'mdi-cog';
+    },
+    getGroupColor(unlock) {
+      const groupColors = {
+        'general': 'grey',
+        'miningFeature': 'brown',
+        'villageFeature': 'green',
+        'hordeFeature': 'red',
+        'farmFeature': 'light-green',
+        'galleryFeature': 'purple',
+        'schoolFeature': 'blue',
+        'cardFeature': 'indigo',
+        'gemFeature': 'pink',
+        'eventFeature': 'orange',
+        'treasureFeature': 'amber',
+        'cryolabFeature': 'cyan',
+        'debugFeature': 'deep-orange'
+      };
+
+      return groupColors[unlock] || 'primary';
     }
   },
   destroyed() {

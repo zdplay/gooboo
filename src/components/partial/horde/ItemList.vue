@@ -44,6 +44,72 @@
         <v-icon small>mdi-cog</v-icon>
       </v-btn>
     </div>
+    <div class="ma-2 d-flex justify-center align-center">
+      <v-btn
+        small
+        class="mr-2"
+        :color="showRecommendedOnly ? 'orange' : 'primary'"
+        @click="toggleRecommendedFilter"
+        v-if="showRecommendedButton"
+      >
+        <v-icon small class="mr-1">{{ showRecommendedOnly ? 'mdi-star' : 'mdi-star-outline' }}</v-icon>
+        建议装备
+      </v-btn>
+      <v-btn
+        small
+        class="mx-2"
+        :color="showEquippedOnly ? 'orange' : 'primary'"
+        @click="toggleEquippedFilter"
+        v-if="showEquipmentFilter"
+      >
+        <v-icon small class="mr-1">{{ showEquippedOnly ? 'mdi-check-circle' : 'mdi-circle-outline' }}</v-icon>
+        已装备
+      </v-btn>
+      <v-menu offset-y v-if="showEquipmentFilter">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            small
+            class="ml-2"
+            :color="selectedCategory ? 'orange' : 'primary'"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon small class="mr-1">mdi-filter-variant</v-icon>
+            {{ selectedCategory ? categoryDisplayNames[selectedCategory] : '分类筛选' }}
+          </v-btn>
+        </template>
+        <v-list dense>
+          <v-list-item @click="clearCategoryFilter">
+            <v-list-item-icon>
+              <v-icon small>mdi-filter-remove</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>显示全部</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item
+            v-for="(displayName, category) in categoryDisplayNames"
+            :key="category"
+            @click="setCategoryFilter(category)"
+            :class="{ 'v-list-item--active': selectedCategory === category }"
+          >
+            <v-list-item-icon>
+              <v-icon small>{{ selectedCategory === category ? 'mdi-check' : 'mdi-circle-outline' }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ displayName }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
+    <div class="ma-2 pa-2 bg-tile-default rounded elevation-1" v-if="showRecommendedOnly && showRecommendedButton">
+      <div class="text-center text-body-2 orange--text" style="white-space: pre-line;">
+        <v-icon small color="orange" class="mr-1">mdi-information</v-icon>
+        {{ recommendationSummary }}
+      </div>
+    </div>
     <div class="d-flex flex-column align-center bg-tile-default rounded-b elevation-2 ma-2 pa-1" v-if="showLoadouts">
       <div class="d-flex justify-space-between align-center w-100">
         <v-btn class="ma-1" color="success" @click="addEmptyLoadout">
@@ -80,7 +146,6 @@
     </div>
     <item v-for="item in finalItems" :key="'item-' + item.name" :name="item.name" :disabled="itemsBlocked" :active-disabled="isFrozen" class="ma-2"></item>
 
-    <!-- 批量配置编辑弹窗 -->
     <v-dialog v-model="batchConfigDialog" max-width="800" @click:outside="closeBatchConfigDialog">
       <v-card class="default-card pa-2">
         <v-card-title class="pa-2 justify-center">
@@ -138,6 +203,7 @@ import { mapGetters, mapState } from 'vuex';
 import StatBreakdown from '../../render/StatBreakdown.vue';
 import EquipLoadout from './EquipLoadout.vue';
 import Item from './Item.vue';
+import { getEquipmentsByCategory } from '../../../js/modules/horde/equipmentRecommendationDynamic';
 
 export default {
   components: { Item, StatBreakdown, EquipLoadout },
@@ -145,6 +211,9 @@ export default {
     page: 1,
     cacheKey: 'horde_0_equipment',
     showLoadouts: false,
+    showEquippedOnly: false,
+    showRecommendedOnly: false,
+    selectedCategory: null,
     batchConfigDialog: false,
     configJsonText: '',
     originalConfigJson: '',
@@ -173,6 +242,28 @@ export default {
       for (const [key, elem] of Object.entries(this.itemsList)) {
         arr.push({...elem, name: key});
       }
+
+      if (this.showEquippedOnly) {
+        arr = arr.filter(item => item.equipped === true);
+      } else if (this.showRecommendedOnly) {
+        const currentZone = this.$store.state.horde.zone;
+
+        console.log('Updating recommendations for zone:', currentZone);
+
+        const { getRecommendedEquipments } = require('../../../js/modules/horde/equipmentRecommendationDynamic');
+        const recommendedNames = getRecommendedEquipments();
+
+        const itemMap = new Map();
+        arr.forEach(item => itemMap.set(item.name, item));
+
+        arr = recommendedNames
+          .filter(name => itemMap.has(name))
+          .map(name => itemMap.get(name));
+      } else if (this.selectedCategory) {
+        const categoryEquipments = getEquipmentsByCategory(this.selectedCategory);
+        arr = arr.filter(item => categoryEquipments.includes(item.name));
+      }
+
       return arr;
     },
     finalItems() {
@@ -193,11 +284,66 @@ export default {
     hasEnhancedAutocastSettings() {
       const settings = this.$store.state.horde.enhancedAutocastSettings || {};
       return Object.keys(settings).length > 0;
+    },
+    recommendationSummary() {
+      if (!this.showRecommendedOnly) {
+        return '';
+      }
+
+      const currentZone = this.$store.state.horde.zone;
+
+      console.log('Updating recommendation summary for zone:', currentZone);
+
+      const { getRecommendationSummary } = require('../../../js/modules/horde/equipmentRecommendationDynamic');
+      return getRecommendationSummary();
+    },
+    categoryDisplayNames() {
+      const { getEquipmentCategoryFilter } = require('../../../js/modules/horde/equipmentRecommendationDynamic');
+      const { categoryDisplayNames } = getEquipmentCategoryFilter();
+      return categoryDisplayNames;
+    },
+    showRecommendedButton() {
+      const experimentSettings = this.$store.state.system.settings.experiment.items;
+      const isHordeSubfeature1 = this.$store.state.system.features.horde.currentSubfeature === 0; // 部落1
+
+      return experimentSettings?.recommendedEquipment?.value && isHordeSubfeature1;
+    },
+    showEquipmentFilter() {
+      const experimentSettings = this.$store.state.system.settings.experiment.items;
+      const isHordeSubfeature1 = this.$store.state.system.features.horde.currentSubfeature === 0; // 部落1
+
+      return experimentSettings?.equipmentFilter?.value && isHordeSubfeature1;
     }
   },
   methods: {
     toggleLoadouts() {
       this.showLoadouts = !this.showLoadouts;
+    },
+    toggleEquippedFilter() {
+      this.showEquippedOnly = !this.showEquippedOnly;
+      if (this.showEquippedOnly) {
+        this.showRecommendedOnly = false;
+        this.selectedCategory = null;
+      }
+      this.page = 1;
+    },
+    toggleRecommendedFilter() {
+      this.showRecommendedOnly = !this.showRecommendedOnly;
+      if (this.showRecommendedOnly) {
+        this.showEquippedOnly = false;
+        this.selectedCategory = null;
+      }
+      this.page = 1;
+    },
+    setCategoryFilter(category) {
+      this.selectedCategory = category;
+      this.showEquippedOnly = false;
+      this.showRecommendedOnly = false;
+      this.page = 1;
+    },
+    clearCategoryFilter() {
+      this.selectedCategory = null;
+      this.page = 1;
     },
     unequipAll() {
       this.$store.dispatch('horde/unequipAll');
@@ -243,7 +389,6 @@ export default {
     saveBatchConfig() {
       try {
         if (this.configJsonText.trim() === '') {
-          // 清空所有配置
           this.$store.commit('horde/updateKey', {
             key: 'enhancedAutocastSettings',
             value: {}
@@ -255,11 +400,8 @@ export default {
             value: newConfig
           });
         }
-
-        console.log('批量配置保存成功');
         this.closeBatchConfigDialog();
       } catch (error) {
-        console.error('批量配置保存失败:', error);
         this.jsonError = `保存失败: ${error.message}`;
       }
     }

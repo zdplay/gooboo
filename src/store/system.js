@@ -284,14 +284,14 @@ export default {
                         defaultValue: false
                     },
                     card1newLabel: {
-                        unlock: null,
+                        unlock: 'cardFeature',
                         hasDescription: false,
                         type: 'switch',
                         value: true,
                         defaultValue: true
                     },
                     card2newLabel: {
-                        unlock: null,
+                        unlock: 'cardFeature',
                         hasDescription: false,
                         type: 'switch',
                         value: true,
@@ -404,7 +404,7 @@ export default {
                         defaultValue: false
                     },
                     bingoPrediction: {
-                        unlock: null,
+                        unlock: 'eventFeature',
                         hasDescription: true,
                         type: 'switch',
                         value: true,
@@ -493,6 +493,20 @@ export default {
                         type: 'switch',
                         value: false,
                         defaultValue: false
+                    },
+                    recommendedEquipment: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
+                    equipmentFilter: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     },
                     lowCostMaterialFade: {
                         unlock: null,

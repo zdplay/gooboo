@@ -1369,6 +1369,7 @@ export default {
         warning: '这些设置仍处于实验阶段，可能存在错误、未完成、性能不佳或令人困惑。 启用它们的风险由您自行承担，如果您正在使用它们，请留下反馈！ 如果此部分为空，则表示当时没有可用的实验设置，或者您尚未取得足够的进展，无法看到它们',
         layoutSettings: '界面布局设置',
         featureSettings: '功能性设置',
+        generalSettings: '通用设置',
         treasurePreview: {
           name: '宝藏预测',
           description: '显示购买宝藏时可能获得的未来宝藏效果预览'
@@ -1510,6 +1511,14 @@ export default {
         enhancedAutocast: {
           name: '增强自动释放（测试）',
           description: '启用增强版自动释放系统，支持战斗/非战斗技能分类，非战斗技能可在非战斗状态下释放，部落2不支持自定义释放'
+        },
+        recommendedEquipment: {
+          name: '推荐装备',
+          description: '在装备列表中显示【推荐装备】按钮，根据当前层敌人技能智能推荐装备'
+        },
+        equipmentFilter: {
+          name: '装备筛选',
+          description: '在装备列表中显示【已装备】和【分类筛选】按钮，可按装备状态和功能类型筛选装备'
         },
         lowCostMaterialFade: {
           name: '低耗材料半隐藏',

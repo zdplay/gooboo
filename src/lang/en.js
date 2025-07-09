@@ -1337,6 +1337,7 @@ export default {
         warning: 'These settings are still experimental and may contain bugs, be incomplete, perform poorly or be confusing. You enable them at your own risk, and please leave feedback if you are using them! If this section is empty, it means that there are no experimental settings available at the moment, or you have not progressed far enough to see them',
         layoutSettings: 'Layout Settings',
         featureSettings: 'Feature Settings',
+        generalSettings: 'General Settings',
         treasurePreview: {
           name: 'Treasure Preview',
           description: 'Show preview of future treasures when buying a treasure'
@@ -1470,6 +1471,14 @@ export default {
         enhancedAutocast: {
           name: 'Enhanced Autocast',
           description: 'Enable enhanced autocast system with combat/utility skill classification, allowing utility skills to be cast outside of combat'
+        },
+        recommendedEquipment: {
+          name: 'Recommended Equipment',
+          description: 'Show [Recommended Equipment] button in equipment list, intelligently recommends equipment based on current zone enemy skills'
+        },
+        equipmentFilter: {
+          name: 'Equipment Filter',
+          description: 'Show [Equipped] and [Category Filter] buttons in equipment list, allows filtering equipment by status and function type'
         },
         showFarmIconLevel: {
           name: 'Show Farm Icon Level',

@@ -115,4 +115,4 @@ export const SNOWDOWN_BOOST_COST = 55;
 
 export const NIGHT_HUNT_GL_BOOST = 1.01;
 
-export const UPDATE_VERSION = 'v5';
+export const UPDATE_VERSION = 'v6';
