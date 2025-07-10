@@ -59,11 +59,44 @@
         <v-card-subtitle class="pa-1 text-center">每天签到一次获得随机奖励</v-card-subtitle>
         
         <v-card-text class="px-0">
-          <div class="d-flex justify-center align-center mb-3">
+          <div class="d-flex justify-center align-center flex-column mb-3">
             <v-chip outlined class="ma-1">
               <v-icon left>mdi-calendar-check</v-icon>
               今日签到次数: {{availableCheckIns}}/{{maxCheckIns}}
             </v-chip>
+            <div v-if="showConsecutiveProgress" class="text-caption mt-1">
+              累签次数: {{totalSignInCount}}天
+            </div>
+          </div>
+          <div v-if="showConsecutiveProgress" class="consecutive-progress-container mb-2">
+            <div class="stars-container d-flex justify-center align-center mb-1">
+              <v-icon
+                v-for="(star, index) in consecutiveStars"
+                :key="index"
+                :color="star.filled ? 'amber' : 'grey'"
+                class="star-icon"
+                size="16"
+              >
+                {{ star.filled ? 'mdi-star' : 'mdi-star-outline' }}
+              </v-icon>
+            </div>
+            <div v-if="nextRewardProgress.show" class="progress-container">
+              <gb-tooltip :min-width="0" :max-width="9999">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-progress-linear
+                    v-bind="attrs"
+                    v-on="on"
+                    :value="nextRewardProgress.percentage"
+                    color="amber"
+                    background-color="grey lighten-2"
+                    height="4"
+                    rounded
+                    class="progress-bar"
+                  ></v-progress-linear>
+                </template>
+                <div>还需 {{nextRewardProgress.remaining}} 天获得下一个奖励</div>
+              </gb-tooltip>
+            </div>
           </div>
           
           <div class="d-flex justify-center flex-wrap">
@@ -334,6 +367,23 @@
   word-break: break-word;
   line-height: 1.4;
 }
+
+.consecutive-progress-container {
+  margin: 0 16px;
+}
+
+.stars-container {
+  gap: 2px;
+}
+
+.star-icon {
+  transition: color 0.3s ease;
+}
+
+.progress-bar {
+  width: 198px;
+  margin: 0 auto;
+}
 </style>
 
 <script>
@@ -384,6 +434,53 @@ export default {
     },
     isDebugMode() {
       return Boolean(dailyCheckIn && dailyCheckIn.debug);
+    },
+    showConsecutiveProgress() {
+      return this.$store.state.system.settings.experiment.items.consecutiveSignInRelics.value;
+    },
+    totalSignInCount() {
+      return this.$store.state.system.dailyCheckIn?.totalCount || 0;
+    },
+    consecutiveRewards() {
+      return [
+        { days: 7, relic: 'consecutiveSignIn1' },
+        { days: 14, relic: 'consecutiveSignIn2' },
+        { days: 21, relic: 'consecutiveSignIn3' },
+        { days: 28, relic: 'consecutiveSignIn4' },
+        { days: 35, relic: 'consecutiveSignIn5' },
+        { days: 50, relic: 'consecutiveSignIn6' },
+        { days: 65, relic: 'consecutiveSignIn7' },
+        { days: 80, relic: 'consecutiveSignIn8' },
+        { days: 95, relic: 'consecutiveSignIn9' },
+        { days: 110, relic: 'consecutiveSignIn10' },
+        { days: 150, relic: 'consecutiveSignIn11' }
+      ];
+    },
+    consecutiveStars() {
+      return this.consecutiveRewards.map(reward => ({
+        filled: this.totalSignInCount >= reward.days
+      }));
+    },
+    nextRewardProgress() {
+      const nextReward = this.consecutiveRewards.find(reward => this.totalSignInCount < reward.days);
+
+      if (!nextReward) {
+        return { show: false };
+      }
+
+      const currentRewardIndex = this.consecutiveRewards.indexOf(nextReward);
+      const prevRewardDays = currentRewardIndex > 0 ? this.consecutiveRewards[currentRewardIndex - 1].days : 0;
+
+      const progress = this.totalSignInCount - prevRewardDays;
+      const total = nextReward.days - prevRewardDays;
+      const percentage = Math.min(100, (progress / total) * 100);
+      const remaining = nextReward.days - this.totalSignInCount;
+
+      return {
+        show: true,
+        percentage,
+        remaining
+      };
     }
   },
   methods: {

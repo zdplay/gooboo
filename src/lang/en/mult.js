@@ -250,4 +250,6 @@ export default {
   snowdownRevengeStats: 'Revenge stats',
   snowdownRevengeCrit: 'Revenge crit rating',
   snowdownRevengeBlock: 'Revenge block rating',
+
+  gemGenSpeed: 'Gem generation speed',
 };

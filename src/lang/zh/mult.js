@@ -250,4 +250,6 @@ export default {
   snowdownRevengeStats: '复仇统计',
   snowdownRevengeCrit: '复仇暴击率',
   snowdownRevengeBlock: '复仇格挡率',
+
+  gemGenSpeed: '宝石生成速度',
 };

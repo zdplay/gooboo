@@ -81,8 +81,8 @@ export default {
             }
             return total;
         },
-        offeringPerSecond: (state, getters) => {
-            return getters.offeringScore * VILLAGE_OFFERING_PASSIVE_GAIN / SECONDS_PER_HOUR;
+        offeringPerSecond: (state, getters, rootState, rootGetters) => {
+            return rootGetters['mult/get']('currencyVillageOfferingGain', getters.offeringScore * VILLAGE_OFFERING_PASSIVE_GAIN / SECONDS_PER_HOUR);
         },
         sharesGain: (state, getters, rootState, rootGetters) => {
             const val = rootState.currency.village_copperCoin.value / 1000;

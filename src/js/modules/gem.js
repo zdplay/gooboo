@@ -7,6 +7,9 @@ export default {
     name: 'gem',
     tickspeed: 1,
     unlockNeeded: 'gemFeature',
+    mult: {
+        gemGenSpeed: {baseValue: 0}
+    },
     tick(seconds, oldTime, newTime) {
         let progress = store.state.gem.progress;
         const genSpeed = store.getters['gem/genSpeed'] / GEM_SPEED_BASE;

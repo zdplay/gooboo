@@ -1527,6 +1527,10 @@ export default {
         customCasinoEvent: {
           name: '指定赌场事件',
           description: '启用后，每次进入赌场事件时可以手动选择宾果或转盘，而不是随机决定'
+        },
+        consecutiveSignInRelics: {
+          name: '累签圣遗物',
+          description: '基于累计签到次数自动获得累签圣遗物奖励'
         }
       }
   },

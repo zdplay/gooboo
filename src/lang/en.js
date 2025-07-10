@@ -1487,6 +1487,10 @@ export default {
         lowCostMaterialFade: {
           name: 'Low Cost Material Fade',
           description: 'When material abundance percentage is over 1000%, price tag becomes semi-transparent'
+        },
+        consecutiveSignInRelics: {
+          name: 'Cumulative Sign-in Relics',
+          description: 'Automatically grant cumulative sign-in relic rewards based on total sign-in count, and control related formula usage (gem generation speed, village offering, etc.)'
         }
       }
   },

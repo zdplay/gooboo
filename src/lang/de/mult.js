@@ -250,4 +250,6 @@ export default {
   snowdownRevengeStats: 'Rachewerte',
   snowdownRevengeCrit: 'Rache-Kritisch-Wertung',
   snowdownRevengeBlock: 'Rache-Blockwertung',
+
+  gemGenSpeed: 'Edelstein-Generierungsgeschwindigkeit',
 };

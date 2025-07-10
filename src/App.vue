@@ -659,6 +659,7 @@
         <error-message v-else-if="message.type === 'error'" :message="message"></error-message>
         <card-pack-message v-else-if="message.type === 'cardPack'" :message="message"></card-pack-message>
         <heirloom-message v-else-if="message.type === 'heirloom'" :message="message"></heirloom-message>
+        <relic-message v-else-if="message.type === 'relic'" :message="message"></relic-message>
         <prize-message v-else-if="message.type === 'prize'" :message="message"></prize-message>
         <school-message v-else-if="message.type === 'school'" :message="message"></school-message>
         <update-message v-else-if="message.type === 'update'" :message="message"></update-message>
@@ -808,6 +809,7 @@ import CurrentNote from './components/render/CurrentNote.vue';
 import ErrorMessage from './components/partial/snackbar/ErrorMessage.vue';
 import CardPackMessage from './components/partial/snackbar/CardPackMessage.vue';
 import HeirloomMessage from './components/partial/snackbar/HeirloomMessage.vue';
+import RelicMessage from './components/partial/snackbar/RelicMessage.vue';
 import CurrentConfirm from './components/render/CurrentConfirm.vue';
 import { loadGame } from './js/init';
 import ParticleSpawner from './components/render/ParticleSpawner.vue';
@@ -865,6 +867,7 @@ export default {
     ErrorMessage,
     CardPackMessage,
     HeirloomMessage,
+    RelicMessage,
     CurrentConfirm,
     ParticleSpawner,
     PrizeMessage,

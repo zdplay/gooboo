@@ -8,7 +8,8 @@ export default {
     },
     getters: {
         genSpeed: (state, getters, rootState, rootGetters) => {
-            return rootGetters['achievement/totalLevel'] * GEM_SPEED_PER_ACHIEVEMENT + 1;
+            const baseSpeed = rootGetters['achievement/totalLevel'] * GEM_SPEED_PER_ACHIEVEMENT + 1;
+            return rootGetters['mult/get']('gemGenSpeed', baseSpeed);
         }
     },
     mutations: {

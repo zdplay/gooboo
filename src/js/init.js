@@ -17,12 +17,13 @@ import event from "./modules/event";
 import { getDay } from "./utils/date";
 import school from "./modules/school";
 import cryolab from "./modules/cryolab";
+import consecutiveSignIn from "./modules/consecutiveSignIn";
 
 export { newGame, loadGame }
 
 const semverCompare = require('semver/functions/compare');
 
-const modules = [meta, gem, relic, treasure, achievement, school, cryolab, card, general, mining, village, horde, farm, gallery, event];
+const modules = [meta, gem, relic, treasure, achievement, school, cryolab, card, general, mining, village, horde, farm, gallery, event, consecutiveSignIn];
 
 function newGame(startTick = true) {
     prepare();

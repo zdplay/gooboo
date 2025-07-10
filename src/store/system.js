@@ -141,6 +141,12 @@ export default {
                 subfeatures: [],
                 icon: 'mdi-book-open',
                 main: false
+            },
+            consecutiveSignIn: {
+                unlock: null,
+                subfeatures: [],
+                icon: 'mdi-calendar-check',
+                main: false
             }
         },
         settings: {
@@ -521,6 +527,13 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
+                    },
+                    consecutiveSignInRelics: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     }
                 }
             },
@@ -769,6 +782,8 @@ export default {
                         if (state.showRedeemGenerator) {
                             arr.push({...elem, name: key});
                         }
+                    } else if (key === 'consecutiveSignIn') {
+                        // 连签功能不在侧边栏显示，仅用于圣遗物图标
                     } else {
                         arr.push({...elem, name: key});
                     }
@@ -1025,6 +1040,7 @@ export default {
             commit('updateKey', {key: 'farmHint', value: false});
             commit('updateKey', {key: 'rng', value: {}});
             commit('updateKey', {key: 'cachePage', value: {}});
+            commit('updateKey', {key: 'dailyCheckIn', value: null});
             commit('updateKey', {key: 'playerId', value: null});
             commit('updateKey', {key: 'playerName', value: null});
             commit('updateKey', {key: 'updateNoticeVersion', value: null});
@@ -1323,6 +1339,9 @@ export default {
             if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
                 dispatch('cryolab/clearFreezeStates', null, {root: true});
             }
+            if (o.category === 'experiment' && o.name === 'consecutiveSignInRelics') {
+                dispatch('reapplyConsecutiveSignInRelics');
+            }
             if (o.category === 'experiment' && o.name === 'farmWatering' && !o.value) {
                 dispatch('farm/handleWateringToggleOff', null, {root: true});
             }
@@ -1605,6 +1624,19 @@ export default {
                     localStorage.removeItem(LOCAL_STORAGE_NAME);
                     location.reload();
                     break;
+                }
+            }
+        },
+        reapplyConsecutiveSignInRelics({ rootState, dispatch }) {
+            // 重新应用所有累签圣遗物效果
+            for (const [key, elem] of Object.entries(rootState.relic.item)) {
+                if (key.startsWith('consecutiveSignIn') && elem.found) {
+                    // 先重置效果
+                    elem.effect.forEach(eff => {
+                        dispatch('resetEffect', {type: eff.type, name: eff.name, multKey: `relic_${key}`});
+                    });
+                    // 再重新应用效果（会检查开关状态）
+                    dispatch('relic/apply', {name: key}, {root: true});
                 }
             }
         }

@@ -38,7 +38,8 @@ const dailyCheckIn = {
           value: {
             available: this.debug ? 999 : 1,
             timestamp: now,
-            history: this.debug ? store.state.system.dailyCheckIn.history : []
+            history: store.state.system.dailyCheckIn.history, // 保持原有历史记录
+            totalCount: store.state.system.dailyCheckIn.totalCount || 0 // 累计签到次数
           }
         });
       }
@@ -66,7 +67,7 @@ const dailyCheckIn = {
       }
 
       if (this.debug) {
-        console.log('Daily check-in prizes registered to event store:', Object.keys(dailyCheckInPrize).length, 'prizes');
+        //console.log('Daily check-in prizes registered to event store:', Object.keys(dailyCheckInPrize).length, 'prizes');
       }
     } catch (e) {
       console.warn('Failed to register daily check-in prizes to event store:', e);
@@ -186,7 +187,7 @@ const dailyCheckIn = {
   distributePrize(prize) {
     try {
       if (dailyCheckIn.debug) {
-        console.log(`📦 开始分发奖励: ${prize.id}`);
+        //console.log(`📦 开始分发奖励: ${prize.id}`);
       }
 
       // 步骤1：计算奖励数量
@@ -197,20 +198,20 @@ const dailyCheckIn = {
 
         if (prize.amountMult) {
           if (dailyCheckIn.debug) {
-            console.log(`🔢 应用倍率: ${prize.amountMult.toString()}`);
+            //console.log(`🔢 应用倍率: ${prize.amountMult.toString()}`);
           }
           const multiplier = prize.amountMult();
           amount *= multiplier;
           if (dailyCheckIn.debug) {
-            console.log(`🔢 倍率计算: ${originalAmount} × ${multiplier} = ${amount}`);
+            //console.log(`🔢 倍率计算: ${originalAmount} × ${multiplier} = ${amount}`);
           }
         }
 
         if (prize.roundAmount) {
-          const beforeRound = amount;
+          //const beforeRound = amount;
           amount = Math.round(amount);
           if (dailyCheckIn.debug) {
-            console.log(`🔢 数量取整: ${beforeRound} → ${amount}`);
+            //console.log(`🔢 数量取整: ${beforeRound} → ${amount}`);
           }
         }
       } catch (error) {
@@ -223,7 +224,7 @@ const dailyCheckIn = {
       try {
         prizeName = this.getPrizeName(prize);
         if (dailyCheckIn.debug) {
-          console.log(`📝 奖励名称: ${prizeName}`);
+          //console.log(`📝 奖励名称: ${prizeName}`);
         }
       } catch (error) {
         console.error('❌ 获取奖励名称时出错:', error);
@@ -235,13 +236,13 @@ const dailyCheckIn = {
       try {
         if (prize.type === 'currency') {
           if (dailyCheckIn.debug) {
-            console.log(`💰 分发货币奖励: ${prize.item}`);
+            //console.log(`💰 分发货币奖励: ${prize.item}`);
           }
           // 处理随机货币（如随机宝石）
           const itemName = typeof prize.item === 'function' ? prize.item() : prize.item;
           actualItemName = itemName; // 保存实际分发的物品名称
           if (dailyCheckIn.debug) {
-            console.log(`💰 实际货币名称: ${itemName}`);
+            //console.log(`💰 实际货币名称: ${itemName}`);
           }
 
           const parts = itemName.split('_');
@@ -251,7 +252,7 @@ const dailyCheckIn = {
 
           const [feature, name] = parts;
           if (dailyCheckIn.debug) {
-            console.log(`💰 分发到: ${feature}.${name}, 数量: ${amount}`);
+            //console.log(`💰 分发到: ${feature}.${name}, 数量: ${amount}`);
           }
 
           store.dispatch('currency/gain', {
@@ -262,7 +263,7 @@ const dailyCheckIn = {
 
         } else if (prize.type === 'consumable') {
           if (dailyCheckIn.debug) {
-            console.log(`🧪 分发消耗品奖励: ${prize.item}, 数量: ${amount}`);
+            //console.log(`🧪 分发消耗品奖励: ${prize.item}, 数量: ${amount}`);
           }
           actualItemName = prize.item; // 消耗品名称固定
           store.dispatch('consumable/gain', {
@@ -272,26 +273,26 @@ const dailyCheckIn = {
 
         } else if (prize.type === 'treasure' && prize.data) {
           if (dailyCheckIn.debug) {
-            console.log(`🏺 分发宝藏奖励:`, prize.data);
+            //console.log(`🏺 分发宝藏奖励:`, prize.data);
           }
           actualItemName = prize.item; // 宝藏名称固定
           store.dispatch('treasure/winItem', prize.data);
 
         } else if (prize.type === 'relic') {
           if (dailyCheckIn.debug) {
-            console.log(`💍 分发圣物奖励: ${prize.item}`);
+            //console.log(`💍 分发圣物奖励: ${prize.item}`);
           }
           actualItemName = prize.item; // 圣物名称固定
           store.dispatch('relic/find', prize.item);
 
         } else if (prize.type === 'cardPack') {
           if (dailyCheckIn.debug) {
-            console.log(`🃏 分发卡包奖励: ${prize.item}, 数量: ${amount}`);
+            //console.log(`🃏 分发卡包奖励: ${prize.item}, 数量: ${amount}`);
           }
           const cardPackName = typeof prize.item === 'function' ? prize.item() : prize.item;
           actualItemName = cardPackName; // 保存实际分发的卡包名称
           if (dailyCheckIn.debug) {
-            console.log(`🃏 实际卡包名称: ${cardPackName}`);
+            //console.log(`🃏 实际卡包名称: ${cardPackName}`);
           }
 
           store.dispatch('card/openPack', {
@@ -305,7 +306,7 @@ const dailyCheckIn = {
         }
 
         if (dailyCheckIn.debug) {
-          console.log(`✅ 奖励分发成功: ${prize.type} - ${prizeName}`);
+          //console.log(`✅ 奖励分发成功: ${prize.type} - ${prizeName}`);
         }
 
       } catch (error) {
@@ -358,7 +359,7 @@ const dailyCheckIn = {
         }
 
         if (dailyCheckIn.debug) {
-          console.log(`📝 生成历史记录:`, historyItem);
+          //console.log(`📝 生成历史记录:`, historyItem);
         }
 
         // 步骤5：更新签到状态
@@ -368,12 +369,13 @@ const dailyCheckIn = {
           value: {
             available: dailyCheckInState.available - 1,
             timestamp: Math.floor(Date.now() / 1000),
-            history: [historyItem, ...dailyCheckInState.history]
+            history: [historyItem, ...dailyCheckInState.history].slice(0, 10),
+            totalCount: (dailyCheckInState.totalCount || 0) + 1 // 增加累计次数
           }
         });
 
         if (dailyCheckIn.debug) {
-          console.log(`✅ distributePrize 完成: ${prizeText}`);
+          //console.log(`✅ distributePrize 完成: ${prizeText}`);
         }
 
         return {
@@ -406,7 +408,7 @@ const dailyCheckIn = {
         pool = this.selectPrizePool();
         poolName = pool.name;
         if (dailyCheckIn.debug) {
-          console.log(`🎯 选中奖励池: ${poolName} (${pool.color}池, ${pool.chance}%概率)`);
+          //console.log(`🎯 选中奖励池: ${poolName} (${pool.color}池, ${pool.chance}%概率)`);
         }
       } catch (error) {
         console.error('❌ 选择奖励池时出错:', error);
@@ -425,7 +427,7 @@ const dailyCheckIn = {
           };
         }
         if (dailyCheckIn.debug) {
-          console.log(`🎁 选中奖励: ${prize.id} (类型: ${prize.type}, 物品: ${prize.item})`);
+          //console.log(`🎁 选中奖励: ${prize.id} (类型: ${prize.type}, 物品: ${prize.item})`);
         }
       } catch (error) {
         console.error('❌ 从奖励池选择奖励时出错:', error);
@@ -442,7 +444,7 @@ const dailyCheckIn = {
           }
 
           if (dailyCheckIn.debug) {
-            console.log(`🏺 生成宝藏: ${prizeData.item}, bonusTier: ${prizeData.bonusTier || 0}`);
+            //console.log(`🏺 生成宝藏: ${prizeData.item}, bonusTier: ${prizeData.bonusTier || 0}`);
           }
           const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD格式
           const totalCount = store.state.system.rng['dailyCheckIn_treasure'] || 0;
@@ -475,12 +477,24 @@ const dailyCheckIn = {
       // 步骤5：分发奖励
       try {
         if (dailyCheckIn.debug) {
-          console.log(`💰 开始分发奖励: ${prize.id}`);
+          //console.log(`💰 开始分发奖励: ${prize.id}`);
         }
         const result = this.distributePrize(prize);
         if (dailyCheckIn.debug) {
-          console.log(`✅ 奖励分发成功: ${result.prizeText}`);
+          //console.log(`✅ 奖励分发成功: ${result.prizeText}`);
         }
+
+        // 步骤6：检查并发放连签奖励
+        try {
+          store.dispatch('consecutiveSignIn/checkAndGrantRewards');
+          if (dailyCheckIn.debug) {
+            //console.log(`🎁 连签奖励检查完成`);
+          }
+        } catch (error) {
+          console.error('❌ 检查连签奖励时出错:', error);
+          // 不影响主要签到流程，只记录错误
+        }
+
         return result;
       } catch (error) {
         console.error('❌ 分发奖励时出错:', error);

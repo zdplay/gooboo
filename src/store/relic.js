@@ -48,8 +48,13 @@ export default {
                 commit('updateKey', {name: key, key: 'found', value: false});
             }
         },
-        apply({ state, dispatch }, o) {
+        apply({ state, dispatch, rootState }, o) {
             let trigger = o.onFind ?? false;
+            if (o.name.startsWith('consecutiveSignIn') &&
+                !rootState.system.settings.experiment.items.consecutiveSignInRelics.value) {
+                return;
+            }
+
             state.item[o.name].effect.forEach(eff => {
                 dispatch('system/applyEffect', {type: eff.type, name: eff.name, multKey: `relic_${o.name}`, value: eff.value, trigger}, {root: true});
             });

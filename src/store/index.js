@@ -30,6 +30,7 @@ import treasure from './treasure';
 import cryolab from './cryolab';
 import consumable from './consumable';
 import tag from './tag';
+import consecutiveSignIn from './consecutiveSignIn';
 
 // store modules
 
@@ -66,6 +67,7 @@ export default new Vuex.Store({
         treasure,
         cryolab,
         consumable,
-        tag
+        tag,
+        consecutiveSignIn
     }
 })

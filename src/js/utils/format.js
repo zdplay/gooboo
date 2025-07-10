@@ -49,8 +49,8 @@ function formatNum(amount, showDecimals = false) {
     
     // 如果启用了科学记数法，对大数和小数应用统一格式
     if (useScientificNotation && amount > 0) {
-        // 只对1000及以上的数字或0.001及以下的数字应用科学记数法
-        if (numBase >= 3 || numBase <= -3) {
+        // 只对10000及以上的数字或0.0001及以下的数字应用科学记数法
+        if (numBase >= 4 || numBase <= -4) {
             // 处理数字的尾数和指数
             const exponent = numBase;
             let mantissa = amount / Math.pow(10, exponent);
