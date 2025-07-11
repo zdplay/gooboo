@@ -33,7 +33,22 @@
 <template>
   <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.currency.${ currencyName }.name`)" :min-width="200">
     <template v-slot:activator="{ on, attrs }">
-      <div class="ingredient-container balloon-text-dynamic rounded d-flex justify-center align-center" @mouseover="hovered = true" @mouseleave="hovered = false" :class="[$vuetify.theme.dark ? 'darken-2' : 'lighten-2', currency.color, {'premium-glow': premium}, $vnode.data.staticClass]" v-bind="attrs" v-on="{$listeners, ...on}">
+      <div
+        class="ingredient-container balloon-text-dynamic rounded d-flex justify-center align-center"
+        @mouseover="hovered = true"
+        @mouseleave="hovered = false"
+        :class="[$vuetify.theme.dark ? 'darken-2' : 'lighten-2', currency.color, {'premium-glow': premium}, $vnode.data.staticClass]"
+        v-bind="attrs"
+        v-on="{$listeners, ...on}"
+        :id="`mining-ingredient-${index}`"
+        draggable
+        @dragstart="drag"
+        @drop="drop"
+        @dragover="allowDrop"
+        @dragenter="allowDrop"
+        @touchstart="touchstart"
+        @touchend="touchdrop"
+      >
         <v-icon class="mb-3" large>{{ currency.icon }}</v-icon>
         <div class="ingredient-amount">{{ $formatNum(amount) }}</div>
         <v-btn @click="compressMore" v-if="canCompress && hovered" :disabled="!canUpgrade" class="ingredient-more px-1" x-small min-width="0" min-height="0"><v-icon size="12">mdi-arrow-up</v-icon></v-btn>
@@ -110,6 +125,38 @@ export default {
     },
     compressLess() {
       this.$store.commit('mining/updateIngredientKey', {index: this.index, key: 'compress', value: this.compress - 1});
+    },
+    drag(ev) {
+      ev.dataTransfer.setData("text", this.index.toString());
+      ev.dataTransfer.effectAllowed = "move";
+    },
+    drop(ev) {
+      ev.preventDefault();
+      const draggedIndex = parseInt(ev.dataTransfer.getData("text"));
+      if (draggedIndex !== this.index && !isNaN(draggedIndex)) {
+        this.$store.commit('mining/moveIngredient', {from: draggedIndex, to: this.index});
+      }
+    },
+    allowDrop(ev) {
+      ev.preventDefault();
+    },
+    touchstart() {
+      window.miningDragIndex = this.index;
+    },
+    touchdrop(ev) {
+      if (window.miningDragIndex !== undefined && window.miningDragIndex !== null) {
+        const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+        if (elemList) {
+          const endElem = elemList.find(el => el.id && el.id.startsWith('mining-ingredient-'));
+          if (endElem) {
+            const endIndex = parseInt(endElem.id.split('-')[2]);
+            if (endIndex !== window.miningDragIndex && !isNaN(endIndex)) {
+              this.$store.commit('mining/moveIngredient', {from: window.miningDragIndex, to: endIndex});
+            }
+          }
+        }
+        window.miningDragIndex = null;
+      }
     }
   }
 }

@@ -453,6 +453,14 @@ export default {
         removeIngredient(state, index) {
             state.ingredientList.splice(index, 1);
         },
+        moveIngredient(state, o) {
+            if (o.from !== o.to && o.from >= 0 && o.to >= 0 && o.from < state.ingredientList.length && o.to < state.ingredientList.length) {
+                const fromItem = state.ingredientList[o.from];
+                const toItem = state.ingredientList[o.to];
+                Vue.set(state.ingredientList, o.from, toItem);
+                Vue.set(state.ingredientList, o.to, fromItem);
+            }
+        },
         addBreaks(state, o) {
             while (state.breaks.length < o.depth) {
                 state.breaks.push(0);
