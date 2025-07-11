@@ -1181,7 +1181,8 @@ export default {
           value: {
             available: null,
             timestamp: now,
-            history: []
+            history: [],
+            totalCount: 0
           }
         });
       } else {
@@ -1198,7 +1199,8 @@ export default {
             value: {
               available: 1,
               timestamp: now,
-              history: []
+              history: [], 
+              totalCount: this.$store.state.system.dailyCheckIn.totalCount || 0
             }
           });
         }
