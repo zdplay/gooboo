@@ -293,7 +293,6 @@ export default {
   },
   data() {
     return {
-      boardSize: 300,
       gridSize: 15,
       gameEngine: null,
       snake: [],
@@ -328,6 +327,28 @@ export default {
       set(value) {
         this.$emit('input', value);
       }
+    },
+    boardSize() {
+      // 根据屏幕大小动态计算游戏板尺寸
+      const screenWidth = this.$vuetify.breakpoint.width;
+      const dialogPadding = 48; // 对话框左右边距
+      const contentPadding = 32; // 内容区域边距
+      const availableWidth = screenWidth - dialogPadding - contentPadding;
+
+      // 根据断点设置不同的最大尺寸
+      let maxSize;
+      if (this.$vuetify.breakpoint.xs) {
+        maxSize = Math.min(280, availableWidth);
+      } else if (this.$vuetify.breakpoint.sm) {
+        maxSize = Math.min(320, availableWidth);
+      } else if (this.$vuetify.breakpoint.md) {
+        maxSize = Math.min(400, availableWidth);
+      } else {
+        maxSize = 450; // 大屏幕使用较大尺寸
+      }
+
+      // 确保最小尺寸
+      return Math.max(240, maxSize);
     },
     cellSize() {
       return this.boardSize / this.gridSize;
@@ -607,6 +628,22 @@ export default {
   overflow: hidden;
   background-color: var(--v-background-base);
   pointer-events: none;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 响应式调整 */
+@media (max-width: 599px) {
+  .game-board {
+    margin: 8px auto;
+  }
+}
+
+@media (max-width: 479px) {
+  .game-board {
+    margin: 4px auto;
+    border-width: 1px;
+  }
 }
 
 .snake-segment, .food-item, .game-item {
@@ -646,6 +683,21 @@ export default {
   gap: 4px;
   max-width: 300px;
   margin: 0 auto;
+}
+
+/* 控制网格响应式调整 */
+@media (max-width: 599px) {
+  .control-grid {
+    max-width: 250px;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 479px) {
+  .control-grid {
+    max-width: 200px;
+    gap: 1px;
+  }
 }
 
 .control-btn {
