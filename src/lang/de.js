@@ -1432,6 +1432,10 @@ export default {
         name: 'Upgrade-Menü Filterfunktion',
         description: 'Fügt Materialfilterung im Upgrade-Menü hinzu, um Upgrades einfacher durchsuchen zu können'
       },
+      previewUnlockedUpgrades: {
+        name: 'Vorschau nicht freigeschalteter Upgrades',
+        description: 'Ermöglicht die Anzeige noch nicht freigeschalteter Upgrades mit spezifischen Materialanforderungen anstelle von Fragezeichen, erfordert die Aktivierung der Upgrade-Menü-Filter-Funktion.'
+      },
       upgradeBuyProgress: {
         name: 'Fortschrittsbalken für Kauf-Buttons',
         description: 'Zeigt einen Fortschrittsbalken auf Kauf-Buttons an, der anzeigt, wie nah du daran bist, das Upgrade basierend auf benötigten Materialien kaufen zu können'

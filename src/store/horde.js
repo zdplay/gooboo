@@ -277,6 +277,9 @@ export default {
         },
         masteryRequired: (state) => (name, lvl) => {
             const item = state.items[name];
+            if (!item || item.findZone === undefined) {
+                return 0;
+            }
             return Math.pow(10, lvl) * Math.pow(1.04, item.findZone) * (item.unlock === 'hordeChessItems' ? buildNum(20, 'K') : 500);
         },
         baseRespawnTime: (state) => {
@@ -292,7 +295,11 @@ export default {
             return rootState.stat.horde_maxZone.value >= HORDE_HEIRLOOM_MIN_ZONE;
         },
         masteryBaseGain: (state) => (name) => {
-            return state.zone - state.items[name].findZone - 24;
+            const item = state.items[name];
+            if (!item || !item.findZone) {
+                return 0;
+            }
+            return state.zone - item.findZone - 24;
         },
         expIncrement: (state, getters, rootState, rootGetters) => (className) => {
             const incLowerLimit = className === 'scholar' ? 1.12 : 1.15;

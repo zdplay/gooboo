@@ -352,6 +352,13 @@ export default {
                         value: false,
                         defaultValue: false
                     },
+                    previewUnlockedUpgrades: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                     upgradeBuyProgress: {
                         unlock: null,
                         hasDescription: true,

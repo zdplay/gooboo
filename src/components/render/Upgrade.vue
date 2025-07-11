@@ -21,6 +21,12 @@
   border-color: #81C784 !important;
   color: #000 !important;
 }
+.queue-button-disabled {
+  background-color: #424242 !important;
+  border-color: #424242 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
 .progress-button-wrap {
   position: relative;
   border-radius: 4px;
@@ -41,10 +47,14 @@
 .error-overlay {
   background-color: rgba(244, 67, 54, 0.5);
 }
+.upgrade-unlocked-preview {
+  opacity: 0.7;
+  border: 2px dashed var(--v-warning-base);
+}
 </style>
 
 <template>
-  <v-card class="d-flex align-center pa-1" v-if="upgrade.collapse">
+  <v-card class="d-flex align-center pa-1" :class="{'upgrade-unlocked-preview': previewUnlocked}" v-if="upgrade.collapse">
     <v-icon v-if="upgrade.icon" class="ma-1">{{ upgrade.icon }}</v-icon>
     <div v-else class="ma-1">{{ $vuetify.lang.t(`$vuetify.upgrade.${name}`) }}</div>
     <gb-tooltip key="upgrade-bought-collapse" v-if="upgrade.bought || (upgrade.cap !== null && !upgrade.hideCap)" :min-width="0">
@@ -56,8 +66,8 @@
           :class="showUpgradeQueue ? queueButtonColor : ''"
           v-bind="attrs"
           v-on="on"
-          @click="showUpgradeQueue ? toggleModuleQueue() : null"
-          :style="showUpgradeQueue ? 'cursor: pointer;' : ''"
+          @click="showUpgradeQueue && upgrade.requirement(upgrade.level) ? toggleModuleQueue() : null"
+          :style="showUpgradeQueue && upgrade.requirement(upgrade.level) ? 'cursor: pointer;' : (showUpgradeQueue ? 'cursor: not-allowed;' : '')"
         >
           <v-icon class="mr-1">mdi-chevron-double-up</v-icon>
           <span>{{ upgrade.level }}{{ upgrade.level !== upgrade.bought ? (' (+' + Math.round(upgrade.bought - upgrade.level) + ')') : '' }}</span>
@@ -78,20 +88,28 @@
       <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.upgrade.keyset.${ translationSet }.persistent`) }}</div>
     </gb-tooltip>
     <v-spacer></v-spacer>
-    <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-    <gb-tooltip key="upgrade-buy-collapse">
-      <template v-slot:activator="{ on, attrs }">
-        <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
-          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-          <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
-        </div>
-      </template>
-      <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag></div>
-      <display-row class="mt-0" v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
-    </gb-tooltip>
+    <!-- 未解锁升级项显示解锁条件 -->
+    <div v-if="!isMiningOrHordeUnlocked && unlockRequirementText" class="ma-1 px-2 text-caption text--secondary">
+      <v-icon small class="mr-1">mdi-lock</v-icon>
+      {{ unlockRequirementText }}
+    </div>
+    <!-- 已解锁升级项显示按钮 -->
+    <template v-else>
+      <v-btn key="upgrade-max-collapse" small v-if="!isMax" class="ma-1 px-2" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+      <gb-tooltip key="upgrade-buy-collapse">
+        <template v-slot:activator="{ on, attrs }">
+          <div class="progress-button-wrap ma-1" v-bind="attrs" v-on="on">
+            <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+            <v-btn class="px-2" v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+          </div>
+        </template>
+        <div class="mx-n1"><price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount" :preview-unlocked="previewUnlocked"></price-tag></div>
+        <display-row class="mt-0" v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
+      </gb-tooltip>
+    </template>
     <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
-  <v-card v-else>
+  <v-card v-else :class="{'upgrade-unlocked-preview': previewUnlocked}">
     <v-card-title class="pa-2 justify-center">
       <v-icon v-if="upgrade.icon" class="mr-2">{{ upgrade.icon }}</v-icon>
       <div>{{ $vuetify.lang.t(`$vuetify.upgrade.${ name }`) }}</div>
@@ -100,7 +118,7 @@
       <display-row v-for="(item, key) in display" :key="`${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
       <alert-text v-if="upgrade.hasDescription && upgrade.highestLevel <= 0" type="info" class="mt-1">{{ $vuetify.lang.t(`$vuetify.upgrade.description.${ name }`) }}</alert-text>
       <div class="d-flex flex-wrap align-center mx-n1 mt-2" v-if="!isMax">
-        <price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount"></price-tag>
+        <price-tag class="ma-1" v-for="(amount, currency, index) in price" :key="currency + '-' + index" :currency="currency" :amount="amount" :preview-unlocked="previewUnlocked"></price-tag>
         <v-spacer></v-spacer>
         <div>
           <gb-tooltip key="upgrade-predict" v-if="!upgrade.hideCap && !isNearMax" :min-width="350" :title-text="$vuetify.lang.t('$vuetify.upgrade.nextLevels')">
@@ -115,7 +133,7 @@
               <div class="bg-tile-background flex-grow-1 rounded pa-1">
                 <display-row v-for="(item, subkey) in predict.display" class="mx-1" :key="`predict-display-${key}-${item.name}-${item.type}-${subkey}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
                 <div class="d-flex flex-wrap">
-                  <price-tag class="ma-1" v-for="(amount, currency, index) in predict.price" :key="'predict-price-' + key + '-' + currency + '-' + index" :currency="currency" :amount="amount"></price-tag>
+                  <price-tag class="ma-1" v-for="(amount, currency, index) in predict.price" :key="'predict-price-' + key + '-' + currency + '-' + index" :currency="currency" :amount="amount" :preview-unlocked="previewUnlocked"></price-tag>
                 </div>
               </div>
             </div>
@@ -149,8 +167,8 @@
               ]"
               v-bind="attrs"
               v-on="on"
-              @click="showUpgradeQueue ? toggleModuleQueue() : null"
-              :style="showUpgradeQueue ? 'cursor: pointer;' : ''"
+              @click="showUpgradeQueue && upgrade.requirement(upgrade.level) ? toggleModuleQueue() : null"
+              :style="showUpgradeQueue && upgrade.requirement(upgrade.level) ? 'cursor: pointer;' : (showUpgradeQueue ? 'cursor: not-allowed;' : '')"
             >
               <v-icon class="mr-1">mdi-chevron-double-up</v-icon>
               <span>{{ upgrade.level }}{{ upgrade.level !== upgrade.bought ? (' (+' + Math.round(upgrade.bought - upgrade.level) + ')') : '' }}</span>
@@ -184,16 +202,24 @@
           </div>
           <display-row v-for="(item, key) in otherDisplay" class="mt-0 mx-1" :key="`other-display-${item.name}-${item.type}-${key}`" :name="item.name" :type="item.type" :before="item.before" :after="item.after"></display-row>
           <div class="d-flex flex-wrap mt-0">
-            <price-tag class="ma-1" v-for="(amount, currency, index) in otherPrice" :key="'other-price-' + currency + '-' + index" :currency="currency" :amount="amount"></price-tag>
+            <price-tag class="ma-1" v-for="(amount, currency, index) in otherPrice" :key="'other-price-' + currency + '-' + index" :currency="currency" :amount="amount" :preview-unlocked="previewUnlocked"></price-tag>
           </div>
         </gb-tooltip>
       </div>
       <v-spacer></v-spacer>
-      <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
-      <div class="progress-button-wrap ml-2">
-        <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
-        <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+      <!-- 未解锁升级项显示解锁条件 -->
+      <div v-if="!isMiningOrHordeUnlocked && unlockRequirementText" class="ma-1 px-2 text-body-2 text--secondary">
+        <v-icon small class="mr-1">mdi-lock</v-icon>
+        {{ unlockRequirementText }}
       </div>
+      <!-- 已解锁升级项显示按钮 -->
+      <template v-else>
+        <v-btn key="upgrade-buy-max" small v-if="!isMax" color="primary" :disabled="!canAfford || disabled" @click="buyMax">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+        <div class="progress-button-wrap ml-2">
+          <div v-if="showProgressBar && !disabled && !isMax" class="progress-overlay" :class="[ableAfford ? 'primary-overlay' : 'error-overlay']" :style="{ width: `${affordProgress}%` }"></div>
+          <v-btn key="upgrade-buy" v-if="!isMax" :data-cy="`upgrade-${ name }-buy`" color="primary" :disabled="!canAfford || disabled" @click="buy">{{ $vuetify.lang.t(upgradeTranslation) }}</v-btn>
+        </div>
+      </template>
     </v-card-actions>
     <v-btn class="upgrade-collapse" icon @click="toggleCollapse"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
     <gb-tooltip key="upgrade-persistent" v-if="upgrade.persistent" :min-width="0">
@@ -232,6 +258,11 @@ export default {
       type: String,
       required: false,
       default: 'default'
+    },
+    previewUnlocked: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -417,7 +448,52 @@ export default {
     },
     queueButtonColor() {
       if (!this.showUpgradeQueue) return '';
+
+      const isUnlocked = this.upgrade.requirement(this.upgrade.level);
+      if (!isUnlocked) {
+        return 'queue-button-disabled';
+      }
+
       return this.isInModuleQueue ? 'queue-button-active' : 'queue-button-default';
+    },
+    isMiningOrHordeUnlocked() {
+      const isMiningOrHorde = (this.upgrade.feature === 'mining' && (this.upgrade.subfeature === 0 || this.upgrade.subfeature === 1)) ||
+                              (this.upgrade.feature === 'horde' && (this.upgrade.subfeature === 0 || this.upgrade.subfeature === 1));
+
+      if (!isMiningOrHorde) {
+        return true;
+      }
+
+      const isUnlocked = this.upgrade.requirement(this.upgrade.level);
+      return isUnlocked;
+    },
+    unlockRequirementText() {
+      const isMiningOrHorde = (this.upgrade.feature === 'mining' && (this.upgrade.subfeature === 0 || this.upgrade.subfeature === 1)) ||
+                              (this.upgrade.feature === 'horde' && (this.upgrade.subfeature === 0 || this.upgrade.subfeature === 1));
+
+      if (!isMiningOrHorde || this.isMiningOrHordeUnlocked) {
+        return null;
+      }
+
+      if (this.upgrade.feature === 'mining') {
+        if (this.upgrade.requirementValue !== undefined && this.upgrade.requirementStat) {
+          const statName = this.getStatDisplayName(this.upgrade.requirementStat);
+          return `需要 ${statName} 达到 ${this.upgrade.requirementValue}`;
+        } else {
+          return '需要相关解锁';
+        }
+      }
+
+      if (this.upgrade.feature === 'horde') {
+        if (this.upgrade.requirementValue !== undefined && this.upgrade.requirementStat) {
+          const statName = this.getStatDisplayName(this.upgrade.requirementStat);
+          return `需要 ${statName} 达到 ${this.upgrade.requirementValue}`;
+        } else {
+          return '需要相关解锁';
+        }
+      }
+
+      return '需要满足解锁条件';
     }
   },
   methods: {
@@ -455,7 +531,35 @@ export default {
       this.$store.commit('upgrade/updateKey', {name: this.name, key: 'collapse', value: !this.upgrade.collapse});
     },
     toggleModuleQueue() {
+      const isUnlocked = this.upgrade.requirement(this.upgrade.level);
+      if (!isUnlocked) {
+        this.$store.dispatch('system/addNotification', {
+          color: 'error',
+          timeout: 3000,
+          message: {
+            text: {
+              zh: '无法将未解锁的升级项添加到队列',
+              en: 'Cannot add unlocked upgrade to queue',
+              de: 'Kann nicht freigeschaltetes Upgrade zur Warteschlange hinzufügen'
+            }
+          }
+        });
+        return;
+      }
+
       this.$store.dispatch('upgrade/toggleModuleQueue', {name: this.name});
+    },
+    getStatDisplayName(statName) {
+      const statNameMap = {
+        'mining_maxDepth0': '矿1最大深度',
+        'mining_maxDepth1': '矿2最大深度',
+        'mining_depthDwellerCap0': '深度居民容量',
+        'mining_depthDwellerCap1': '气体居民容量',
+        'horde_maxZone': '最大区域',
+        'horde_battlePassCurrentLevel': '战斗通行证等级'
+      };
+
+      return statNameMap[statName] || '特定条件';
     }
   }
 }

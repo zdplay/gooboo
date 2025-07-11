@@ -1400,6 +1400,10 @@ export default {
           name: 'Upgrade Menu Filter',
           description: 'Add material filtering in the upgrade menu for easier finding of needed upgrade items'
         },
+        previewUnlockedUpgrades: {
+          name: 'Preview Unlocked Upgrades',
+          description: 'Allow viewing upgrades that are not yet unlocked, showing specific material requirements instead of question marks, requires the upgrade menu filter feature to be enabled.'
+        },
         upgradeBuyProgress: {
           name: 'Upgrade Button Progress Bar',
           description: 'Show a progress bar on buy buttons indicating how close you are to being able to purchase the upgrade based on required materials'

@@ -367,6 +367,7 @@ export default {
       { category: '其他', color: 'cyan', content: '增加升级队列功能。在【设置】-【实验性】中开关，点击【已升级】按钮添加。', isCurrentUpdate: false },
       { category: '其他', color: 'cyan', content: '增加低耗材料半隐藏功能，当材料充足百分比超过1000%时价格标签显示半透明效果。', isCurrentUpdate: true },
       { category: '其他', color: 'cyan', content: '增加兑换码功能，用来补偿部分玩家的损失。', isCurrentUpdate: false },
+      { category: '其他', color: 'cyan', content: '增加预览未解锁升级项功能，可查看尚未解锁的升级项目并显示具体材料需求。', isCurrentUpdate: true }
     ],
     categoryIcons: {
       '设置': 'mdi-cog',

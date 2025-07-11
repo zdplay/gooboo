@@ -8,7 +8,7 @@
 </style>
 
 <template>
-  <gb-tooltip v-if="add || curr.alwaysVisible || stat.total > 0" :title-text="$vuetify.lang.t(`$vuetify.currency.${ currency }.name`)">
+  <gb-tooltip v-if="add || curr.alwaysVisible || stat.total > 0 || previewUnlocked" :title-text="$vuetify.lang.t(`$vuetify.currency.${ currency }.name`)">
     <template v-slot:activator="{ on, attrs }">
       <v-badge dot overlap bordered :color="curr.color" :value="multWarning">
         <div class="v-chip v-chip--label v-size--small px-2 balloon-text-dynamic" :class="[{'price-tag-highlight': highlight, 'price-tag-over-abundant': isOverAbundant}, $vuetify.theme.dark ? 'theme--dark darken-3' : 'theme--light lighten-3', curr.color, $vnode.data.staticClass]" v-bind="attrs" v-on="on" @click="handleClick">
@@ -20,7 +20,7 @@
     <currency-tooltip :name="currency" :needed="add ? null : amount" hide-details :show-mult-warning="multWarning"></currency-tooltip>
     <slot></slot>
   </gb-tooltip>
-  <v-chip v-else small label>
+  <v-chip v-else-if="!previewUnlocked" small label>
     <v-icon>mdi-help</v-icon>
   </v-chip>
 </template>
@@ -46,6 +46,11 @@ export default {
       default: false
     },
     highlight: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    previewUnlocked: {
       type: Boolean,
       required: false,
       default: false

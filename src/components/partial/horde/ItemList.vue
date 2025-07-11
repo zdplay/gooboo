@@ -44,10 +44,10 @@
         <v-icon small>mdi-cog</v-icon>
       </v-btn>
     </div>
-    <div class="ma-2 d-flex justify-center align-center">
+    <div class="ma-2 d-flex justify-center align-center flex-wrap">
       <v-btn
         small
-        class="mr-2"
+        class="ma-1"
         :color="showRecommendedOnly ? 'orange' : 'primary'"
         @click="toggleRecommendedFilter"
         v-if="showRecommendedButton"
@@ -57,7 +57,7 @@
       </v-btn>
       <v-btn
         small
-        class="mx-2"
+        class="ma-1"
         :color="showEquippedOnly ? 'orange' : 'primary'"
         @click="toggleEquippedFilter"
         v-if="showEquipmentFilter"
@@ -69,7 +69,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             small
-            class="ml-2"
+            class="ma-1"
             :color="selectedCategory ? 'orange' : 'primary'"
             v-bind="attrs"
             v-on="on"
@@ -103,6 +103,17 @@
           </v-list-item>
         </v-list>
       </v-menu>
+
+      <v-btn
+        small
+        class="ma-1"
+        :color="showUnlockedOnly ? 'orange' : 'primary'"
+        @click="toggleUnlockedFilter"
+        v-if="showPreviewUnlockedUpgrades"
+      >
+        <v-icon small class="mr-1">{{ showUnlockedOnly ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
+        {{ showUnlockedOnly ? '清空' : '未解锁' }}
+      </v-btn>
     </div>
     <div class="ma-2 pa-2 bg-tile-default rounded elevation-1" v-if="showRecommendedOnly && showRecommendedButton">
       <div class="text-center text-body-2 orange--text" style="white-space: pre-line;">
@@ -213,6 +224,7 @@ export default {
     showLoadouts: false,
     showEquippedOnly: false,
     showRecommendedOnly: false,
+    showUnlockedOnly: false,
     selectedCategory: null,
     batchConfigDialog: false,
     configJsonText: '',
@@ -239,8 +251,17 @@ export default {
     },
     items() {
       let arr = [];
-      for (const [key, elem] of Object.entries(this.itemsList)) {
-        arr.push({...elem, name: key});
+
+      if (this.showUnlockedOnly) {
+        for (const [key, elem] of Object.entries(this.$store.state.horde.items)) {
+          if (!elem.found) {
+            arr.push({...elem, name: key});
+          }
+        }
+      } else {
+        for (const [key, elem] of Object.entries(this.itemsList)) {
+          arr.push({...elem, name: key});
+        }
       }
 
       if (this.showEquippedOnly) {
@@ -313,6 +334,12 @@ export default {
       const isHordeSubfeature1 = this.$store.state.system.features.horde.currentSubfeature === 0; // 部落1
 
       return experimentSettings?.equipmentFilter?.value && isHordeSubfeature1;
+    },
+    showPreviewUnlockedUpgrades() {
+      const experimentSettings = this.$store.state.system.settings.experiment.items;
+      const isHordeSubfeature1 = this.$store.state.system.features.horde.currentSubfeature === 0; // 部落1
+
+      return experimentSettings?.previewUnlockedUpgrades?.value && isHordeSubfeature1;
     }
   },
   methods: {
@@ -323,6 +350,7 @@ export default {
       this.showEquippedOnly = !this.showEquippedOnly;
       if (this.showEquippedOnly) {
         this.showRecommendedOnly = false;
+        this.showUnlockedOnly = false;
         this.selectedCategory = null;
       }
       this.page = 1;
@@ -331,6 +359,7 @@ export default {
       this.showRecommendedOnly = !this.showRecommendedOnly;
       if (this.showRecommendedOnly) {
         this.showEquippedOnly = false;
+        this.showUnlockedOnly = false;
         this.selectedCategory = null;
       }
       this.page = 1;
@@ -339,10 +368,20 @@ export default {
       this.selectedCategory = category;
       this.showEquippedOnly = false;
       this.showRecommendedOnly = false;
+      this.showUnlockedOnly = false;
       this.page = 1;
     },
     clearCategoryFilter() {
       this.selectedCategory = null;
+      this.page = 1;
+    },
+    toggleUnlockedFilter() {
+      this.showUnlockedOnly = !this.showUnlockedOnly;
+      if (this.showUnlockedOnly) {
+        this.showEquippedOnly = false;
+        this.showRecommendedOnly = false;
+        this.selectedCategory = null;
+      }
       this.page = 1;
     },
     unequipAll() {

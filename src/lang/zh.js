@@ -1432,6 +1432,10 @@ export default {
           name: '升级菜单筛选功能',
           description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目'
         },
+        previewUnlockedUpgrades: {
+          name: '预览未解锁升级项',
+          description: '允许查看尚未解锁的升级项目，显示具体材料需求而非问号，需要同时打开升级菜单筛选功能。'
+        },
         upgradeBuyProgress: {
           name: '升级购买按钮进度条',
           description: '在购买按钮上显示进度条，指示您根据所需材料有多接近能够购买该升级'

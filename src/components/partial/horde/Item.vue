@@ -7,10 +7,14 @@
 .mastery-unreached {
   opacity: 0.5;
 }
+.item-unlocked-preview {
+  opacity: 0.7;
+  border: 2px dashed var(--v-warning-base);
+}
 </style>
 
 <template>
-  <v-card class="d-flex align-center pa-1" v-if="item.collapse">
+  <v-card class="d-flex align-center pa-1" :class="{'item-unlocked-preview': !found}" v-if="item.collapse">
     <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.horde.items.${name}`)">
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="ma-1" v-bind="attrs" v-on="on">{{ item.icon }}</v-icon>
@@ -53,7 +57,7 @@
     </gb-tooltip>
     <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
-  <v-card v-else>
+  <v-card v-else :class="{'item-unlocked-preview': !found}">
     <v-card-title class="pa-2 justify-center">
       <v-icon class="mr-2">{{ item.icon }}</v-icon>
       {{ $vuetify.lang.t(`$vuetify.horde.items.${name}`) }}
@@ -196,12 +200,21 @@ export default {
       return this.item.found;
     },
     findChance() {
+      if (this.item.findChance === undefined || this.item.findZone === undefined) {
+        return 0;
+      }
       return this.$store.getters['mult/get']('hordeItemChance', this.item.findChance * (1 + this.zone - this.item.findZone));
     },
     findChanceArray() {
+      if (this.item.findZone === undefined) {
+        return [];
+      }
       return this.zone > this.item.findZone ? [{name: 'zone', value: 1 + this.zone - this.item.findZone}] : [];
     },
     stats() {
+      if (!this.item.stats || typeof this.item.stats !== 'function') {
+        return [];
+      }
       let obj = this.item.stats(this.item.level);
       if (this.item.passive) {
         obj = obj.map(elem => {
@@ -260,9 +273,19 @@ export default {
       return this.$store.getters['currency/value']('horde_monsterPart') >= this.upgradePrice;
     },
     upgradePrice() {
+      if (!this.item.price || typeof this.item.price !== 'function') {
+        return 0;
+      }
       return this.item.price(this.item.level);
     },
     statDiff() {
+      if (!this.item.stats || !this.item.active || !this.item.cooldown ||
+          typeof this.item.stats !== 'function' ||
+          typeof this.item.active !== 'function' ||
+          typeof this.item.cooldown !== 'function') {
+        return [];
+      }
+
       let after = [...this.item.stats(this.item.level + 1), ...this.item.active(this.item.level + 1), {value: this.item.cooldown(this.item.level + 1)}];
       let buffs = [];
       const stats = [...this.item.stats(this.item.level), ...this.item.active(this.item.level).map(elem => {
@@ -320,7 +343,7 @@ export default {
       const isEnhancedAutocastEnabled = this.$store.state.system.settings.experiment.items.enhancedAutocast.value;
       const isCombatEquipment = this.item.activeType === 'combat';
       const isNotCollapsed = !this.item.collapse;
-      const isUnlocked = this.item.unlock === null || this.$store.getters['horde/itemUnlock'](this.name);
+      const isUnlocked = this.item.unlock === null || (this.item.unlock && this.$store.state.unlock[this.item.unlock] && this.$store.state.unlock[this.item.unlock].use);
 
       return isEnhancedAutocastEnabled && isUnlocked && isCombatEquipment && isNotCollapsed;
     }

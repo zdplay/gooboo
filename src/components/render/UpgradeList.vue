@@ -145,6 +145,16 @@
         >
           {{ showMaterialsRow ? '隐藏' : '列表' }}
         </v-btn>
+
+        <v-btn
+          small
+          class="unlocked-button ml-2"
+          @click="toggleUnlockedMode"
+          :color="unlockedMode ? 'orange' : 'primary'"
+          v-if="showPreviewUnlockedUpgrades"
+        >
+          {{ unlockedMode ? '清空' : '未解锁' }}
+        </v-btn>
         
         <gb-tooltip v-if="showMaterialsRow" :min-width="250">
           <template v-slot:activator="{ on, attrs }">
@@ -186,7 +196,7 @@
     <div v-if="items.length > 0">
       <v-row class="pa-1" no-gutters>
         <v-col class="pa-1" v-for="(item, key) in finalItems" :key="`${feature}-${type}-${key}`" :cols="cols">
-          <upgrade :name="item" :disabled="isFrozen" :upgrade-translation="upgradeTranslation" :translation-set="translationSet">
+          <upgrade :name="item" :disabled="isFrozen" :upgrade-translation="upgradeTranslation" :translation-set="translationSet" :preview-unlocked="unlockedMode">
             <slot :upgrade-name="item"></slot>
           </upgrade>
         </v-col>
@@ -254,6 +264,7 @@ export default {
     selectedMaterial: null,
     satisfyMode: false,
     unsatisfyMode: false,
+    unlockedMode: false,
     originalItems: null,
     showMaterialsRow: false
   }),
@@ -270,26 +281,33 @@ export default {
     showFilterFeature() {
       return this.$store.state.system.settings.experiment.items.upgradeFilterFeature.value || false;
     },
+    showPreviewUnlockedUpgrades() {
+      return this.$store.state.system.settings.experiment.items.previewUnlockedUpgrades.value || false;
+    },
     baseItems() {
       return [...this.$store.state.upgrade.cache[`${this.feature}_${this.subfeature}_${this.type}`]];
     },
     items() {
+      if (this.unlockedMode) {
+        return this.getUnlockedItems();
+      }
+
       if (this.satisfyMode) {
         return this.getSatisfyItems();
       }
-      
+
       if (this.unsatisfyMode) {
         return this.getUnsatisfyItems();
       }
-      
+
       return this.baseItems.filter(elem => {
         const upgrade = this.$store.state.upgrade.item[elem];
         const baseRequirement = upgrade.requirement(upgrade.level);
-        
+
         if (!this.selectedMaterial || !baseRequirement) {
           return baseRequirement;
         }
-        
+
         const price = upgrade.price(upgrade.level);
         return price && Object.keys(price).includes(this.selectedMaterial);
       });
@@ -464,6 +482,7 @@ export default {
       this.satisfyMode = !this.satisfyMode;
       if (this.satisfyMode) {
         this.unsatisfyMode = false;
+        this.unlockedMode = false;
       }
       this.page = 1;
     },
@@ -471,6 +490,15 @@ export default {
       this.unsatisfyMode = !this.unsatisfyMode;
       if (this.unsatisfyMode) {
         this.satisfyMode = false;
+        this.unlockedMode = false;
+      }
+      this.page = 1;
+    },
+    toggleUnlockedMode() {
+      this.unlockedMode = !this.unlockedMode;
+      if (this.unlockedMode) {
+        this.satisfyMode = false;
+        this.unsatisfyMode = false;
       }
       this.page = 1;
     },
@@ -555,6 +583,31 @@ export default {
           return !canAfford;
         });
         
+        return result;
+      }
+    },
+    getUnlockedItems() {
+      if (!this.selectedMaterial) {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          const baseRequirement = upgrade.requirement(upgrade.level);
+          return !baseRequirement;
+        });
+
+        return result;
+      } else {
+        const result = this.baseItems.filter(elem => {
+          const upgrade = this.$store.state.upgrade.item[elem];
+          const baseRequirement = upgrade.requirement(upgrade.level);
+
+          if (baseRequirement) {
+            return false;
+          }
+
+          const price = upgrade.price(upgrade.level);
+          return price && Object.keys(price).includes(this.selectedMaterial);
+        });
+
         return result;
       }
     }
