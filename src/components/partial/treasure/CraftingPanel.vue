@@ -121,25 +121,87 @@ export default {
     drop(event, index) {
       event.preventDefault();
       const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-      
+
       if (data.from === 'inventory') {
-        this.$store.dispatch('treasure/moveToCraftingSlot', {
-          fromType: 'inventory',
-          fromIndex: data.fromIndex,
-          slotIndex: index
-        });
+        // Handle both regular inventory items and new item (fromIndex: -1)
+        if (data.fromIndex === -1) {
+          // Handle exchange logic for new item to crafting slot
+          const newItem = this.$store.state.treasure.newItem;
+          const targetItem = this.craftingSlots[index];
+
+          if (newItem) {
+            if (targetItem) {
+              // Exchange items
+              this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+              this.$store.commit('treasure/updateCraftingSlotItem', { index, item: newItem });
+            } else {
+              // Simple move if target is empty
+              this.$store.dispatch('treasure/moveToCraftingSlot', {
+                fromType: 'newItem',
+                fromIndex: -1,
+                slotIndex: index
+              });
+            }
+          }
+        } else {
+          // Handle exchange logic for inventory to crafting slot
+          const sourceItem = this.$store.state.treasure.items[data.fromIndex];
+          const targetItem = this.craftingSlots[index];
+
+          if (sourceItem) {
+            if (targetItem) {
+              // Exchange items
+              this.$store.commit('treasure/setItem', { id: data.fromIndex, item: targetItem });
+              this.$store.commit('treasure/updateCraftingSlotItem', { index, item: sourceItem });
+              this.$store.dispatch('treasure/updateEffectCache');
+            } else {
+              // Simple move if target is empty
+              this.$store.dispatch('treasure/moveToCraftingSlot', {
+                fromType: 'inventory',
+                fromIndex: data.fromIndex,
+                slotIndex: index
+              });
+            }
+          }
+        }
       } else if (data.from === 'temporary') {
-        this.$store.dispatch('treasure/moveToCraftingSlot', {
-          fromType: 'temporary',
-          fromIndex: data.fromIndex,
-          slotIndex: index
-        });
+        // Handle exchange logic for temporary to crafting slot
+        const sourceItem = this.$store.state.treasure.temporaryStorage[data.fromIndex];
+        const targetItem = this.craftingSlots[index];
+
+        if (sourceItem) {
+          if (targetItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateTemporaryStorageItem', { index: data.fromIndex, item: targetItem });
+            this.$store.commit('treasure/updateCraftingSlotItem', { index, item: sourceItem });
+          } else {
+            // Simple move if target is empty
+            this.$store.dispatch('treasure/moveToCraftingSlot', {
+              fromType: 'temporary',
+              fromIndex: data.fromIndex,
+              slotIndex: index
+            });
+          }
+        }
       } else if (data.from === 'newItem') {
-        this.$store.dispatch('treasure/moveToCraftingSlot', {
-          fromType: 'newItem',
-          fromIndex: -1,
-          slotIndex: index
-        });
+        // Handle exchange logic for new item to crafting slot
+        const newItem = this.$store.state.treasure.newItem;
+        const targetItem = this.craftingSlots[index];
+
+        if (newItem) {
+          if (targetItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+            this.$store.commit('treasure/updateCraftingSlotItem', { index, item: newItem });
+          } else {
+            // Simple move if target is empty
+            this.$store.dispatch('treasure/moveToCraftingSlot', {
+              fromType: 'newItem',
+              fromIndex: -1,
+              slotIndex: index
+            });
+          }
+        }
       } else if (data.from === 'crafting' && data.fromIndex !== index) {
         // Swap items in crafting slots
         const fromItem = this.craftingSlots[data.fromIndex];

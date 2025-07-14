@@ -132,7 +132,7 @@ export default {
       if (isFeatureEnabled) {
         // New drag system with JSON data
         ev.dataTransfer.setData("text", JSON.stringify({
-          from: 'inventory',
+          from: id === -1 ? 'newItem' : 'inventory',
           fromIndex: id
         }));
       } else {
@@ -158,22 +158,58 @@ export default {
             this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
           }
         } else if (data.from === 'temporary') {
-          this.$store.dispatch('treasure/moveFromTemporaryStorage', {
-            storageIndex: data.fromIndex,
-            itemIndex: parseInt(id)
-          });
+          // Handle exchange logic for temporary storage to inventory
+          const targetIndex = parseInt(id);
+          const targetItem = this.$store.state.treasure.items[targetIndex];
+          const sourceItem = this.$store.state.treasure.temporaryStorage[data.fromIndex];
+
+          if (targetItem && sourceItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateTemporaryStorageItem', { index: data.fromIndex, item: targetItem });
+            this.$store.commit('treasure/setItem', { id: targetIndex, item: sourceItem });
+            this.$store.dispatch('treasure/updateEffectCache');
+          } else {
+            // Simple move if target is empty
+            this.$store.dispatch('treasure/moveFromTemporaryStorage', {
+              storageIndex: data.fromIndex,
+              itemIndex: targetIndex
+            });
+          }
         } else if (data.from === 'crafting') {
-          this.$store.dispatch('treasure/moveFromCraftingSlot', {
-            slotIndex: data.fromIndex,
-            toType: 'inventory',
-            toIndex: parseInt(id)
-          });
+          // Handle exchange logic for crafting slot to inventory
+          const targetIndex = parseInt(id);
+          const targetItem = this.$store.state.treasure.items[targetIndex];
+          const sourceItem = this.$store.state.treasure.craftingSlots[data.fromIndex];
+
+          if (targetItem && sourceItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateCraftingSlotItem', { index: data.fromIndex, item: targetItem });
+            this.$store.commit('treasure/setItem', { id: targetIndex, item: sourceItem });
+            this.$store.dispatch('treasure/updateEffectCache');
+          } else {
+            // Simple move if target is empty
+            this.$store.dispatch('treasure/moveFromCraftingSlot', {
+              slotIndex: data.fromIndex,
+              toType: 'inventory',
+              toIndex: targetIndex
+            });
+          }
         } else if (data.from === 'newItem') {
-          // Move new item to inventory slot
+          // Handle exchange logic for new item to inventory
+          const targetIndex = parseInt(id);
+          const targetItem = this.$store.state.treasure.items[targetIndex];
           const newItem = this.$store.state.treasure.newItem;
+
           if (newItem) {
-            this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
-            this.$store.commit('treasure/setItem', { id: parseInt(id), item: newItem });
+            if (targetItem) {
+              // Exchange items
+              this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+              this.$store.commit('treasure/setItem', { id: targetIndex, item: newItem });
+            } else {
+              // Simple move if target is empty
+              this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+              this.$store.commit('treasure/setItem', { id: targetIndex, item: newItem });
+            }
             this.$store.dispatch('treasure/updateEffectCache');
           }
         }

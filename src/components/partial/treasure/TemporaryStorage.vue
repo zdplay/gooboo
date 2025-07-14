@@ -65,24 +65,79 @@ export default {
     drop(event, index) {
       event.preventDefault();
       const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-      
+
       if (data.from === 'inventory') {
-        this.$store.dispatch('treasure/moveToTemporaryStorage', {
-          itemIndex: data.fromIndex,
-          storageIndex: index
-        });
+        // Handle both regular inventory items and new item (fromIndex: -1)
+        if (data.fromIndex === -1) {
+          // Handle exchange logic for new item to temporary storage
+          const newItem = this.$store.state.treasure.newItem;
+          const targetItem = this.temporaryStorage[index];
+
+          if (newItem) {
+            if (targetItem) {
+              // Exchange items
+              this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+              this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: newItem });
+            } else {
+              // Simple move if target is empty
+              this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+              this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: newItem });
+            }
+          }
+        } else {
+          // Handle exchange logic for inventory to temporary storage
+          const sourceItem = this.$store.state.treasure.items[data.fromIndex];
+          const targetItem = this.temporaryStorage[index];
+
+          if (sourceItem) {
+            if (targetItem) {
+              // Exchange items
+              this.$store.commit('treasure/setItem', { id: data.fromIndex, item: targetItem });
+              this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: sourceItem });
+              this.$store.dispatch('treasure/updateEffectCache');
+            } else {
+              // Simple move if target is empty
+              this.$store.dispatch('treasure/moveToTemporaryStorage', {
+                itemIndex: data.fromIndex,
+                storageIndex: index
+              });
+            }
+          }
+        }
       } else if (data.from === 'crafting') {
-        this.$store.dispatch('treasure/moveFromCraftingSlot', {
-          slotIndex: data.fromIndex,
-          toType: 'temporary',
-          toIndex: index
-        });
+        // Handle exchange logic for crafting to temporary storage
+        const sourceItem = this.$store.state.treasure.craftingSlots[data.fromIndex];
+        const targetItem = this.temporaryStorage[index];
+
+        if (sourceItem) {
+          if (targetItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateCraftingSlotItem', { index: data.fromIndex, item: targetItem });
+            this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: sourceItem });
+          } else {
+            // Simple move if target is empty
+            this.$store.dispatch('treasure/moveFromCraftingSlot', {
+              slotIndex: data.fromIndex,
+              toType: 'temporary',
+              toIndex: index
+            });
+          }
+        }
       } else if (data.from === 'newItem') {
-        // Move new item to temporary storage
+        // Handle exchange logic for new item to temporary storage
         const newItem = this.$store.state.treasure.newItem;
+        const targetItem = this.temporaryStorage[index];
+
         if (newItem) {
-          this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
-          this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: newItem });
+          if (targetItem) {
+            // Exchange items
+            this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+            this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: newItem });
+          } else {
+            // Simple move if target is empty
+            this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+            this.$store.commit('treasure/updateTemporaryStorageItem', { index, item: newItem });
+          }
         }
       } else if (data.from === 'temporary' && data.fromIndex !== index) {
         // Swap items in temporary storage
