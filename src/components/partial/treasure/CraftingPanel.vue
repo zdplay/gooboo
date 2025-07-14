@@ -53,7 +53,8 @@
           :draggable="craftingSlots[i - 1] !== null"
           @dragstart="drag($event, i - 1, 'crafting')"
           @dragover="allowDrop"
-          @drop="drop($event, i - 1, 'crafting')"
+          @drop="drop($event, i - 1)"
+          @touchstart="touchstart($event, i - 1, 'crafting')"
           @touchend="touchdrop($event, i - 1, 'crafting')"
         ></item-slot>
       </div>
@@ -117,6 +118,13 @@ export default {
     },
     allowDrop(event) {
       event.preventDefault();
+    },
+    touchstart(ev, index) {
+      // Prevent default touch behavior (scrolling) when touching draggable items
+      if (this.craftingSlots[index]) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
     },
     drop(event, index) {
       event.preventDefault();
@@ -210,12 +218,94 @@ export default {
         this.$store.commit('treasure/updateCraftingSlotItem', { index, item: fromItem });
       }
     },
-    touchdrop(_, index) {
-      // Handle touch events for mobile
-      if (this.$store.state.treasure.draggedItem) {
-        const data = this.$store.state.treasure.draggedItem;
-        this.drop({ preventDefault: () => {}, dataTransfer: { getData: () => JSON.stringify(data) } }, index, 'crafting');
-        this.$store.commit('treasure/updateKey', { key: 'draggedItem', value: null });
+    touchdrop(ev, index) {
+      // Use the same approach as main treasure touchdrop
+      const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+      if (elemList) {
+        // Find the dragged element to determine source
+        const draggedElem = elemList.find(el => el.id && (
+          el.id.startsWith('treasure_') ||
+          el.id.startsWith('temp_') ||
+          el.id.startsWith('craft_')
+        ));
+
+        if (draggedElem) {
+          if (draggedElem.id.startsWith('treasure_')) {
+            // Dragged from inventory
+            const draggedId = parseInt(draggedElem.id.split('_')[1]);
+
+            if (draggedId === -1) {
+              // Move new item to crafting slot
+              const newItem = this.$store.state.treasure.newItem;
+              const targetItem = this.craftingSlots[index];
+
+              if (newItem) {
+                if (targetItem) {
+                  // Exchange items
+                  this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+                  this.$store.commit('treasure/updateCraftingSlotItem', { index, item: newItem });
+                } else {
+                  // Simple move if target is empty
+                  this.$store.dispatch('treasure/moveToCraftingSlot', {
+                    fromType: 'newItem',
+                    fromIndex: -1,
+                    slotIndex: index
+                  });
+                }
+              }
+            } else {
+              // Move inventory item to crafting slot
+              const sourceItem = this.$store.state.treasure.items[draggedId];
+              const targetItem = this.craftingSlots[index];
+
+              if (sourceItem) {
+                if (targetItem) {
+                  // Exchange items
+                  this.$store.commit('treasure/setItem', { id: draggedId, item: targetItem });
+                  this.$store.commit('treasure/updateCraftingSlotItem', { index, item: sourceItem });
+                  this.$store.dispatch('treasure/updateEffectCache');
+                } else {
+                  // Simple move if target is empty
+                  this.$store.dispatch('treasure/moveToCraftingSlot', {
+                    fromType: 'inventory',
+                    fromIndex: draggedId,
+                    slotIndex: index
+                  });
+                }
+              }
+            }
+          } else if (draggedElem.id.startsWith('temp_')) {
+            // Dragged from temporary storage
+            const draggedIndex = parseInt(draggedElem.id.split('_')[1]);
+            const sourceItem = this.$store.state.treasure.temporaryStorage[draggedIndex];
+            const targetItem = this.craftingSlots[index];
+
+            if (sourceItem) {
+              if (targetItem) {
+                // Exchange items
+                this.$store.commit('treasure/updateTemporaryStorageItem', { index: draggedIndex, item: targetItem });
+                this.$store.commit('treasure/updateCraftingSlotItem', { index, item: sourceItem });
+              } else {
+                // Simple move if target is empty
+                this.$store.dispatch('treasure/moveToCraftingSlot', {
+                  fromType: 'temporary',
+                  fromIndex: draggedIndex,
+                  slotIndex: index
+                });
+              }
+            }
+          } else if (draggedElem.id.startsWith('craft_')) {
+            // Dragged from crafting slot (internal move)
+            const draggedIndex = parseInt(draggedElem.id.split('_')[1]);
+            if (draggedIndex !== index) {
+              // Swap items in crafting slots
+              const fromItem = this.craftingSlots[draggedIndex];
+              const toItem = this.craftingSlots[index];
+              this.$store.commit('treasure/updateCraftingSlotItem', { index: draggedIndex, item: toItem });
+              this.$store.commit('treasure/updateCraftingSlotItem', { index, item: fromItem });
+            }
+          }
+        }
       }
     },
     craftTreasure() {

@@ -34,6 +34,7 @@
             :slot-id="-1"
             :draggable="newItem !== null"
             @dragstart="drag($event, -1)"
+            @touchstart="touchstart($event, -1)"
             @touchend="touchdrop($event, -1)"
           ></item-slot>
           <buy-item class="ma-1" name="regular"></buy-item>
@@ -71,6 +72,7 @@
           @dragstart="drag($event, i - 1)"
           @drop="drop($event, i - 1)"
           @dragover="allowDrop"
+          @touchstart="touchstart($event, i - 1)"
           @touchend="touchdrop($event, i - 1)"
         ></item-slot>
       </div>
@@ -225,15 +227,143 @@ export default {
     allowDrop(ev) {
       ev.preventDefault();
     },
+    touchstart(ev, id) {
+      // Prevent default touch behavior (scrolling) when touching draggable items
+      const hasItem = id === -1 ? this.newItem !== null : (this.items[id] !== null && this.items[id] !== undefined);
+      if (hasItem) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    },
     touchdrop(ev, draggedId) {
       const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
       if (elemList) {
-        const endElem = elemList.find(el => el.id.slice(0, 9) === 'treasure_');
+        // Check if temporary and crafting features are enabled
+        const isFeatureEnabled = this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting &&
+                                 this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value;
+
+        if (isFeatureEnabled) {
+          // Check for temporary storage slots
+          const tempElem = elemList.find(el => el.id && el.id.startsWith('temp_'));
+          if (tempElem) {
+            const tempIndex = parseInt(tempElem.id.split('_')[1]);
+            if (!isNaN(tempIndex)) {
+              // Handle move from inventory to temporary storage
+              if (draggedId === -1) {
+                // Move new item to temporary storage
+                const newItem = this.$store.state.treasure.newItem;
+                if (newItem) {
+                  this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+                  this.$store.commit('treasure/updateTemporaryStorageItem', { index: tempIndex, item: newItem });
+                }
+              } else {
+                // Move inventory item to temporary storage
+                const sourceItem = this.$store.state.treasure.items[draggedId];
+                const targetItem = this.$store.state.treasure.temporaryStorage[tempIndex];
+
+                if (sourceItem) {
+                  if (targetItem) {
+                    // Exchange items
+                    this.$store.commit('treasure/setItem', { id: draggedId, item: targetItem });
+                    this.$store.commit('treasure/updateTemporaryStorageItem', { index: tempIndex, item: sourceItem });
+                    this.$store.dispatch('treasure/updateEffectCache');
+                  } else {
+                    // Simple move if target is empty
+                    this.$store.dispatch('treasure/moveToTemporaryStorage', {
+                      itemIndex: draggedId,
+                      storageIndex: tempIndex
+                    });
+                  }
+                }
+              }
+              return;
+            }
+          }
+
+          // Check for crafting slots
+          const craftElem = elemList.find(el => el.id && el.id.startsWith('craft_'));
+          if (craftElem) {
+            const craftIndex = parseInt(craftElem.id.split('_')[1]);
+            if (!isNaN(craftIndex)) {
+              // Handle move from inventory to crafting slot
+              if (draggedId === -1) {
+                // Move new item to crafting slot
+                const newItem = this.$store.state.treasure.newItem;
+                const targetItem = this.$store.state.treasure.craftingSlots[craftIndex];
+
+                if (newItem) {
+                  if (targetItem) {
+                    // Exchange items
+                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+                    this.$store.commit('treasure/updateCraftingSlotItem', { index: craftIndex, item: newItem });
+                  } else {
+                    // Simple move if target is empty
+                    this.$store.dispatch('treasure/moveToCraftingSlot', {
+                      fromType: 'newItem',
+                      fromIndex: -1,
+                      slotIndex: craftIndex
+                    });
+                  }
+                }
+              } else {
+                // Move inventory item to crafting slot
+                const sourceItem = this.$store.state.treasure.items[draggedId];
+                const targetItem = this.$store.state.treasure.craftingSlots[craftIndex];
+
+                if (sourceItem) {
+                  if (targetItem) {
+                    // Exchange items
+                    this.$store.commit('treasure/setItem', { id: draggedId, item: targetItem });
+                    this.$store.commit('treasure/updateCraftingSlotItem', { index: craftIndex, item: sourceItem });
+                    this.$store.dispatch('treasure/updateEffectCache');
+                  } else {
+                    // Simple move if target is empty
+                    this.$store.dispatch('treasure/moveToCraftingSlot', {
+                      fromType: 'inventory',
+                      fromIndex: draggedId,
+                      slotIndex: craftIndex
+                    });
+                  }
+                }
+              }
+              return;
+            }
+          }
+        }
+
+        // Check for regular treasure slots (works for both enabled and disabled features)
+        const endElem = elemList.find(el => el.id && el.id.startsWith('treasure_'));
         if (endElem) {
           const startId = parseInt(draggedId);
-          const endId = parseInt(endElem.id.slice(9));
+          const endId = parseInt(endElem.id.split('_')[1]);
           if (startId !== endId && endId !== -1) {
-            this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+            if (isFeatureEnabled) {
+              // Use new drag system logic for exchange
+              if (startId === -1) {
+                // Handle new item to inventory exchange
+                const newItem = this.$store.state.treasure.newItem;
+                const targetItem = this.$store.state.treasure.items[endId];
+
+                if (newItem) {
+                  if (targetItem) {
+                    // Exchange items
+                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+                    this.$store.commit('treasure/setItem', { id: endId, item: newItem });
+                  } else {
+                    // Simple move if target is empty
+                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+                    this.$store.commit('treasure/setItem', { id: endId, item: newItem });
+                  }
+                  this.$store.dispatch('treasure/updateEffectCache');
+                }
+              } else {
+                // Regular inventory to inventory move with exchange logic
+                this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+              }
+            } else {
+              // Original behavior for disabled features
+              this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+            }
           }
         }
       }
