@@ -67,6 +67,14 @@
 
     <v-card>
       <v-card-title class="pa-2 justify-center position-relative">
+        <gb-tooltip v-if="respawn > 0" title-text="即时复活">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn small class="revive-button pa-1" color="red" min-width="20" min-height="20" style="height: 24px; position: absolute; left: 8px;" @click="revivePlayer" v-bind="attrs" v-on="on">
+              <v-icon small>mdi-heart-pulse</v-icon>
+            </v-btn>
+          </template>
+        </gb-tooltip>
+
         <span v-if="subfeature === 1">{{ $vuetify.lang.t(`$vuetify.horde.classes.${ selectedClass }.name`) }}{{ isPlayerNameEnabled && $store.state.system.playerName && $store.state.system.playerName.trim() ? ' ' + $store.state.system.playerName : '' }}</span>
         <span v-else>{{ isPlayerNameEnabled && $store.state.system.playerName && $store.state.system.playerName.trim() ? $store.state.system.playerName : $vuetify.lang.t('$vuetify.horde.player') }}</span>
 
@@ -279,6 +287,12 @@ export default {
     },
     unequipAll() {
       this.$store.dispatch('horde/unequipAll');
+    },
+    revivePlayer() {
+      if (this.respawn > 0) {
+        this.$store.commit('horde/updateKey', {key: 'respawn', value: 0});
+        this.$store.dispatch('horde/resetStats');
+      }
     }
   }
 }
