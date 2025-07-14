@@ -23,9 +23,11 @@
       </v-select>
       <gb-tooltip v-if="showPreview">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn small class="ma-1" color="primary" :disabled="!canBuyPack" v-bind="attrs" v-on="on" @click="buyPack(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+          <div v-bind="attrs" v-on="on">
+            <v-btn small class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
+          </div>
         </template>
-        <div class="mt-0 text-center">最大购买预览</div>
+        <div class="mt-0 text-center">{{ canBuyPack ? '最大购买预览' : '单次购买预览' }}</div>
         <div v-if="maxPreviewCards.length > 0" class="mt-2">
           <div v-for="(item, key) in maxPreviewSummary" :key="key">
             <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
@@ -36,9 +38,11 @@
       </gb-tooltip>
       <gb-tooltip v-if="showPreview">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn class="ma-1" color="primary" :disabled="!canBuyPack" v-bind="attrs" v-on="on" @click="buyPack(false)">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+          <div v-bind="attrs" v-on="on">
+            <v-btn class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(false)">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+          </div>
         </template>
-        <div class="mt-0 text-center">单次购买预览</div>
+        <div class="mt-0 text-center">{{ canBuyPack ? '单次购买预览' : '单次购买预览' }}</div>
         <div v-if="singlePreviewCards.length > 0" class="mt-2">
           <div v-for="(item, key) in singlePreviewSummary" :key="key">
             <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
@@ -212,14 +216,11 @@ export default {
     },
     maxPreviewCards() {
       if (!this.selectedPack) return [];
-      
       const pack = this.packList[this.selectedPack];
       if (!pack) return [];
-      
       const maxAfford = Math.floor(this.$store.state.currency.gem_emerald.value / pack.price);
-      if (maxAfford <= 0) return [];
-      
-      return this.generatePreviewCards(pack, maxAfford);
+      const previewAmount = maxAfford <= 0 ? 1 : maxAfford;
+      return this.generatePreviewCards(pack, previewAmount);
     },
     singlePreviewSummary() {
       return this.summarizePreviewCards(this.singlePreviewCards);
