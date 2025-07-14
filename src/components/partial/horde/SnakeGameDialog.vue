@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="500px"
+    :max-width="dialogMaxWidth"
     persistent
     @keydown.stop="handleDialogKeyDown"
     class="snake-game-dialog"
@@ -164,14 +164,14 @@
             <div class="control-grid">
               <v-btn tile color="primary" @click="turnLeft" class="control-btn">
                 <v-icon>mdi-rotate-left</v-icon>
-                <span class="shortcut-hint">(Q)</span>
+                <span class="shortcut-hint" v-if="$vuetify.breakpoint.smAndUp">(Q)</span>
               </v-btn>
               <v-btn tile color="primary" @click="changeDirection('up')" class="control-btn">
                 <v-icon>mdi-arrow-up</v-icon>
               </v-btn>
               <v-btn tile color="primary" @click="turnRight" class="control-btn">
                 <v-icon>mdi-rotate-right</v-icon>
-                <span class="shortcut-hint">(E)</span>
+                <span class="shortcut-hint" v-if="$vuetify.breakpoint.smAndUp">(E)</span>
               </v-btn>
               <v-btn tile color="primary" @click="changeDirection('left')" class="control-btn">
                 <v-icon>mdi-arrow-left</v-icon>
@@ -190,7 +190,8 @@
             </div>
             <div class="text-center mt-2 caption" v-if="gameStarted && !showGameOverDialog && !showPauseDialog">
               <v-icon small color="warning">mdi-information</v-icon>
-              游戏开始后需要鼠标点击游戏区域才能使用键盘快捷键操作(方向键/WASD/QE)
+              <span v-if="$vuetify.breakpoint.smAndUp">游戏开始后需要鼠标点击游戏区域才能使用键盘快捷键操作(方向键/WASD/QE)</span>
+              <span v-else>点击游戏区域使用键盘操作</span>
             </div>
             
             <!-- 速度控制 -->
@@ -203,12 +204,13 @@
                 <v-btn x-small fab class="mx-1" :color="speedLevel === 3 ? 'primary' : ''" @click="changeSpeed(3)">3</v-btn>
                 <v-btn x-small fab class="mx-1" :color="speedLevel === 4 ? 'primary' : ''" @click="changeSpeed(4)">4</v-btn>
                 <v-btn x-small fab class="mx-1" :color="speedLevel === 5 ? 'primary' : ''" @click="changeSpeed(5)">5</v-btn>
-                <div class="caption ml-2">(1慢-5快，可用数字键1-5调节)</div>
+                <div class="caption ml-2" v-if="$vuetify.breakpoint.smAndUp">(1慢-5快，可用数字键1-5调节)</div>
+                <div class="caption ml-2" v-else>(1慢-5快)</div>
               </div>
             </div>
             
             <!-- 道具信息 -->
-            <div class="item-info mt-3" v-if="gameStarted && !showGameOverDialog && !showPauseDialog">
+            <div class="item-info mt-3" v-if="gameStarted && !showGameOverDialog && !showPauseDialog && $vuetify.breakpoint.smAndUp">
               <div class="d-flex align-center">
                 <div class="caption">
                   <v-icon x-small color="primary">mdi-information</v-icon>
@@ -293,7 +295,6 @@ export default {
   },
   data() {
     return {
-      gridSize: 15,
       gameEngine: null,
       snake: [],
       food: { x: 0, y: 0 },
@@ -328,29 +329,68 @@ export default {
         this.$emit('input', value);
       }
     },
-    boardSize() {
-      // 根据屏幕大小动态计算游戏板尺寸
-      const screenWidth = this.$vuetify.breakpoint.width;
-      const dialogPadding = 48; // 对话框左右边距
-      const contentPadding = 32; // 内容区域边距
-      const availableWidth = screenWidth - dialogPadding - contentPadding;
-
-      // 根据断点设置不同的最大尺寸
-      let maxSize;
+    dialogMaxWidth() {
+      // 对话框响应式宽度
       if (this.$vuetify.breakpoint.xs) {
-        maxSize = Math.min(280, availableWidth);
+        return '95vw';
       } else if (this.$vuetify.breakpoint.sm) {
-        maxSize = Math.min(320, availableWidth);
+        return '80vw';
       } else if (this.$vuetify.breakpoint.md) {
-        maxSize = Math.min(400, availableWidth);
+        return '600px';
       } else {
-        maxSize = 450; // 大屏幕使用较大尺寸
+        return '700px';
+      }
+    },
+    gridSize() {
+      // 固定初始网格数量，保持游戏逻辑一致性
+      // 游戏引擎会根据道具动态调整（expandMap功能）
+      return this.gameEngine ? this.gameEngine.gridSize : 15;
+    },
+    boardSize() {
+      // 根据屏幕大小动态计算游戏板尺寸，确保所有格子都完整显示
+      const screenWidth = this.$vuetify.breakpoint.width;
+      const screenHeight = this.$vuetify.breakpoint.height;
+
+      // 计算真正可用的空间
+      const dialogPadding = this.$vuetify.breakpoint.xs ? 16 : 24; // 对话框边距
+      const contentPadding = this.$vuetify.breakpoint.xs ? 16 : 24; // 内容区域边距
+      const titleHeight = 64; // 标题栏高度
+      const controlsHeight = this.$vuetify.breakpoint.xs ? 120 : 160; // 控制区域高度
+      const safetyMargin = 20; // 安全边距
+
+      const availableWidth = screenWidth - (dialogPadding * 2) - (contentPadding * 2) - safetyMargin;
+      const availableHeight = screenHeight - titleHeight - controlsHeight - (dialogPadding * 2) - safetyMargin;
+
+      // 当前网格数量（包括道具扩展）
+      const currentGridSize = this.gameEngine ? this.gameEngine.gridSize : 15;
+
+      // 计算理想的格子大小
+      const idealCellSize = 25;
+
+      // 根据可用空间计算最大可能的格子大小
+      const maxCellSizeByWidth = Math.floor(availableWidth / currentGridSize);
+      const maxCellSizeByHeight = Math.floor(availableHeight / currentGridSize);
+      const maxCellSize = Math.min(maxCellSizeByWidth, maxCellSizeByHeight);
+
+      // 选择合适的格子大小（理想值和最大可能值中的较小者）
+      let cellSize = Math.min(idealCellSize, maxCellSize);
+
+      // 设置绝对最小格子大小，确保基本可玩性
+      const absoluteMinCellSize = 10;
+      if (cellSize < absoluteMinCellSize) {
+        console.warn(`屏幕过小，格子大小将小于理想值: ${cellSize}px，使用最小值: ${absoluteMinCellSize}px`);
+        cellSize = absoluteMinCellSize;
       }
 
-      // 确保最小尺寸
-      return Math.max(240, maxSize);
+      // 计算最终的游戏板大小，确保是格子大小的整数倍
+      const finalBoardSize = cellSize * currentGridSize;
+
+
+
+      return finalBoardSize;
     },
     cellSize() {
+      // 现在boardSize已经是格子大小的整数倍，所以这里的计算结果一定是整数
       return this.boardSize / this.gridSize;
     },
     canPlayGame() {
@@ -361,6 +401,10 @@ export default {
     dialog(newVal) {
       if (newVal) {
         this.checkGameAvailability();
+        // 对话框打开时更新网格大小
+        this.$nextTick(() => {
+          this.updateGameGridSize();
+        });
       } else {
         if (this.focusInterval) {
           clearInterval(this.focusInterval);
@@ -370,14 +414,14 @@ export default {
     }
   },
   created() {
-    this.gameEngine = new SnakeGame(this.gridSize);
+    // 初始化时使用默认网格大小，后续会在mounted中更新
+    this.gameEngine = new SnakeGame(15);
 
     this.gameEngine.onUpdate = () => {
       this.snake = [...this.gameEngine.snake];
       this.food = { ...this.gameEngine.food };
       this.foods = [...this.gameEngine.foods];
       this.items = [...this.gameEngine.items];
-      this.gridSize = this.gameEngine.gridSize;
       this.score = this.gameEngine.score;
       this.isPaused = this.gameEngine.isPaused;
       this.speedLevel = this.gameEngine.speedLevel;
@@ -386,11 +430,11 @@ export default {
     this.gameEngine.onGameOver = (score) => {
       if (score > this.currentShards) {
         this.reward = score - this.currentShards;
-        
+
         // 立即计算奖励，而不是等到关闭时
         this.$store.dispatch('currency/gain', {
-          feature: 'horde', 
-          name: 'mysticalShard', 
+          feature: 'horde',
+          name: 'mysticalShard',
           amount: this.reward
         });
       } else {
@@ -401,6 +445,8 @@ export default {
     };
   },
   mounted() {
+    // 在组件挂载后更新游戏引擎的网格大小
+    this.updateGameGridSize();
     this.checkGameAvailability();
   },
   beforeDestroy() {
@@ -411,6 +457,14 @@ export default {
     this.resetGame();
   },
   methods: {
+    updateGameGridSize() {
+      if (this.gameEngine) {
+        // 只在游戏未开始时重新初始化，保持原有网格大小
+        if (!this.gameStarted) {
+          this.gameEngine.init(false);
+        }
+      }
+    },
     checkGameAvailability() {
       if (!this.canPlayGame) {
         this.errorMessage = "当前神秘碎片上限为空，无法进行游戏";
@@ -423,11 +477,14 @@ export default {
         this.showErrorDialog = true;
         return;
       }
-      
+
+      // 确保游戏引擎使用当前的网格大小
+      this.updateGameGridSize();
+
       this.gameStarted = true;
       this.gameEngine.init(this.selectedMode === 'hard');
       this.gameEngine.start();
-      
+
     },
     resetGame() {
       if (this.gameEngine) {
@@ -637,12 +694,41 @@ export default {
   .game-board {
     margin: 8px auto;
   }
+
+  .snake-game-card {
+    margin: 8px;
+  }
 }
 
 @media (max-width: 479px) {
   .game-board {
     margin: 4px auto;
     border-width: 1px;
+  }
+
+  .snake-game-card {
+    margin: 4px;
+  }
+}
+
+/* 极小屏幕优化 */
+@media (max-width: 360px) {
+  .game-board {
+    margin: 2px auto;
+    border-width: 1px;
+  }
+
+  .snake-game-card {
+    margin: 2px;
+  }
+
+  .snake-game-card .v-card-title {
+    padding: 8px 12px;
+    font-size: 1.1rem;
+  }
+
+  .snake-game-card .v-card-text {
+    padding: 8px 12px;
   }
 }
 
@@ -691,12 +777,26 @@ export default {
     max-width: 250px;
     gap: 2px;
   }
+
+  .control-btn {
+    min-width: 40px !important;
+    height: 40px !important;
+  }
+
+  .shortcut-hint {
+    font-size: 10px !important;
+  }
 }
 
 @media (max-width: 479px) {
   .control-grid {
     max-width: 200px;
     gap: 1px;
+  }
+
+  .control-btn {
+    min-width: 35px !important;
+    height: 35px !important;
   }
 }
 

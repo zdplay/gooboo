@@ -37,3 +37,16 @@ export default {
 }
 </script>
 
+<style scoped>
+:deep(.v-present .v-btn) {
+  border: 2px solid var(--v-primary-base) !important;
+}
+
+.theme--dark :deep(.v-present .v-btn) {
+  border-color: var(--v-primary-darken1) !important;
+}
+
+.theme--light :deep(.v-present .v-btn) {
+  border-color: var(--v-primary-lighten1) !important;
+}
+</style>
