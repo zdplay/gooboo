@@ -66,6 +66,21 @@ export default function(seconds) {
         }
     });
 
+    // Award topaz from mountain tiles (2 topaz per hour per mountain tile)
+    let mountainTileCount = 0;
+    store.state.summerFestival.island.forEach(row => {
+        row.forEach(cell => {
+            if (cell.unlocked && cell.tile === 'mountain') {
+                mountainTileCount++;
+            }
+        });
+    });
+
+    if (mountainTileCount > 0) {
+        const topazGain = mountainTileCount * 2 * (seconds / 3600); // 2 topaz per hour per tile
+        store.dispatch('currency/gain', {feature: 'gem', name: 'topaz', amount: topazGain});
+    }
+
     // Handle building actions
     for (const [id, building] of Object.entries(store.state.summerFestival.placedBuilding)) {
         if (building.timeLeft <= 0 && building.selectedAction !== null) {

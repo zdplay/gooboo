@@ -42,7 +42,7 @@
 .island-cell-locked:not(:hover):not(.island-cell-selected) {
   background-color: #808080 !important;
 }
-.island-cell-locked:not(:hover):not(.island-cell-selected) > i {
+.island-cell-locked:not(:hover):not(.island-cell-selected) > .island-cell-tile-icon {
   visibility: hidden;
 }
 .island-cell-locked:hover {
@@ -53,6 +53,13 @@
   position: absolute;
   top: 12px;
   right: 12px;
+}
+.island-cell-tile-icon-locked {
+  transition: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .island-cell-selected > .island-cell-tile-icon, .island-cell-halfselected > .island-cell-tile-icon {
   top: 9px;
@@ -108,6 +115,13 @@
   top: 6px;
   right: 6px;
 }
+.island-tablet .island-cell-tile-icon-locked {
+  transition: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
 /* mobile view */
 .island-mobile .island-cell {
@@ -137,6 +151,13 @@
   top: 3px;
   right: 3px;
 }
+.island-mobile .island-cell-tile-icon-locked {
+  transition: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
 
 <template>
@@ -160,7 +181,8 @@
             @click="selectCell(x, y)"
             @mouseover="hoverCell(x, y)"
           >
-            <v-icon v-if="cellType[cell.tile].icon" :size="16 * iconSizeMult" class="island-cell-tile-icon">{{ cellType[cell.tile].icon }}</v-icon>
+            <v-icon v-if="!cell.unlocked && cellType[cell.tile].icon" :size="32 * iconSizeMult" class="island-cell-tile-icon-locked">{{ cellType[cell.tile].icon }}</v-icon>
+            <v-icon v-else-if="cell.unlocked && cellType[cell.tile].icon" :size="16 * iconSizeMult" class="island-cell-tile-icon">{{ cellType[cell.tile].icon }}</v-icon>
             <v-icon v-if="cell.building" :size="36 * iconSizeMult">{{ buildQueue.includes(cell.building) ? 'mdi-hammer' : buildingListBase[placedBuilding[cell.building].type].icon }}</v-icon>
             <v-badge v-else-if="cell.drop > 0" overlap bordered bottom :content="$formatNum(cell.drop)" :value="cell.drop > 1">
               <v-icon :size="36 * iconSizeMult">{{ currency[`event_${cellType[cell.tile].produces}`].icon }}</v-icon>
@@ -225,7 +247,7 @@
     <div class="bg-tile-default rounded pa-1 ma-2" v-if="selectedCell">
       <h3 class="text-center mb-2">
         <span>{{ $vuetify.lang.t(`$vuetify.event.summerFestival.tile.${ island[selectedCell.y][selectedCell.x].tile }`) }}&nbsp;</span>
-        <span v-if="selectedCellType.produces">({{ $vuetify.lang.t('$vuetify.event.summerFestival.produces') }}: {{ $vuetify.lang.t(`$vuetify.currency.event_${selectedCellType.produces}.name`) }})</span>
+        <span v-if="selectedCellType.produces">({{ $vuetify.lang.t('$vuetify.event.summerFestival.produces') }}: {{ $vuetify.lang.t(`$vuetify.currency.event_${selectedCellType.produces}.name`) }}{{ island[selectedCell.y][selectedCell.x].tile === 'mountain' ? ', ' + $vuetify.lang.t('$vuetify.currency.gem_topaz.name') : '' }})</span>
         <span v-else>({{ $vuetify.lang.t('$vuetify.event.summerFestival.producesNothing') }})</span>
       </h3>
       <div class="d-flex flex-wrap align-center" v-if="!island[selectedCell.y][selectedCell.x].unlocked">

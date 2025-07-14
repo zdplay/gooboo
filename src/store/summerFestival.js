@@ -52,8 +52,8 @@ export default {
                 produces: null,
                 isLand: true,
                 terraform: {
-                    forest: {price: {event_cocktail: 150}, reward: {}},
-                    palm: {price: {event_cocktail: 175}, reward: {}}
+                    forest: {price: {event_cocktail: 100}, reward: {}},
+                    palm: {price: {event_cocktail: 125}, reward: {}}
                 }
             }
         },
@@ -78,7 +78,7 @@ export default {
             if (state.topazExpansion >= 20) {
                 return null;
             }
-            return state.topazExpansion * 10 + 100;
+            return state.topazExpansion * 10 + 50;
         },
         timeSkipCost: () => (seconds) => {
             return Math.ceil(Math.pow(seconds / 10, 0.5));
@@ -261,6 +261,20 @@ export default {
         },
         currentQuest: (state) => {
             return state.questsCompleted < state.quest.length ? state.quest[state.questsCompleted] : null;
+        },
+        futureQuests: (state) => {
+            const futureQuests = [];
+            const startIndex = state.questsCompleted + 1;
+            const maxQuests = Math.min(5, state.quest.length - startIndex);
+
+            for (let i = 0; i < maxQuests; i++) {
+                futureQuests.push({
+                    questNumber: startIndex + i + 1,
+                    tasks: state.quest[startIndex + i]
+                });
+            }
+
+            return futureQuests;
         },
         questTokenGain: (state) => {
             return Math.floor(Math.pow(state.questsCompleted * 0.35, 1.12) + 4);

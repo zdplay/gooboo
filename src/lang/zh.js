@@ -715,13 +715,13 @@ export default {
         land: '陆地'
       },
       tilePos: {
-        0: 'center',
-        1: 'right',
-        2: 'bottom right',
-        3: 'bottom left',
-        4: 'left',
-        5: 'top left',
-        6: 'top right'
+        0: '中心',
+        1: '右边',
+        2: '右下',
+        3: '左下',
+        4: '左边',
+        5: '左上',
+        6: '右上'
       },
       building: {
         collector: {
