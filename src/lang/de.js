@@ -1519,6 +1519,10 @@ export default {
       lowCostMaterialFade: {
         name: 'Low Cost Material Fade',
         description: 'When material abundance percentage is over 1000%, price tag becomes semi-transparent'
+      },
+      treasureTemporaryAndCrafting: {
+        name: 'Schätze temporäre Speicherung und Herstellung',
+        description: 'Aktiviert die Schatz-temporäre-Speicherung- und -Herstellungsfunktion, die 10 temporäre Speicherplätze und 3 Herstellungsslots bereitstellt'
       }
     }
   },

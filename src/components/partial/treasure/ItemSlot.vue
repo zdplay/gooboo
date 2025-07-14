@@ -55,8 +55,8 @@
           </gb-tooltip>
         </v-badge>
       </v-badge>
-      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
-      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && deleting && destroyValue !== null" :content="'+' + $formatNum(destroyValue)" color="amber"></v-badge>
+      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && slotType === 'inventory' && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
+      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && slotType === 'inventory' && deleting && destroyValue !== null" :content="'+' + $formatNum(destroyValue)" color="amber"></v-badge>
     </div>
     <template v-if="item && item.effect && item.effect.length > 0">
       <div class="effect-name">{{ effectName }}</div>
@@ -84,6 +84,11 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    slotType: {
+      type: String,
+      required: false,
+      default: 'inventory'
     }
   },
   computed: {
@@ -98,6 +103,19 @@ export default {
       if (this.itemObj !== null) {
         return this.itemObj;
       }
+
+      // Check if temporary and crafting features are enabled
+      const isFeatureEnabled = this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting &&
+                               this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value;
+
+      if (isFeatureEnabled) {
+        if (this.slotType === 'temporary') {
+          return this.slotId < this.$store.state.treasure.temporaryStorage.length ? this.$store.state.treasure.temporaryStorage[this.slotId] : null;
+        } else if (this.slotType === 'crafting') {
+          return this.slotId < this.$store.state.treasure.craftingSlots.length ? this.$store.state.treasure.craftingSlots[this.slotId] : null;
+        }
+      }
+
       return this.slotId === -1 ? this.$store.state.treasure.newItem : (this.slotId < this.$store.state.treasure.items.length ? this.$store.state.treasure.items[this.slotId] : null);
     },
     itemColor() {
@@ -168,23 +186,27 @@ export default {
   methods: {
     handleClick() {
       if (this.slotId !== null) {
-        if (this.upgrading && this.upgradeCost !== null && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
-          this.$store.dispatch('treasure/upgradeItem', this.slotId);
-        } else if (this.deleting && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
-          if (this.$store.state.system.settings.confirm.items.treasureDelete.value) {
-            this.$store.commit('system/updateKey', {key: 'confirm', value: {
-              type: 'treasureDelete',
-              id: this.slotId,
-              gain: {treasure_fragment: this.destroyValue},
-            }});
+        // Only allow upgrade/delete for inventory slots
+        if (this.slotType === 'inventory') {
+          if (this.upgrading && this.upgradeCost !== null && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
+            this.$store.dispatch('treasure/upgradeItem', this.slotId);
+          } else if (this.deleting && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
+            if (this.$store.state.system.settings.confirm.items.treasureDelete.value) {
+              this.$store.commit('system/updateKey', {key: 'confirm', value: {
+                type: 'treasureDelete',
+                id: this.slotId,
+                gain: {treasure_fragment: this.destroyValue},
+              }});
+            } else {
+              this.$store.dispatch('treasure/deleteItem', this.slotId);
+            }
           } else {
-            this.$store.dispatch('treasure/deleteItem', this.slotId);
-          }
-        } else {
-          if (this.slotId !== -1 && this.$store.state.treasure.newItem && !this.$store.state.treasure.items[this.slotId]) {
-            this.$store.dispatch('treasure/moveItem', {from: -1, to: this.slotId});
+            if (this.slotId !== -1 && this.$store.state.treasure.newItem && !this.$store.state.treasure.items[this.slotId]) {
+              this.$store.dispatch('treasure/moveItem', {from: -1, to: this.slotId});
+            }
           }
         }
+        // For temporary and crafting slots, no special click behavior needed
       }
     }
   }

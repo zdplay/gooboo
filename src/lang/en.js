@@ -1495,6 +1495,10 @@ export default {
         consecutiveSignInRelics: {
           name: 'Cumulative Sign-in Relics',
           description: 'Automatically grant cumulative sign-in relic rewards based on total sign-in count, and control related formula usage (gem generation speed, village offering, etc.)'
+        },
+        treasureTemporaryAndCrafting: {
+          name: 'Treasure Temporary Storage and Crafting',
+          description: 'Enable treasure temporary storage and crafting feature, providing 10 temporary storage slots and 3 crafting slots'
         }
       }
   },

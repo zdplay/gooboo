@@ -80,11 +80,16 @@ export default {
         for (const [key, elem] of Object.entries(treasureTypes)) {
             store.commit('treasure/initType', {name: key, ...elem});
         }
+        // Initialize temporary storage and crafting slots
+        store.commit('treasure/initializeTemporaryStorage');
+        store.commit('treasure/initializeCraftingSlots');
     },
     saveGame() {
         return {
             items: store.state.treasure.items.map(elem => elem ? filterItem(elem) : null),
-            newItem: store.state.treasure.newItem ? filterItem(store.state.treasure.newItem) : null
+            newItem: store.state.treasure.newItem ? filterItem(store.state.treasure.newItem) : null,
+            temporaryStorage: store.state.treasure.temporaryStorage.map(elem => elem ? filterItem(elem) : null),
+            craftingSlots: store.state.treasure.craftingSlots.map(elem => elem ? filterItem(elem) : null)
         };
     },
     loadGame(data) {
@@ -110,6 +115,33 @@ export default {
                 ))
             }});
         }
+
+        // Load temporary storage if exists
+        if (data.temporaryStorage) {
+            store.commit('treasure/updateKey', {key: 'temporaryStorage', value: data.temporaryStorage.map(elem => elem ? {
+                ...filterItem(elem),
+                valueCache: elem.effect.map(el => store.state.treasure.effectToFeature[el] ? el : fallbackEffect).map((el, i) => store.getters['treasure/effectValue'](
+                    store.state.treasure.effect[store.state.treasure.effectToFeature[el]][el].value * store.state.treasure.type[elem.type].slots[i].power,
+                    elem.tier,
+                    elem.level,
+                    elem.type
+                ))
+            } : null)});
+        }
+
+        // Load crafting slots if exists
+        if (data.craftingSlots) {
+            store.commit('treasure/updateKey', {key: 'craftingSlots', value: data.craftingSlots.map(elem => elem ? {
+                ...filterItem(elem),
+                valueCache: elem.effect.map(el => store.state.treasure.effectToFeature[el] ? el : fallbackEffect).map((el, i) => store.getters['treasure/effectValue'](
+                    store.state.treasure.effect[store.state.treasure.effectToFeature[el]][el].value * store.state.treasure.type[elem.type].slots[i].power,
+                    elem.tier,
+                    elem.level,
+                    elem.type
+                ))
+            } : null)});
+        }
+
         store.dispatch('treasure/updateEffectCache');
     }
 }

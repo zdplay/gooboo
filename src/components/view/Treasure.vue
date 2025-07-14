@@ -74,6 +74,12 @@
           @touchend="touchdrop($event, i - 1)"
         ></item-slot>
       </div>
+
+      <!-- Temporary Storage -->
+      <temporary-storage v-if="$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting && $store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value"></temporary-storage>
+
+      <!-- Crafting Panel -->
+      <crafting-panel v-if="$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting && $store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value"></crafting-panel>
     </v-col>
     <v-col :class="{'scroll-container': $vuetify.breakpoint.mdAndUp}" cols="12" md="4" lg="3">
       <stat-list></stat-list>
@@ -88,11 +94,13 @@ import BuyItem from '../partial/treasure/BuyItem.vue';
 import ChanceList from '../partial/treasure/ChanceList.vue';
 import ItemSlot from '../partial/treasure/ItemSlot.vue';
 import StatList from '../partial/treasure/StatList.vue';
+import TemporaryStorage from '../partial/treasure/TemporaryStorage.vue';
+import CraftingPanel from '../partial/treasure/CraftingPanel.vue';
 import Currency from '../render/Currency.vue';
 import PriceTag from '../render/PriceTag.vue';
 
 export default {
-  components: { ChanceList, Currency, ItemSlot, StatList, BuyItem, PriceTag },
+  components: { ChanceList, Currency, ItemSlot, StatList, BuyItem, PriceTag, TemporaryStorage, CraftingPanel },
   computed: {
     ...mapState({
       upgrading: state => state.treasure.upgrading,
@@ -117,14 +125,65 @@ export default {
   },
   methods: {
     drag(ev, id) {
-      ev.dataTransfer.setData("text", id);
+      // Check if temporary and crafting features are enabled
+      const isFeatureEnabled = this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting &&
+                               this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value;
+
+      if (isFeatureEnabled) {
+        // New drag system with JSON data
+        ev.dataTransfer.setData("text", JSON.stringify({
+          from: 'inventory',
+          fromIndex: id
+        }));
+      } else {
+        // Original drag system (legacy behavior)
+        ev.dataTransfer.setData("text", id);
+      }
     },
     drop(ev, id) {
       ev.preventDefault();
-      const startId = parseInt(ev.dataTransfer.getData("text"));
-      const endId = parseInt(id);
-      if (startId !== endId) {
-        this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+
+      // Check if temporary and crafting features are enabled
+      const isFeatureEnabled = this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting &&
+                               this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value;
+
+      if (isFeatureEnabled) {
+        // New drag system with temporary storage and crafting
+        const data = JSON.parse(ev.dataTransfer.getData("text"));
+
+        if (data.from === 'inventory') {
+          const startId = data.fromIndex;
+          const endId = parseInt(id);
+          if (startId !== endId) {
+            this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+          }
+        } else if (data.from === 'temporary') {
+          this.$store.dispatch('treasure/moveFromTemporaryStorage', {
+            storageIndex: data.fromIndex,
+            itemIndex: parseInt(id)
+          });
+        } else if (data.from === 'crafting') {
+          this.$store.dispatch('treasure/moveFromCraftingSlot', {
+            slotIndex: data.fromIndex,
+            toType: 'inventory',
+            toIndex: parseInt(id)
+          });
+        } else if (data.from === 'newItem') {
+          // Move new item to inventory slot
+          const newItem = this.$store.state.treasure.newItem;
+          if (newItem) {
+            this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+            this.$store.commit('treasure/setItem', { id: parseInt(id), item: newItem });
+            this.$store.dispatch('treasure/updateEffectCache');
+          }
+        }
+      } else {
+        // Original drag system (legacy behavior)
+        const startId = parseInt(ev.dataTransfer.getData("text"));
+        const endId = parseInt(id);
+        if (startId !== endId) {
+          this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+        }
       }
     },
     allowDrop(ev) {

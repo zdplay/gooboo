@@ -343,6 +343,7 @@ export default {
       { category: '宝藏', color: 'yellow', content: '增加宝藏属性显示和翡翠显示。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏整理排序功能。', isCurrentUpdate: false },
       { category: '宝藏', color: 'yellow', content: '增加宝藏购买预测功能，可以预览未来10次随机效果。', isCurrentUpdate: false },
+      { category: '宝藏', color: 'yellow', content: '增加宝藏临时保存槽和合成功能。', isCurrentUpdate: true },
       { category: '事件', color: 'dark-blue', content: '调整每日签到奖励，在【设置】-【实验性】中开关。（别服存档过来要过一天才能签到）', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '增加天气混乱事件萌新钓竿和海贼王宝藏，钓鱼日志，互动钓鱼小游戏。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },

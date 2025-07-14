@@ -11,6 +11,12 @@ export default {
         // Contains the new bought item (or null)
         newItem: null,
 
+        // Contains temporarily stored treasure items (max 10, not active)
+        temporaryStorage: [],
+
+        // Contains crafting slots (max 3, not active, can also be used as temporary storage)
+        craftingSlots: [],
+
         // Contains all features with their possible effects
         effect: {},
 
@@ -96,7 +102,7 @@ export default {
         fragmentGain: (state, getters) => {
             return Math.round(getters.averageFragments * TREASURE_FRAGMENT_BUY_GAIN);
         },
-        generateItem: (state, getters, rootState, rootGetters) => (type, tier = 0, auto = false, rngSkip = 0, bonusTier = 0) => {
+        generateItem: (state, getters, rootState, rootGetters) => (type, tier = 0, auto = false, rngSkip = 0, bonusTier = 0, targetEffect = null) => {
             let rngGen = rootGetters['system/getRng']('treasure_' + type, rngSkip);
 
             let effectList = {};
@@ -114,11 +120,24 @@ export default {
             }
 
             let chosenEffect = [];
-            state.type[type].slots.forEach(slot => {
-                const chosenElem = randomElem(effectList[slot.type], rngGen());
-                effectList[slot.type] = effectList[slot.type].filter(el => el !== chosenElem);
-                chosenEffect.push(chosenElem);
-            });
+            if (targetEffect && state.type[type].slots.length > 0) {
+                // If target effect is specified, use it for the first slot
+                chosenEffect.push(targetEffect);
+                // For remaining slots (if any), choose randomly
+                for (let i = 1; i < state.type[type].slots.length; i++) {
+                    const slot = state.type[type].slots[i];
+                    const chosenElem = randomElem(effectList[slot.type], rngGen());
+                    effectList[slot.type] = effectList[slot.type].filter(el => el !== chosenElem);
+                    chosenEffect.push(chosenElem);
+                }
+            } else {
+                // Normal random generation
+                state.type[type].slots.forEach(slot => {
+                    const chosenElem = randomElem(effectList[slot.type], rngGen());
+                    effectList[slot.type] = effectList[slot.type].filter(el => el !== chosenElem);
+                    chosenEffect.push(chosenElem);
+                });
+            }
 
             let level = 0;
             if (auto) {
@@ -224,6 +243,42 @@ export default {
                 effect: chosenEffect,
                 valueCache
             };
+        },
+        canCraft: (state) => {
+            const items = state.craftingSlots.filter(item => item !== null);
+            if (items.length !== 3) return false;
+
+            // Check if all items have the same tier (color)
+            const firstTier = items[0].tier;
+            return items.every(item => item.tier === firstTier);
+        },
+        craftingResult: (state, getters) => {
+            if (!getters.canCraft) return null;
+
+            const items = state.craftingSlots.filter(item => item !== null);
+            const firstTier = items[0].tier;
+            const firstType = items[0].type;
+            const firstEffect = items[0].effect[0];
+            const sameEffect = items.every(item => item.effect[0] === firstEffect);
+
+            if (sameEffect) {
+                // Same color same effect: upgrade tier by 1, keep same effect
+                const newTier = Math.min(firstTier + 1, state.tierColor.length - 1);
+                return {
+                    type: 'upgrade',
+                    tier: newTier,
+                    treasureType: firstType,
+                    targetEffect: firstEffect
+                };
+            } else {
+                // Same color different effects: random treasure
+                return {
+                    type: 'random',
+                    tier: firstTier,
+                    treasureType: 'regular', // Default type for random generation
+                    items: items // Pass items for seed generation
+                };
+            }
         }
     },
     mutations: {
@@ -273,6 +328,30 @@ export default {
                 Vue.set(state.items[o.id], o.key, o.value);
             }
         },
+        updateTemporaryStorageItem(state, { index, item }) {
+            if (index >= 0 && index < 10) {
+                Vue.set(state.temporaryStorage, index, item);
+            }
+        },
+        updateCraftingSlotItem(state, { index, item }) {
+            if (index >= 0 && index < 3) {
+                Vue.set(state.craftingSlots, index, item);
+            }
+        },
+        initializeTemporaryStorage(state) {
+            // Initialize temporary storage with 10 empty slots
+            state.temporaryStorage = new Array(10).fill(null);
+        },
+        initializeCraftingSlots(state) {
+            // Initialize crafting slots with 3 empty slots
+            state.craftingSlots = new Array(3).fill(null);
+        },
+        clearTemporaryStorage(state) {
+            state.temporaryStorage = new Array(10).fill(null);
+        },
+        clearCraftingSlots(state) {
+            state.craftingSlots = new Array(3).fill(null);
+        },
         moveItem(state, o) {
             while (state.items.length < (Math.max(o.from, o.to) + 1)) {
                 state.items.push(null);
@@ -311,6 +390,10 @@ export default {
             commit('updateKey', {key: 'effectCache', value: {}});
             commit('updateKey', {key: 'upgrading', value: false});
             commit('updateKey', {key: 'deleting', value: false});
+
+            // Clear temporary storage and crafting slots
+            commit('clearTemporaryStorage');
+            commit('clearCraftingSlots');
         },
         sortItems({ state, commit, dispatch }) {
             const featureOrder = {
@@ -429,6 +512,8 @@ export default {
         updateEffectCache({ state, commit, dispatch }) {
             let effects = {};
 
+            // Only include main inventory items in effect calculation
+            // Temporary storage and crafting slots never contribute to effects
             state.items.forEach(item => {
                 if (item) {
                     item.effect.forEach((el, i) => {
@@ -451,6 +536,124 @@ export default {
                     dispatch('mult/setMult', {name: key, key: 'treasure', value: elem}, {root: true});
                 }
             }
+        },
+        moveToTemporaryStorage({ state, commit, dispatch }, { itemIndex, storageIndex }) {
+            // Move item from main inventory to temporary storage
+            const item = state.items[itemIndex];
+            if (item && storageIndex >= 0 && storageIndex < 10) {
+                commit('setItem', { id: itemIndex, item: null });
+                commit('updateTemporaryStorageItem', { index: storageIndex, item });
+                dispatch('updateEffectCache');
+            }
+        },
+        moveFromTemporaryStorage({ state, commit, dispatch }, { storageIndex, itemIndex }) {
+            // Move item from temporary storage to main inventory
+            const item = state.temporaryStorage[storageIndex];
+            if (item && itemIndex >= 0) {
+                commit('updateTemporaryStorageItem', { index: storageIndex, item: null });
+                commit('setItem', { id: itemIndex, item });
+                dispatch('updateEffectCache');
+            }
+        },
+        moveToCraftingSlot({ state, commit, dispatch }, { fromType, fromIndex, slotIndex }) {
+            // Move item to crafting slot from various sources
+            let item = null;
+
+            if (fromType === 'inventory') {
+                item = state.items[fromIndex];
+                if (item) {
+                    commit('setItem', { id: fromIndex, item: null });
+                    dispatch('updateEffectCache');
+                }
+            } else if (fromType === 'temporary') {
+                item = state.temporaryStorage[fromIndex];
+                if (item) {
+                    commit('updateTemporaryStorageItem', { index: fromIndex, item: null });
+                }
+            } else if (fromType === 'newItem') {
+                item = state.newItem;
+                if (item) {
+                    commit('updateKey', { key: 'newItem', value: null });
+                }
+            }
+
+            if (item && slotIndex >= 0 && slotIndex < 3) {
+                commit('updateCraftingSlotItem', { index: slotIndex, item });
+            }
+        },
+        moveFromCraftingSlot({ state, commit, dispatch }, { slotIndex, toType, toIndex }) {
+            // Move item from crafting slot to various destinations
+            const item = state.craftingSlots[slotIndex];
+            if (!item) return;
+
+            commit('updateCraftingSlotItem', { index: slotIndex, item: null });
+
+            if (toType === 'inventory') {
+                commit('setItem', { id: toIndex, item });
+                dispatch('updateEffectCache');
+            } else if (toType === 'temporary') {
+                commit('updateTemporaryStorageItem', { index: toIndex, item });
+            }
+        },
+        craftTreasure({ state, getters, commit, dispatch }) {
+            if (!getters.canCraft) return;
+
+            const result = getters.craftingResult;
+            if (!result) return;
+
+            const items = state.craftingSlots.filter(item => item !== null);
+
+            // Calculate fragments to return from consumed items
+            let fragmentsToReturn = 0;
+            items.forEach(item => {
+                fragmentsToReturn += item.fragmentsSpent;
+            });
+
+            // Clear crafting slots
+            for (let i = 0; i < 3; i++) {
+                commit('updateCraftingSlotItem', { index: i, item: null });
+            }
+
+            let newItem;
+            if (result.type === 'upgrade') {
+                // Same color same effect: create upgraded treasure with same effect
+                newItem = getters.generateItem(result.treasureType, result.tier, false, 0, 0, result.targetEffect);
+            } else {
+                // Same color different effects: create random treasure with custom seed
+                // Generate seed based on items and daily timestamp for consistent daily randomness
+                let seedString = '';
+                items.forEach(item => {
+                    seedString += item.effect[0] + item.level + item.tier;
+                });
+
+                // Add daily timestamp (YYYY-MM-DD format) to make patterns change daily
+                const today = new Date();
+                const dailyTimestamp = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+                seedString += dailyTimestamp.toString();
+
+                const customSeed = seedString.split('').reduce((a, b) => {
+                    a = ((a << 5) - a) + b.charCodeAt(0);
+                    return a & a;
+                }, 0);
+
+                // Use custom seed to determine if tier should be upgraded
+                const seedForTier = Math.abs(customSeed) % 100;
+                const shouldUpgradeTier = seedForTier < 30; // 30% chance to upgrade tier
+
+                const finalTier = shouldUpgradeTier ?
+                    Math.min(result.tier + 1, state.tierColor.length - 1) :
+                    result.tier;
+
+                newItem = getters.generateItem(result.treasureType, finalTier, false, Math.abs(customSeed) % 1000);
+            }
+
+            // Return fragments from consumed items
+            if (fragmentsToReturn > 0) {
+                dispatch('currency/gain', {feature: 'treasure', name: 'fragment', amount: fragmentsToReturn}, {root: true});
+            }
+
+            // Place in first crafting slot instead of inventory
+            commit('updateCraftingSlotItem', { index: 0, item: newItem });
         }
     }
 }

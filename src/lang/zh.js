@@ -1535,6 +1535,10 @@ export default {
         consecutiveSignInRelics: {
           name: '累签圣遗物',
           description: '基于累计签到次数自动获得累签圣遗物奖励'
+        },
+        treasureTemporaryAndCrafting: {
+          name: '宝藏临时空间和合成',
+          description: '启用宝藏临时存放和合成功能，提供10个临时存放槽位和3个合成槽位'
         }
       }
   },
