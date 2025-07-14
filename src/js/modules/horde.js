@@ -34,6 +34,23 @@ import trinket from "./horde/trinket";
 import sigil_boss from "./horde/sigil_boss";
 import { isEnhancedAutocastEnabled, legacyAutocastLogic, enhancedAutocastLogic } from "./horde/enhancedAutocast";
 
+export function clearReflectedBuffs() {
+    // Clear all reflected buffs (buffs that start with 'reflected_')
+    let newBuffs = {};
+    let refreshCache = false;
+    for (const [key, elem] of Object.entries(store.state.horde.playerBuff)) {
+        if (!key.startsWith('reflected_')) {
+            newBuffs[key] = elem;
+        } else {
+            refreshCache = true;
+        }
+    }
+    if (refreshCache) {
+        store.commit('horde/updateKey', {key: 'playerBuff', value: newBuffs});
+        store.dispatch('horde/updatePlayerCache');
+    }
+}
+
 function playerDie() {
     if (store.state.horde.player.revive) {
         store.commit('horde/updatePlayerKey', {key: 'health', value: store.state.horde.cachePlayerStats.health});
@@ -156,6 +173,7 @@ export default {
     tick(seconds) {
         store.commit('stat/add', {feature: 'horde', name: 'timeSpent', value: seconds});
         store.dispatch('horde/checkIceClawsStatus');
+        store.dispatch('horde/checkExtraHordeEquipmentStatus');
 
         const subfeature = store.state.system.features.horde.currentSubfeature;
 
@@ -403,6 +421,10 @@ export default {
                                     } else if (elem.type.substring(0, 9) === 'maxdamage') {
                                         const maxdamage = Math.max(0, enemyStats.maxHealth * (enemyHealth / enemyStats.maxHealth - playerStats.execute));
                                         damage += getDamage(value * maxdamage / divisionShieldMult, elem.type.substring(9).toLowerCase(), playerStats, enemyStats);
+                                    } else if (elem.type === 'skillNullify') {
+                                        store.commit('horde/updateEnemyKey', {key: 'skillNullified', value: store.state.horde.enemy.skillNullified + Math.round(value)});
+                                    } else if (elem.type === 'skillReflect') {
+                                        store.commit('horde/updateEnemyKey', {key: 'skillReflected', value: store.state.horde.enemy.skillReflected + Math.round(value)});
                                     } else if (elem.type.substring(0, 6) === 'damage') {
                                         damage += getDamage(value * playerStats.attack / divisionShieldMult, elem.type.substring(6).toLowerCase(), playerStats, enemyStats);
                                     }
@@ -619,7 +641,80 @@ export default {
                     } else {
                         // Perform an active attack
                         const active = store.state.horde.sigil[usedAttack].active;
-                        active.effect(enemyStats.sigil[usedAttack], store.state.horde.bossFight).forEach(elem => {
+                        const skillEffects = active.effect(enemyStats.sigil[usedAttack], store.state.horde.bossFight);
+
+                        // Check for skill nullification
+                        if (enemyStats.skillNullified > 0) {
+                            store.commit('horde/updateEnemyKey', {key: 'skillNullified', value: Math.max(0, enemyStats.skillNullified - 1)});
+                            // Skill is nullified, no effects applied but cooldown and uses still consumed
+                        } else if (enemyStats.skillReflected > 0) {
+                            store.commit('horde/updateEnemyKey', {key: 'skillReflected', value: Math.max(0, enemyStats.skillReflected - 1)});
+                            // Reflect skill effects back to enemy
+                            skillEffects.forEach(elem => {
+                                if (elem.type === 'heal') {
+                                    // Enemy heal becomes player heal
+                                    store.commit('horde/updatePlayerKey', {key: 'health', value: Math.min(playerStats.health, store.state.horde.player.health + playerStats.health * elem.value)});
+                                } else if (elem.type === 'stun') {
+                                    // Enemy stun player becomes enemy stun self
+                                    store.commit('horde/updateEnemyKey', {key: 'stun', value: store.state.horde.enemy.stun + elem.value});
+                                } else if (elem.type === 'silence') {
+                                    // Enemy silence player becomes enemy silence self
+                                    store.commit('horde/updateEnemyKey', {key: 'silence', value: store.state.horde.enemy.silence + elem.value});
+                                } else if (elem.type === 'divisionShield') {
+                                    // Enemy gain shield becomes player gain shield
+                                    store.commit('horde/updatePlayerKey', {key: 'divisionShield', value: store.state.horde.player.divisionShield + elem.value});
+                                } else if (elem.type === 'removeDivisionShield') {
+                                    // Enemy remove player shield becomes enemy remove own shield
+                                    store.commit('horde/updateEnemyKey', {key: 'divisionShield', value: Math.ceil(store.state.horde.enemy.divisionShield * (1 - elem.value))});
+                                } else if (elem.type === 'poison') {
+                                    // Enemy poison player becomes enemy poison self
+                                    const poisonDmg = Math.max(0, getDamage(elem.value * enemyStats.attack / divisionShieldMult, 'bio', enemyStats, enemyStats) - enemyStats.defense * enemyStats.maxHealth);
+                                    if (poisonDmg > 0) {
+                                        store.commit('horde/updateEnemyKey', {key: 'poison', value: poisonDmg + store.state.horde.enemy.poison});
+                                        hitShield = true;
+                                    }
+                                } else if (elem.type === 'antidote') {
+                                    // Enemy cure self becomes player cure self
+                                    store.commit('horde/updatePlayerKey', {key: 'poison', value: store.state.horde.player.poison * (1 - elem.value)});
+                                } else if (elem.type.substring(0, 9) === 'maxdamage') {
+                                    // Enemy damage player becomes enemy damage self
+                                    const maxdamage = Math.max(0, enemyStats.maxHealth * (enemyHealth / enemyStats.maxHealth - enemyStats.execute));
+                                    const reflectedDamage = getDamage(elem.value * maxdamage / divisionShieldMult, elem.type.substring(9).toLowerCase(), enemyStats, enemyStats);
+                                    const finalDamage = Math.max(0, reflectedDamage - enemyStats.defense * enemyStats.maxHealth);
+                                    if (finalDamage > 0) {
+                                        store.commit('horde/updateEnemyKey', {key: 'health', value: store.state.horde.enemy.health - finalDamage});
+                                        hitShield = true;
+                                    }
+                                } else if (elem.type === 'buff') {
+                                    // Enemy buff becomes player buff (temporary, cleared at fight end)
+                                    store.dispatch('horde/addBuff', {name: `reflected_${usedAttack}`, time: Math.round(elem.value), positive: true, effect: elem.effect});
+                                } else if (elem.type === 'permanentStat') {
+                                    // Enemy permanent stat becomes player temporary buff (cleared at fight end)
+                                    const statName = elem.stat.split('_')[0];
+                                    const statType = elem.stat.split('_')[1] || 'base';
+                                    store.dispatch('horde/addBuff', {name: `reflected_permanent_${usedAttack}`, time: 999999, positive: true, effect: [
+                                        {type: statType, name: `horde${statName.charAt(0).toUpperCase() + statName.slice(1)}`, value: elem.value}
+                                    ]});
+                                } else if (elem.type === 'gainStat') {
+                                    // Enemy gain stat becomes player temporary buff (cleared at fight end)
+                                    const statName = elem.stat.split('_')[0];
+                                    const statType = elem.stat.split('_')[1] || 'base';
+                                    store.dispatch('horde/addBuff', {name: `reflected_gain_${usedAttack}`, time: 999999, positive: true, effect: [
+                                        {type: statType, name: `horde${statName.charAt(0).toUpperCase() + statName.slice(1)}`, value: elem.value}
+                                    ]});
+                                } else if (elem.type.substring(0, 6) === 'damage') {
+                                    // Enemy damage player becomes enemy damage self
+                                    const reflectedDamage = getDamage(elem.value * enemyStats.attack / divisionShieldMult, elem.type.substring(6).toLowerCase(), enemyStats, enemyStats);
+                                    const finalDamage = Math.max(0, reflectedDamage - enemyStats.defense * enemyStats.maxHealth);
+                                    if (finalDamage > 0) {
+                                        store.commit('horde/updateEnemyKey', {key: 'health', value: store.state.horde.enemy.health - finalDamage});
+                                        hitShield = true;
+                                    }
+                                }
+                            });
+                        } else {
+                            // Normal skill execution
+                            skillEffects.forEach(elem => {
                             if (elem.type === 'heal') {
                                 store.commit('horde/updateEnemyKey', {key: 'health', value: Math.min(enemyStats.maxHealth, store.state.horde.enemy.health + enemyStats.maxHealth * elem.value)});
                             } else if (elem.type === 'stun') {
@@ -662,6 +757,7 @@ export default {
                                 }
                             }
                         });
+                        }
 
                         // Count use and apply cooldown
                         store.commit('horde/updateEnemyActive', {name: usedAttack, key: 'cooldown', value: active.cooldown(enemyStats.sigil[usedAttack], store.state.horde.bossFight)});

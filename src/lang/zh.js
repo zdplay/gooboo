@@ -1539,6 +1539,10 @@ export default {
         treasureTemporaryAndCrafting: {
           name: '宝藏临时空间和合成',
           description: '启用宝藏临时存放和合成功能，提供10个临时存放槽位和3个合成槽位'
+        },
+        extraHordeEquipment: {
+          name: '额外部落装备',
+          description: '增加钢铁圣域（150）和业火轮回装备（170）'
         }
       }
   },
@@ -2054,6 +2058,8 @@ export default {
       needle: '针',
       mine: '矿山',
       maskOfJoy: '欢乐面具',
+      steelSanctuary: '钢铁圣域',
+      karmaWheel: '业火轮回',
 
       // Chess pieces
       pawn: '士兵',
@@ -2161,6 +2167,14 @@ export default {
       freezeTime: {
         0: '增加',
         1: '可用冷冻时间'
+      },
+      skillNullify: {
+        0: '使敌人下回合技能',
+        1: '无效'
+      },
+      skillReflect: {
+        0: '使敌人下回合技能',
+        1: '反作用到敌人身上'
       },
       buff: {
         duration: '增益持续时间',

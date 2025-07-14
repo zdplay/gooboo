@@ -1523,6 +1523,10 @@ export default {
       treasureTemporaryAndCrafting: {
         name: 'Schätze temporäre Speicherung und Herstellung',
         description: 'Aktiviert die Schatz-temporäre-Speicherung- und -Herstellungsfunktion, die 10 temporäre Speicherplätze und 3 Herstellungsslots bereitstellt'
+      },
+      extraHordeEquipment: {
+        name: 'Zusätzliche Horde-Ausrüstung',
+        description: 'Aktiviert Stählernes Heiligtum und Karma-Rad Ausrüstung. Wenn deaktiviert, werden diese Ausrüstungen ausgeblendet und automatisch abgelegt'
       }
     }
   },
@@ -2037,6 +2041,8 @@ export default {
       needle: 'Nadel',
       mine: 'Mine',
       maskOfJoy: 'Maske der Freude',
+      steelSanctuary: 'Stählernes Heiligtum',
+      karmaWheel: 'Karma-Rad',
 
       // Chess pieces
       pawn: 'Bauer',
@@ -2144,6 +2150,14 @@ export default {
       freezeTime: {
         0: 'Hinzufügen',
         1: 'verfügbare Einfrierzeit'
+      },
+      skillNullify: {
+        0: 'Gegnerische Fähigkeiten für',
+        1: 'Runde unwirksam machen'
+      },
+      skillReflect: {
+        0: 'Gegnerische Fähigkeiten für',
+        1: 'Runde reflektieren'
       },
       buff: {
         duration: 'Schubdauer',

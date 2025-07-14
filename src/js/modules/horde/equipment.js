@@ -1455,6 +1455,30 @@ export default {
         activeIcon: 'mdi-virus',
         activeColor: 'lime'
     },
+    steelSanctuary: {
+        findZone: 150,
+        findChance: 1 / buildNum(2, 'B'),
+        price(lvl) {
+            return Math.pow(3, lvl - 1) * buildNum(10, 'B');
+        },
+        cap: 1,
+        stats() {
+            return [
+                {isPositive: true, type: 'mult', name: 'hordeHealth', value: 1.5},
+                {isPositive: true, type: 'base', name: 'hordeDivisionShield', value: 30}
+            ];
+        },
+        active() {
+            return [
+                {type: 'skillNullify', value: 1}
+            ];
+        },
+        activeType: 'combat',
+        cooldown: () => 15,
+        icon: 'mdi-shield-sword',
+        activeIcon: 'mdi-shield-off',
+        activeColor: 'grey'
+    },
     bomb: {
         findZone: 156,
         findChance: 1 / buildNum(4.8, 'B'),
@@ -1505,6 +1529,30 @@ export default {
         icon: 'mdi-magic-staff',
         activeIcon: 'mdi-swap-horizontal',
         activeColor: 'light-green'
+    },
+    karmaWheel: {
+        findZone: 170,
+        findChance: 1 / buildNum(20, 'B'),
+        price(lvl) {
+            return Math.pow(3, lvl - 1) * buildNum(20, 'B');
+        },
+        cap: 1,
+        stats() {
+            return [
+                {isPositive: true, type: 'mult', name: 'hordeAttack', value: 1.3},
+                {isPositive: true, type: 'base', name: 'hordeDivisionShield', value: 50}
+            ];
+        },
+        active() {
+            return [
+                {type: 'skillReflect', value: 1}
+            ];
+        },
+        activeType: 'combat',
+        cooldown: () => 30,
+        icon: 'mdi-fire-circle',
+        activeIcon: 'mdi-reflect-horizontal',
+        activeColor: 'deep-orange'
     },
     shatteredGem: {
         findZone: 170,

@@ -1499,6 +1499,10 @@ export default {
         treasureTemporaryAndCrafting: {
           name: 'Treasure Temporary Storage and Crafting',
           description: 'Enable treasure temporary storage and crafting feature, providing 10 temporary storage slots and 3 crafting slots'
+        },
+        extraHordeEquipment: {
+          name: 'Extra Horde Equipment',
+          description: 'Enable Steel Sanctuary and Karma Wheel equipment. When disabled, these equipment will be hidden and automatically unequipped'
         }
       }
   },
@@ -2013,6 +2017,8 @@ export default {
       needle: 'Needle',
       mine: 'Mine',
       maskOfJoy: 'Mask of joy',
+      steelSanctuary: 'Steel Sanctuary',
+      karmaWheel: 'Karma Wheel',
 
       // Chess pieces
       pawn: 'Pawn',
@@ -2120,6 +2126,14 @@ export default {
       freezeTime: {
         0: 'Add',
         1: 'available freeze time'
+      },
+      skillNullify: {
+        0: 'Nullify enemy skills for',
+        1: 'turn'
+      },
+      skillReflect: {
+        0: 'Reflect enemy skills for',
+        1: 'turn'
       },
       buff: {
         duration: 'Buff duration',

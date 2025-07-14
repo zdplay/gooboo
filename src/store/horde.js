@@ -3,6 +3,7 @@ import { HORDE_COMBO_ATTACK, HORDE_COMBO_BONE, HORDE_COMBO_HEALTH, HORDE_ENEMY_R
 import { buildNum, capitalize, decapitalize } from "../js/utils/format";
 import { chance, randomElem, randomInt, randomRound, weightSelect } from "../js/utils/random";
 import { logBase } from "../js/utils/math";
+import { clearReflectedBuffs } from "../js/modules/horde";
 
 const notes = {
     1: 'horde_1',
@@ -874,6 +875,8 @@ export default {
                     commit('updateEnemyKey', {key: 'stun', value: 0});
                     commit('updateEnemyKey', {key: 'poison', value: 0});
                     commit('updateEnemyKey', {key: 'hits', value: 0});
+                    commit('updateEnemyKey', {key: 'skillNullified', value: 0});
+                    commit('updateEnemyKey', {key: 'skillReflected', value: 0});
                     commit('updateEnemyKey', {key: 'sigil', value: sigil});
                     commit('updateEnemyKey', {key: 'active', value: active});
 
@@ -983,6 +986,7 @@ export default {
         },
         resetStats({ commit, dispatch }) {
             commit('updateKey', {key: 'combo', value: 0});
+            clearReflectedBuffs(); // Clear reflected buffs before clearing all buffs
             commit('updateKey', {key: 'playerBuff', value: {}});
             dispatch('updatePlayerStats');
             dispatch('updateEnemyStats');
@@ -1075,6 +1079,9 @@ export default {
             }
         },
         killEnemy({ state, rootState, getters, rootGetters, commit, dispatch }) {
+            // Clear reflected buffs when enemy is defeated
+            clearReflectedBuffs();
+
             const subfeature = rootState.system.features.horde.currentSubfeature;
             if (subfeature === 0 && state.bossFight === 0 && state.currentTower === null) {
                 dispatch('currency/gain', {feature: 'horde', name: 'bone', amount: rootGetters['mult/get']('currencyHordeBoneGain', getters.currentBone, state.enemy.loot)}, {root: true});
@@ -2103,6 +2110,34 @@ export default {
                     dispatch('unequipItem', 'iceClaws');
                 }
             }
+        },
+        checkExtraHordeEquipmentStatus({ state, rootState, commit, dispatch }) {
+            const extraEquipmentEnabled = rootState.system.settings.experiment.items.extraHordeEquipment.value;
+            const equipmentNames = ['steelSanctuary', 'karmaWheel'];
+
+            equipmentNames.forEach(equipmentName => {
+                const equipment = state.items[equipmentName];
+                if (!equipment) return;
+
+                if (extraEquipmentEnabled) {
+                    if (!equipment.known) {
+                        commit('updateItemKey', {name: equipmentName, key: 'known', value: true});
+                    }
+                    if (!equipment.found) {
+                        commit('updateItemKey', {name: equipmentName, key: 'found', value: true});
+                    }
+                } else {
+                    if (equipment.known) {
+                        commit('updateItemKey', {name: equipmentName, key: 'known', value: false});
+                    }
+                    if (equipment.found) {
+                        commit('updateItemKey', {name: equipmentName, key: 'found', value: false});
+                    }
+                    if (equipment.equipped) {
+                        dispatch('unequipItem', equipmentName);
+                    }
+                }
+            });
         }
     }
 }

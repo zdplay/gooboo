@@ -321,6 +321,7 @@ export default {
       { category: '部落', color: 'red', content: '增加塔楼技能冷却重置功能，每次进入塔楼时自动重置所有已装备的装备技能冷却时间。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加已装备和分类筛选，智能推荐装备功能，在【设置】-【实验性】设置。', isCurrentUpdate: true },
       { category: '部落', color: 'red', content: '增加即时复活按钮。', isCurrentUpdate: true },
+      { category: '部落', color: 'red', content: '增加2件额外的装备，钢铁圣域（150）和业火轮回（170），在【设置】-【实验性】设置。', isCurrentUpdate: true },
       { category: '部落', color: 'red', content: '调整装备配置能同步保存装备自动施法和禁用主动技能状态。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊的形状游戏显示各个形状的个数。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。', isCurrentUpdate: false },

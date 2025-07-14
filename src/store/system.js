@@ -548,6 +548,13 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
+                    },
+                    extraHordeEquipment: {
+                        unlock: 'hordeFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
                     }
                 }
             },
@@ -1369,6 +1376,9 @@ export default {
             if (o.category === 'experiment' && o.name === 'doubleDoorFridge' && !o.value) {
                 dispatch('village/setWorkerCount', {name: 'iceMaker', amount: 0}, {root: true});
                 dispatch('cryolab/clearFreezeStates', null, {root: true});
+            }
+            if (o.category === 'experiment' && o.name === 'extraHordeEquipment') {
+                dispatch('horde/checkExtraHordeEquipmentStatus', null, {root: true});
             }
         },
         buyTheme({ state, rootGetters, commit, dispatch }, name) {
