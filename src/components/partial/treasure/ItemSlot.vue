@@ -40,7 +40,7 @@
 </style>
 
 <template>
-  <div :data-cy="slotId !== null ? `treasure-slot-${ slotId }` : undefined" @click="handleClick" v-bind="$attrs" v-on="$listeners" class="treasure-item-slot bg-tile-default elevation-2 d-flex flex-column justify-start align-center rounded-lg" :class="{'treasure-item-slot-mobile': $vuetify.breakpoint.xsOnly}">
+  <div :id="slotId !== null ? `treasure_${slotId}` : undefined" :data-cy="slotId !== null ? `treasure-slot-${ slotId }` : undefined" @click="handleClick" v-bind="$attrs" v-on="$listeners" class="treasure-item-slot bg-tile-default elevation-2 d-flex flex-column justify-start align-center rounded-lg" :class="{'treasure-item-slot-mobile': $vuetify.breakpoint.xsOnly}">
     <div class="d-flex justify-center align-center" style="flex: 1;">
       <v-badge v-if="item" :value="itemType.icon" bordered :icon="itemType.icon" color="grey">
         <v-badge bordered overlap bottom :value="item.level > 0" :content="'+' + item.level" color="success">
@@ -55,7 +55,7 @@
           </gb-tooltip>
         </v-badge>
       </v-badge>
-      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && slotType === 'inventory' && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
+      <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && (slotType === 'inventory' || slotType === 'temporary') && upgrading && upgradeCost !== null" :content="'-' + $formatNum(upgradeCost)" color="amber"></v-badge>
       <v-badge class="treasure-badge balloon-text-black" inline bordered left v-if="slotId !== null && slotType === 'inventory' && deleting && destroyValue !== null" :content="'+' + $formatNum(destroyValue)" color="amber"></v-badge>
     </div>
     <template v-if="item && item.effect && item.effect.length > 0">
@@ -186,7 +186,7 @@ export default {
   methods: {
     handleClick() {
       if (this.slotId !== null) {
-        // Only allow upgrade/delete for inventory slots
+        // Allow upgrade/delete for inventory and temporary slots
         if (this.slotType === 'inventory') {
           if (this.upgrading && this.upgradeCost !== null && (this.slotId === -1 ? this.$store.state.treasure.newItem : this.$store.state.treasure.items[this.slotId])) {
             this.$store.dispatch('treasure/upgradeItem', this.slotId);
@@ -205,8 +205,14 @@ export default {
               this.$store.dispatch('treasure/moveItem', {from: -1, to: this.slotId});
             }
           }
+        } else if (this.slotType === 'temporary') {
+          // Allow upgrade for temporary storage slots
+          if (this.upgrading && this.upgradeCost !== null && this.$store.state.treasure.temporaryStorage[this.slotId]) {
+            this.$store.dispatch('treasure/upgradeTemporaryItem', this.slotId);
+          }
+          // Note: Delete functionality not implemented for temporary slots
         }
-        // For temporary and crafting slots, no special click behavior needed
+        // For crafting slots, no special click behavior needed
       }
     }
   }

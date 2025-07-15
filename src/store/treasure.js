@@ -486,6 +486,32 @@ export default {
                 }
             }
         },
+        upgradeTemporaryItem({ state, getters, rootGetters, commit, dispatch }, index) {
+            const item = state.temporaryStorage[index];
+            if (item) {
+                const cost = getters.upgradeFragments(item.tier, item.level, item.type);
+                if (cost !== null && rootGetters['currency/value']('treasure_fragment') >= cost) {
+                    //console.log('Upgrading temporary item at index', index, 'from level', item.level, 'to', item.level + 1, 'cost:', cost);
+                    dispatch('currency/spend', {feature: 'treasure', name: 'fragment', amount: cost}, {root: true});
+
+                    // Create updated item
+                    const updatedItem = {
+                        ...item,
+                        level: item.level + 1,
+                        fragmentsSpent: item.fragmentsSpent + cost,
+                        valueCache: item.effect.map((el, i) => getters.effectValue(
+                            state.effect[state.effectToFeature[el]][el].value * state.type[item.type].slots[i].power,
+                            item.tier,
+                            item.level + 1,
+                            item.type
+                        ))
+                    };
+
+                    // Update temporary storage item
+                    commit('updateTemporaryStorageItem', { index, item: updatedItem });
+                }
+            }
+        },
         winItem({ getters, commit, dispatch }, item) {
             const id = getters.firstEmptySlot;
             if (id !== null) {

@@ -22,7 +22,7 @@
 <template>
   <div class="temporary-storage-container">
     <div class="temporary-storage-title">临时存放</div>
-    <div class="storage-slots">
+    <div class="storage-slots" @touchmove="handleTouchMove">
       <item-slot
         v-for="i in 10"
         :key="'temp-' + (i - 1)"
@@ -82,17 +82,25 @@ export default {
       this.$parent.handleTouchMove(source, target);
     },
     touchstart(ev, index) {
-      // Prevent default touch behavior (scrolling) when touching draggable items
-      if (this.temporaryStorage[index]) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // Store drag source globally
-        window.treasureDragSource = {
-          type: 'temporary',
-          index: index
+      const hasItem = this.temporaryStorage[index] !== null;
+      if (hasItem) {
+        // Record touch start info for click/drag detection
+        window.treasureTouchStart = {
+          time: Date.now(),
+          x: ev.touches[0].clientX,
+          y: ev.touches[0].clientY,
+          id: index,
+          hasItem: true,
+          slotType: 'temporary'
         };
+      } else {
+        window.treasureTouchStart = null;
       }
     },
+    handleTouchMove(ev) {
+      // Call parent's touchmove method
+      this.$parent.touchmove(ev);
+    }
 
   }
 }

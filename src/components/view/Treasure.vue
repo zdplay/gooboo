@@ -37,7 +37,8 @@
             @drop="drop($event, -1)"
             @dragover="allowDrop"
             @touchstart="touchstart($event, -1)"
-            @touchend="touchdrop($event, -1)"
+            @touchmove="touchmove($event)"
+            @touchend="touchdrop($event)"
           ></item-slot>
           <buy-item class="ma-1" name="regular"></buy-item>
           <buy-item v-if="unlock.treasureDual.see" class="ma-1" name="dual"></buy-item>
@@ -75,7 +76,8 @@
           @drop="drop($event, i - 1)"
           @dragover="allowDrop"
           @touchstart="touchstart($event, i - 1)"
-          @touchend="touchdrop($event, i - 1)"
+          @touchmove="touchmove($event)"
+          @touchend="touchdrop($event)"
         ></item-slot>
       </div>
 
@@ -189,46 +191,119 @@ export default {
       ev.preventDefault();
     },
     touchstart(ev, id) {
-      // Prevent default touch behavior (scrolling) when touching draggable items
       const hasItem = id === -1 ? this.newItem !== null : (this.items[id] !== null && this.items[id] !== undefined);
       if (hasItem) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // Store drag source globally like mining module
-        window.treasureDragSource = {
-          type: 'inventory',
-          index: id
+        // Record touch start info for click/drag detection
+        window.treasureTouchStart = {
+          time: Date.now(),
+          x: ev.touches[0].clientX,
+          y: ev.touches[0].clientY,
+          id: id,
+          hasItem: true,
+          slotType: 'inventory'
         };
+
+        // Only prevent default for actual dragging, not for potential clicks
+        // We'll determine this in touchend based on duration and movement
+      } else {
+        window.treasureTouchStart = null;
+      }
+    },
+    touchmove(ev) {
+      // If we have a touch start and it's been long enough or moved far enough, prevent scrolling
+      if (window.treasureTouchStart) {
+        const currentTime = Date.now();
+        const currentDistance = Math.sqrt(
+          Math.pow(ev.touches[0].clientX - window.treasureTouchStart.x, 2) +
+          Math.pow(ev.touches[0].clientY - window.treasureTouchStart.y, 2)
+        );
+
+        const duration = currentTime - window.treasureTouchStart.time;
+        const DRAG_MIN_DURATION = 100; // 100ms
+        const DRAG_MIN_DISTANCE = 5; // 5px
+
+        // If it's been long enough or moved far enough, treat as drag and prevent scrolling
+        if (duration > DRAG_MIN_DURATION || currentDistance > DRAG_MIN_DISTANCE) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
       }
     },
     touchdrop(ev) {
-      if (window.treasureDragSource) {
-        const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-        if (elemList) {
-          // Find target element
-          const treasureElem = elemList.find(el => el.id && el.id.startsWith('treasure_'));
-          const tempElem = elemList.find(el => el.id && el.id.startsWith('temp_'));
-          const craftElem = elemList.find(el => el.id && el.id.startsWith('craft_'));
+      if (window.treasureTouchStart) {
+        const touchEnd = {
+          time: Date.now(),
+          x: ev.changedTouches[0].clientX,
+          y: ev.changedTouches[0].clientY
+        };
 
-          const source = window.treasureDragSource;
+        const duration = touchEnd.time - window.treasureTouchStart.time;
+        const distance = Math.sqrt(
+          Math.pow(touchEnd.x - window.treasureTouchStart.x, 2) +
+          Math.pow(touchEnd.y - window.treasureTouchStart.y, 2)
+        );
 
-          if (treasureElem) {
-            // Target is inventory slot
-            const targetIndex = parseInt(treasureElem.id.split('_')[1]);
-            this.handleTouchMove(source, { type: 'inventory', index: targetIndex });
-          } else if (tempElem) {
-            // Target is temporary storage
-            const targetIndex = parseInt(tempElem.id.split('_')[1]);
-            this.handleTouchMove(source, { type: 'temporary', index: targetIndex });
-          } else if (craftElem) {
-            // Target is crafting slot
-            const targetIndex = parseInt(craftElem.id.split('_')[1]);
-            this.handleTouchMove(source, { type: 'crafting', index: targetIndex });
+        // Define thresholds for click vs drag
+        const CLICK_MAX_DURATION = 500; // 500ms
+        const CLICK_MAX_DISTANCE = 10; // 10px
+
+        if (duration < CLICK_MAX_DURATION && distance < CLICK_MAX_DISTANCE) {
+          // This is a click, prevent default click event and trigger the click handler manually
+          ev.preventDefault();
+          ev.stopPropagation();
+
+          let slotElement = null;
+          if (window.treasureTouchStart.slotType === 'inventory') {
+            slotElement = document.getElementById(`treasure_${window.treasureTouchStart.id}`);
+          } else if (window.treasureTouchStart.slotType === 'temporary') {
+            slotElement = document.getElementById(`temp_${window.treasureTouchStart.id}`);
+          } else if (window.treasureTouchStart.slotType === 'crafting') {
+            slotElement = document.getElementById(`craft_${window.treasureTouchStart.id}`);
+          }
+
+          if (slotElement) {
+            // Find the ItemSlot component and call its handleClick method
+            const itemSlotComponent = slotElement.__vue__;
+            if (itemSlotComponent && itemSlotComponent.handleClick) {
+              itemSlotComponent.handleClick();
+            }
+          }
+        } else {
+          // This is a drag, execute drag logic
+          // Prevent scrolling during drag
+          ev.preventDefault();
+          ev.stopPropagation();
+
+          const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+          if (elemList) {
+            // Find target element
+            const treasureElem = elemList.find(el => el.id && el.id.startsWith('treasure_'));
+            const tempElem = elemList.find(el => el.id && el.id.startsWith('temp_'));
+            const craftElem = elemList.find(el => el.id && el.id.startsWith('craft_'));
+
+            const source = {
+              type: window.treasureTouchStart.slotType || 'inventory',
+              index: window.treasureTouchStart.id
+            };
+
+            if (treasureElem) {
+              // Target is inventory slot
+              const targetIndex = parseInt(treasureElem.id.split('_')[1]);
+              this.handleTouchMove(source, { type: 'inventory', index: targetIndex });
+            } else if (tempElem) {
+              // Target is temporary storage
+              const targetIndex = parseInt(tempElem.id.split('_')[1]);
+              this.handleTouchMove(source, { type: 'temporary', index: targetIndex });
+            } else if (craftElem) {
+              // Target is crafting slot
+              const targetIndex = parseInt(craftElem.id.split('_')[1]);
+              this.handleTouchMove(source, { type: 'crafting', index: targetIndex });
+            }
           }
         }
 
-        // Clear drag source
-        window.treasureDragSource = null;
+        // Clear touch start info
+        window.treasureTouchStart = null;
       }
     },
     handleTouchMove(source, target) {

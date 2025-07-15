@@ -41,7 +41,7 @@
   <div class="crafting-container">
     <div class="crafting-title">宝藏合成</div>
     <div class="crafting-content">
-      <div class="crafting-slots">
+      <div class="crafting-slots" @touchmove="handleTouchMove">
         <item-slot
           v-for="i in 3"
           :key="'craft-' + (i - 1)"
@@ -121,16 +121,24 @@ export default {
       event.preventDefault();
     },
     touchstart(ev, index) {
-      // Prevent default touch behavior (scrolling) when touching draggable items
-      if (this.craftingSlots[index]) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // Store drag source globally
-        window.treasureDragSource = {
-          type: 'crafting',
-          index: index
+      const hasItem = this.craftingSlots[index] !== null;
+      if (hasItem) {
+        // Record touch start info for click/drag detection
+        window.treasureTouchStart = {
+          time: Date.now(),
+          x: ev.touches[0].clientX,
+          y: ev.touches[0].clientY,
+          id: index,
+          hasItem: true,
+          slotType: 'crafting'
         };
+      } else {
+        window.treasureTouchStart = null;
       }
+    },
+    handleTouchMove(ev) {
+      // Call parent's touchmove method
+      this.$parent.touchmove(ev);
     },
     drop(event, index) {
       event.preventDefault();
