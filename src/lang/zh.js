@@ -1372,35 +1372,35 @@ export default {
         generalSettings: '通用设置',
         treasurePreview: {
           name: '宝藏预测',
-          description: '显示购买宝藏时可能获得的未来宝藏效果预览'
+          description: '显示购买宝藏时可能获得的未来宝藏效果预览。'
         },
         cardPackPreview: {
           name: '卡包购买预览',
-          description: '显示购买卡包时可能获得的卡片预览'
+          description: '显示购买卡包时可能获得的卡片预览。'
         },
         mobileHordeLoadoutLayout: {
           name: '手机部落预载新布局',
-          description: '在手机和中屏幕下，在部落玩家状态右边显示预载按钮，点击可在玩家容器上方展开预载功能'
+          description: '在手机和中屏幕下，在部落玩家状态右边显示预载按钮，点击可在玩家容器上方展开预载功能。'
         },
         autoUseExamPass: {
           name: '自动使用考试通行证',
-          description: '自动使用考试通行证，无需手动点击'
+          description: '自动使用考试通行证，无需手动点击。'
         },
         qutickSchoolExam: {
           name: '秒考100分最棒就是你',
-          description: '快速考试，无需等待考试时间'
+          description: '快速考试，无需等待考试时间。'
         },
         dailyCheckIn: {
           name: '每日签到',
-          description: '显示每日签到按钮，每天可以签到一次获得随机奖励'
+          description: '显示每日签到按钮，每天可以签到一次获得随机奖励。'
         },
         currencyLabel: {
           name: '显示货币标签',
-          description: '显示货币收益和达到容量所需的时间，无需悬停'
+          description: '显示货币收益和达到容量所需的时间，无需悬停。'
         },
         currencynewLabel: {
           name: '新UI标签',
-          description: '需要同时开启【显示货币标签】才生效'
+          description: '需要同时开启【显示货币标签】才生效。'
         },
         card1newLabel: {
           name: '卡片抽奖显示卡包',
@@ -1410,19 +1410,19 @@ export default {
         },
         wallpaperPath: {
           name: '壁纸路径',
-          description: '设置壁纸路径，支持网络图片'
+          description: '设置壁纸路径，支持网络图片。'
         },
         wallpaperBlur: {
           name: '壁纸毛玻璃效果',
-          description: '调整壁纸的模糊程度，0为无模糊效果，100为最大模糊效果'
+          description: '调整壁纸的模糊程度，0为无模糊效果，100为最大模糊效果。'
         },
         mobileMenuAtBottom: {
           name: '手机菜单移动底部',
-          description: '将手机界面的主菜单栏从顶部移动到底部'
+          description: '将手机界面的主菜单栏从顶部移动到底部。'
         },
         screenLayoutMode: {
           name: '屏幕布局模式',
-          description: '设置界面布局大小，自动将根据设备屏幕自动调整，其他选项可以强制使用特定布局尺寸。注意：在手机设备上此设置将无效',
+          description: '设置界面布局大小，自动将根据设备屏幕自动调整，其他选项可以强制使用特定布局尺寸。注意：在手机设备上此设置将无效。',
           auto: '自动',
           medium: '中屏幕',
           large: '大屏幕',
@@ -1430,7 +1430,7 @@ export default {
         },
         upgradeFilterFeature: {
           name: '升级菜单筛选功能',
-          description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目'
+          description: '在升级菜单中添加材料筛选功能，方便快速查找所需的升级项目。'
         },
         previewUnlockedUpgrades: {
           name: '预览未解锁升级项',
@@ -1438,51 +1438,55 @@ export default {
         },
         upgradeBuyProgress: {
           name: '升级购买按钮进度条',
-          description: '在购买按钮上显示进度条，指示您根据所需材料有多接近能够购买该升级'
+          description: '在购买按钮上显示进度条，指示您根据所需材料有多接近能够购买该升级。'
         },
         showFarmCropName: {
           name: '显示农场植物名称',
-          description: '在农场单元格中显示植物的名称，方便识别不同作物'
+          description: '在农场单元格中显示植物的名称，方便识别不同作物。'
         },
         showFarmIconLevel: {
           name: '显示农场植物等级',
-          description: '在旧农场植物选择图标上显示等级信息'
+          description: '在旧农场植物选择图标上显示等级信息。'
         },
         showFarmHarvestNotify: {
           name: '农场收获通知',
-          description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知'
+          description: '收获农场作物时显示获得的物品通知，批量收获时会显示汇总通知。'
         },
         showScientificNotation: {
           name: '显示科学记数法',
-          description: '使用科学记数法(如9.73×10^9)代替缩略表示(如9.738B)'
+          description: '使用科学记数法(如9.73×10^9)代替缩略表示(如9.738B)。'
         },
         showFarmOfflineSummary: {
           name: '农场离线汇总',
-          description: '在离线汇总页面中显示农场收获预估'
+          description: '在离线汇总页面中显示农场收获预估。'
         },
         farmNoGeneBlock: {
           name: '跳过基因阻断',
-          description: '跳过基因阻断'
+          description: '跳过基因阻断。'
         },
         enableUpgradeQueue: {
           name: '启用升级队列',
-          description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加'
+          description: '启用升级队列功能，自动处理队列中的升级，点击【已升级】按钮添加。'
         },
         bingoPrediction: {
           name: '启用宾果预测和撤销',
-          description: '在宾果游戏中启用数字预测功能和点击撤销倍率功能，预测最可能被抽中的数字'
+          description: '在宾果游戏中启用数字预测功能和点击撤销倍率功能，预测最可能被抽中的数字。'
         },
         enablePlayerName: {
           name: '显示玩家名称',
-          description: '在部落界面显示自定义玩家名称，或使用默认名称'
+          description: '在部落界面显示自定义玩家名称，或使用默认名称。'
         },
         tierProgress: {
           name: '创意进度条',
-          description: '显示创意层级的升级进度条'
+          description: '显示创意层级的升级进度条。'
         },
         canvasPreview: {
           name: '画布预览',
-          description: '显示画布解锁预测时间'
+          description: '显示画布解锁预测时间。'
+        },
+        canvasFastButtons: {
+          name: '画布快速按钮',
+          description: '在画布增减按钮旁边添加快速按钮，可一次性加满或清空画布空间，开同画布功能后才起作用。'
         },
         enableMenuShortcuts: {
           name: '菜单栏快捷按钮',
@@ -1498,51 +1502,51 @@ export default {
         },
         doubleDoorFridge: {
           name: '双开门冰箱',
-          description: '将冰冻实验室扩展为冷藏和冷冻双系统，同一个使用时为1.3倍声望效果'
+          description: '将冰冻实验室扩展为冷藏和冷冻双系统，同一个使用时为1.3倍声望效果。'
         },
         mechanicalMine: {
           name: '机械矿场',
-          description: '启用村庄机械矿场建筑。关闭时会隐藏建筑选项并清空已建成数量'
+          description: '启用村庄机械矿场建筑，关闭时会隐藏建筑选项并清空已建成数量。'
         },
         ideaConfigs: {
           name: '创意配置',
-          description: '启用画廊模块的创意配置功能，可以保存和切换不同的创意组合'
+          description: '启用画廊模块的创意配置功能，可以保存和切换不同的创意组合。'
         },
         farmWatering: {
           name: '农场浇水',
-          description: '启用农场浇水工具系统，可以给植物浇水提供12小时生长速度+15%的buff，浇水壶可升级扩大范围'
+          description: '启用农场浇水工具系统，可以给植物浇水提供12小时生长速度+15%的buff，浇水壶可升级扩大范围。'
         },
         enhancedAutocast: {
           name: '增强自动释放（测试）',
-          description: '启用增强版自动释放系统，支持战斗/非战斗技能分类，非战斗技能可在非战斗状态下释放，部落2不支持自定义释放'
+          description: '启用增强版自动释放系统，支持战斗/非战斗技能分类，非战斗技能可在非战斗状态下释放，部落2不支持自定义释放。'
         },
         recommendedEquipment: {
           name: '推荐装备',
-          description: '在装备列表中显示【推荐装备】按钮，根据当前层敌人技能智能推荐装备'
+          description: '在装备列表中显示【推荐装备】按钮，根据当前层敌人技能智能推荐装备。'
         },
         equipmentFilter: {
           name: '装备筛选',
-          description: '在装备列表中显示【已装备】和【分类筛选】按钮，可按装备状态和功能类型筛选装备'
+          description: '在装备列表中显示【已装备】和【分类筛选】按钮，可按装备状态和功能类型筛选装备。'
         },
         lowCostMaterialFade: {
           name: '低耗材料半隐藏',
-          description: '当材料充足百分比超过1000%时，价格标签显示为半透明效果'
+          description: '当材料充足百分比超过1000%时，价格标签显示为半透明效果。'
         },
         customCasinoEvent: {
           name: '指定赌场事件',
-          description: '启用后，每次进入赌场事件时可以手动选择宾果或转盘，而不是随机决定'
+          description: '启用后，每次进入赌场事件时可以手动选择宾果或转盘，而不是随机决定。'
         },
         consecutiveSignInRelics: {
           name: '累签圣遗物',
-          description: '基于累计签到次数自动获得累签圣遗物奖励'
+          description: '基于累计签到次数自动获得累签圣遗物奖励。'
         },
         treasureTemporaryAndCrafting: {
           name: '宝藏临时空间和合成',
-          description: '启用宝藏临时存放和合成功能，提供10个临时存放槽位和3个合成槽位'
+          description: '启用宝藏临时存放和合成功能，提供10个临时存放槽位和3个合成槽位。'
         },
         extraHordeEquipment: {
           name: '额外部落装备',
-          description: '增加钢铁圣域（150）和业火轮回装备（170）'
+          description: '增加钢铁圣域（150）和业火轮回装备（170）。'
         }
       }
   },

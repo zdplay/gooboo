@@ -1444,6 +1444,10 @@ export default {
           name: 'Canvas Preview',
           description: 'Show the preview of the canvas'
         },
+        canvasFastButtons: {
+          name: 'Canvas Fast Buttons',
+          description: 'Add fast buttons next to canvas increase/decrease buttons for one-click max/clear operations'
+        },
         enableMenuShortcuts: {
           name: 'Menu Shortcuts',
           description: 'Enable shortcuts for the top menu bar'

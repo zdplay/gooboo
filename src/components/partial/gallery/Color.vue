@@ -90,6 +90,10 @@
           <v-btn small icon :disabled="disabled || !canUseCanvas || canvasSpaceContent.length >= canvasSpaceMax" @click="addCanvasSpace"><v-icon large>mdi-menu-up</v-icon></v-btn>
           <v-btn small icon :disabled="disabled || canvasSpace <= 0" @click="removeCanvasSpace"><v-icon large>mdi-menu-down</v-icon></v-btn>
         </div>
+        <div v-if="showCanvasFastButtons && canSeeCanvas" class="d-flex flex-column mx-1 my-n1">
+          <v-btn small icon :disabled="disabled || !canUseCanvas || canvasSpaceContent.length >= canvasSpaceMax || remainingCanvasSpace <= 0" @click="addAllCanvasSpace"><v-icon large>mdi-chevron-double-up</v-icon></v-btn>
+          <v-btn small icon :disabled="disabled || canvasSpace <= 0" @click="removeAllCanvasSpace"><v-icon large>mdi-chevron-double-down</v-icon></v-btn>
+        </div>
       </div>
       <v-spacer></v-spacer>
     </template>
@@ -274,6 +278,12 @@ export default {
     },
     showCanvasPreview() {
       return this.$store.state.system.settings.experiment.items.canvasPreview.value;
+    },
+    showCanvasFastButtons() {
+      return this.$store.state.system.settings.experiment.items.canvasFastButtons.value;
+    },
+    remainingCanvasSpace() {
+      return this.canvasSpaceMax - this.canvasSpaceContent.length;
     }
   },
   methods: {
@@ -285,6 +295,12 @@ export default {
     },
     removeCanvasSpace() {
       this.$store.dispatch('gallery/removeCanvasSpace', this.name);
+    },
+    addAllCanvasSpace() {
+      this.$store.dispatch('gallery/addAllCanvasSpace', this.name);
+    },
+    removeAllCanvasSpace() {
+      this.$store.dispatch('gallery/removeAllCanvasSpace', this.name);
     }
   }
 }

@@ -402,6 +402,13 @@ export default {
                         value: true,
                         defaultValue: true
                     },
+                    canvasFastButtons: {
+                        unlock: 'galleryFeature',
+                        hasDescription: true,
+                        type: 'switch',
+                        value: true,
+                        defaultValue: true
+                    },
                     farmNoGeneBlock: {
                         unlock: 'farmFeature',
                         hasDescription: true,

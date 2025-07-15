@@ -1476,6 +1476,10 @@ export default {
         name: 'Leinwand-Vorschau',
         description: 'Zeigt eine Vorschau der zukünftigen Leinwand an, wenn du eine neue Leinwand kaufst'
       },
+      canvasFastButtons: {
+        name: 'Leinwand-Schnelltasten',
+        description: 'Fügt Schnelltasten neben den Leinwand-Erhöhen/Verringern-Tasten hinzu für Ein-Klick-Max/Löschen-Operationen'
+      },
       enableMenuShortcuts: {
         name: 'Menü-Tastenkombinationen',
         description: 'Aktivieren Sie Tastenkombinationen für die obere Menüleiste'

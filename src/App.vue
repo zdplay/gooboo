@@ -579,7 +579,7 @@
         <div class="text-center">{{ $vuetify.lang.t('$vuetify.endOfContent.description') }}</div>
       </gb-tooltip>
       <v-spacer></v-spacer>
-      <v-bottom-navigation shift dark background-color="transparent" v-if="$vuetify.breakpoint.mdAndUp" v-model="currentBigFeature">
+      <v-bottom-navigation shift dark background-color="transparent" v-if="$vuetify.breakpoint.mdAndUp && menuShortcutsEnabled" v-model="currentBigFeature">
         <v-btn v-for="feature in bigFeatures" :key="feature.name" :value="feature.name" @click="changeScreen(feature.name, true)">
           <span>{{ feature.title }}</span>
           <v-icon>{{ feature.icon }}</v-icon>

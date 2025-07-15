@@ -684,6 +684,26 @@ export default {
                 commit('updateColorDataKey', {name, key: 'cacheSpace', value: state.colorData[name].cacheSpace - 1});
             }
         },
+        addAllCanvasSpace({ state, rootGetters, commit }, name) {
+            const maxCanvasSize = rootGetters['mult/get']('galleryCanvasSize');
+            const currentCanvasLength = state.canvasSpace.length;
+            const remainingSpace = maxCanvasSize - currentCanvasLength;
+
+            if (remainingSpace > 0) {
+                const newSpaces = Array(remainingSpace).fill(name);
+                commit('updateKey', {key: 'canvasSpace', value: [...state.canvasSpace, ...newSpaces]});
+                commit('updateColorDataKey', {name, key: 'cacheSpace', value: state.colorData[name].cacheSpace + remainingSpace});
+            }
+        },
+        removeAllCanvasSpace({ state, commit }, name) {
+            const currentCacheSpace = state.colorData[name].cacheSpace;
+            if (currentCacheSpace > 0) {
+                let arr = [...state.canvasSpace];
+                arr = arr.filter(elem => elem !== name);
+                commit('updateKey', {key: 'canvasSpace', value: arr});
+                commit('updateColorDataKey', {name, key: 'cacheSpace', value: 0});
+            }
+        },
         applyCanvasLevel({ state, dispatch }, o) {
             let trigger = o.onLevel ?? false;
             const level = Math.floor(state.colorData[o.name].progress);

@@ -307,7 +307,7 @@ export default {
     // 2. updateItems中相应项的isCurrentUpdate标记
     updateItems: [
       { category: '挖矿', color: 'pink', content: '修改冶炼最大按钮为指定数量按钮。', isCurrentUpdate: false },
-      { category: '挖矿', color: 'pink', content: '增加冶炼队列冶炼功能。', isCurrentUpdate: true },
+      { category: '挖矿', color: 'pink', content: '增加冶炼队列冶炼功能。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加自动采矿功能，在深度切换右侧机器人按钮，支持离线。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加矿物总览功能。', isCurrentUpdate: false },
       { category: '挖矿', color: 'pink', content: '增加制作槽可移动功能。', isCurrentUpdate: true },
@@ -327,9 +327,10 @@ export default {
       { category: '画廊', color: 'orange', content: '增加画廊点击形状数量按钮可自动移动对应形状，增加自动按钮。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊形状【清管】功能，一键清空动力值。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊显示全局美丽等级。', isCurrentUpdate: false },
+      { category: '画廊', color: 'orange', content: '增加画廊画布快速按钮功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '画廊', color: 'orange', content: '增加画廊画布预计显示和创意进度条，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '画廊', color: 'orange', content: '增加画廊灵感重置功能，可重置所有创意等级和灵感点数，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
-      { category: '画廊', color: 'orange', content: '增加画廊创意模版功能，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
+      { category: '画廊', color: 'orange', content: '增加画廊创意模版功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '学校', color: 'green', content: '修改学校参考考试为直接满分通过，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '在农场单元格中显示植物名称，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '农场', color: 'brown', content: '在农场货币中显示掉落来源。', isCurrentUpdate: false },
