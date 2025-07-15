@@ -14,7 +14,7 @@
 </style>
 
 <template>
-  <v-card class="d-flex align-center pa-1" :class="{'item-unlocked-preview': !found}" v-if="item.collapse">
+  <v-card class="d-flex align-center pa-1" :class="{'item-unlocked-preview': !found && showUnlockedOnly}" v-if="item.collapse">
     <gb-tooltip :title-text="$vuetify.lang.t(`$vuetify.horde.items.${name}`)">
       <template v-slot:activator="{ on, attrs }">
         <v-icon class="ma-1" v-bind="attrs" v-on="on">{{ item.icon }}</v-icon>
@@ -57,7 +57,7 @@
     </gb-tooltip>
     <v-btn class="ma-1" icon @click="toggleCollapse"><v-icon>mdi-arrow-expand</v-icon></v-btn>
   </v-card>
-  <v-card v-else :class="{'item-unlocked-preview': !found}">
+  <v-card v-else :class="{'item-unlocked-preview': !found && showUnlockedOnly}">
     <v-card-title class="pa-2 justify-center">
       <v-icon class="mr-2">{{ item.icon }}</v-icon>
       {{ $vuetify.lang.t(`$vuetify.horde.items.${name}`) }}
@@ -179,6 +179,11 @@ export default {
       default: false
     },
     activeDisabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showUnlockedOnly: {
       type: Boolean,
       required: false,
       default: false

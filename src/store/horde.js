@@ -2123,7 +2123,7 @@ export default {
                     if (!equipment.known) {
                         commit('updateItemKey', {name: equipmentName, key: 'known', value: true});
                     }
-                    if (!equipment.found) {
+                    if (!equipment.found && state.zone >= equipment.findZone) {
                         commit('updateItemKey', {name: equipmentName, key: 'found', value: true});
                     }
                 } else {

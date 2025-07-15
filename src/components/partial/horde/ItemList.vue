@@ -155,7 +155,7 @@
     <div class="horde-item-pagination text-center bg-tile-default rounded-b elevation-2 mx-2" :class="{'horde-item-pagination-mobile': $vuetify.breakpoint.xsOnly}" v-if="pages > 1">
       <v-pagination v-model="page" :length="pages"></v-pagination>
     </div>
-    <item v-for="item in finalItems" :key="'item-' + item.name" :name="item.name" :disabled="itemsBlocked" :active-disabled="isFrozen" class="ma-2"></item>
+    <item v-for="item in finalItems" :key="'item-' + item.name" :name="item.name" :disabled="itemsBlocked" :active-disabled="isFrozen" :show-unlocked-only="showUnlockedOnly" class="ma-2"></item>
 
     <v-dialog v-model="batchConfigDialog" max-width="800" @click:outside="closeBatchConfigDialog">
       <v-card class="default-card pa-2">
