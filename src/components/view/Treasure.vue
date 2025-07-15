@@ -34,6 +34,8 @@
             :slot-id="-1"
             :draggable="newItem !== null"
             @dragstart="drag($event, -1)"
+            @drop="drop($event, -1)"
+            @dragover="allowDrop"
             @touchstart="touchstart($event, -1)"
             @touchend="touchdrop($event, -1)"
           ></item-slot>
@@ -103,6 +105,7 @@ import PriceTag from '../render/PriceTag.vue';
 
 export default {
   components: { ChanceList, Currency, ItemSlot, StatList, BuyItem, PriceTag, TemporaryStorage, CraftingPanel },
+
   computed: {
     ...mapState({
       upgrading: state => state.treasure.upgrading,
@@ -133,13 +136,13 @@ export default {
 
       if (isFeatureEnabled) {
         // New drag system with JSON data
-        ev.dataTransfer.setData("text", JSON.stringify({
+        ev.dataTransfer.setData("text/plain", JSON.stringify({
           from: id === -1 ? 'newItem' : 'inventory',
           fromIndex: id
         }));
       } else {
         // Original drag system (legacy behavior)
-        ev.dataTransfer.setData("text", id);
+        ev.dataTransfer.setData("text/plain", id);
       }
     },
     drop(ev, id) {
@@ -151,76 +154,34 @@ export default {
 
       if (isFeatureEnabled) {
         // New drag system with temporary storage and crafting
-        const data = JSON.parse(ev.dataTransfer.getData("text"));
+        const data = JSON.parse(ev.dataTransfer.getData("text/plain"));
 
-        if (data.from === 'inventory') {
-          const startId = data.fromIndex;
-          const endId = parseInt(id);
-          if (startId !== endId) {
-            this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
-          }
-        } else if (data.from === 'temporary') {
-          // Handle exchange logic for temporary storage to inventory
-          const targetIndex = parseInt(id);
-          const targetItem = this.$store.state.treasure.items[targetIndex];
-          const sourceItem = this.$store.state.treasure.temporaryStorage[data.fromIndex];
+        // Convert drag data to source/target format and use unified logic
+        const source = {
+          type: data.from === 'newItem' ? 'inventory' : data.from,
+          index: data.from === 'newItem' ? -1 : data.fromIndex
+        };
+        const target = {
+          type: 'inventory',
+          index: parseInt(id)
+        };
 
-          if (targetItem && sourceItem) {
-            // Exchange items
-            this.$store.commit('treasure/updateTemporaryStorageItem', { index: data.fromIndex, item: targetItem });
-            this.$store.commit('treasure/setItem', { id: targetIndex, item: sourceItem });
-            this.$store.dispatch('treasure/updateEffectCache');
-          } else {
-            // Simple move if target is empty
-            this.$store.dispatch('treasure/moveFromTemporaryStorage', {
-              storageIndex: data.fromIndex,
-              itemIndex: targetIndex
-            });
-          }
-        } else if (data.from === 'crafting') {
-          // Handle exchange logic for crafting slot to inventory
-          const targetIndex = parseInt(id);
-          const targetItem = this.$store.state.treasure.items[targetIndex];
-          const sourceItem = this.$store.state.treasure.craftingSlots[data.fromIndex];
-
-          if (targetItem && sourceItem) {
-            // Exchange items
-            this.$store.commit('treasure/updateCraftingSlotItem', { index: data.fromIndex, item: targetItem });
-            this.$store.commit('treasure/setItem', { id: targetIndex, item: sourceItem });
-            this.$store.dispatch('treasure/updateEffectCache');
-          } else {
-            // Simple move if target is empty
-            this.$store.dispatch('treasure/moveFromCraftingSlot', {
-              slotIndex: data.fromIndex,
-              toType: 'inventory',
-              toIndex: targetIndex
-            });
-          }
-        } else if (data.from === 'newItem') {
-          // Handle exchange logic for new item to inventory
-          const targetIndex = parseInt(id);
-          const targetItem = this.$store.state.treasure.items[targetIndex];
-          const newItem = this.$store.state.treasure.newItem;
-
-          if (newItem) {
-            if (targetItem) {
-              // Exchange items
-              this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
-              this.$store.commit('treasure/setItem', { id: targetIndex, item: newItem });
-            } else {
-              // Simple move if target is empty
-              this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
-              this.$store.commit('treasure/setItem', { id: targetIndex, item: newItem });
-            }
-            this.$store.dispatch('treasure/updateEffectCache');
-          }
-        }
+        this.handleTouchMove(source, target);
       } else {
         // Original drag system (legacy behavior)
-        const startId = parseInt(ev.dataTransfer.getData("text"));
+        const startId = parseInt(ev.dataTransfer.getData("text/plain"));
         const endId = parseInt(id);
         if (startId !== endId) {
-          this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
+          // Use unified logic even for legacy mode to ensure consistent behavior
+          const source = {
+            type: 'inventory',
+            index: startId
+          };
+          const target = {
+            type: 'inventory',
+            index: endId
+          };
+          this.handleTouchMove(source, target);
         }
       }
     },
@@ -233,139 +194,126 @@ export default {
       if (hasItem) {
         ev.preventDefault();
         ev.stopPropagation();
+        // Store drag source globally like mining module
+        window.treasureDragSource = {
+          type: 'inventory',
+          index: id
+        };
       }
     },
-    touchdrop(ev, draggedId) {
-      const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-      if (elemList) {
-        // Check if temporary and crafting features are enabled
-        const isFeatureEnabled = this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting &&
-                                 this.$store.state.system.settings.experiment.items.treasureTemporaryAndCrafting.value;
-
-        if (isFeatureEnabled) {
-          // Check for temporary storage slots
+    touchdrop(ev) {
+      if (window.treasureDragSource) {
+        const elemList = document.elementsFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+        if (elemList) {
+          // Find target element
+          const treasureElem = elemList.find(el => el.id && el.id.startsWith('treasure_'));
           const tempElem = elemList.find(el => el.id && el.id.startsWith('temp_'));
-          if (tempElem) {
-            const tempIndex = parseInt(tempElem.id.split('_')[1]);
-            if (!isNaN(tempIndex)) {
-              // Handle move from inventory to temporary storage
-              if (draggedId === -1) {
-                // Move new item to temporary storage
-                const newItem = this.$store.state.treasure.newItem;
-                if (newItem) {
-                  this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
-                  this.$store.commit('treasure/updateTemporaryStorageItem', { index: tempIndex, item: newItem });
-                }
-              } else {
-                // Move inventory item to temporary storage
-                const sourceItem = this.$store.state.treasure.items[draggedId];
-                const targetItem = this.$store.state.treasure.temporaryStorage[tempIndex];
-
-                if (sourceItem) {
-                  if (targetItem) {
-                    // Exchange items
-                    this.$store.commit('treasure/setItem', { id: draggedId, item: targetItem });
-                    this.$store.commit('treasure/updateTemporaryStorageItem', { index: tempIndex, item: sourceItem });
-                    this.$store.dispatch('treasure/updateEffectCache');
-                  } else {
-                    // Simple move if target is empty
-                    this.$store.dispatch('treasure/moveToTemporaryStorage', {
-                      itemIndex: draggedId,
-                      storageIndex: tempIndex
-                    });
-                  }
-                }
-              }
-              return;
-            }
-          }
-
-          // Check for crafting slots
           const craftElem = elemList.find(el => el.id && el.id.startsWith('craft_'));
-          if (craftElem) {
-            const craftIndex = parseInt(craftElem.id.split('_')[1]);
-            if (!isNaN(craftIndex)) {
-              // Handle move from inventory to crafting slot
-              if (draggedId === -1) {
-                // Move new item to crafting slot
-                const newItem = this.$store.state.treasure.newItem;
-                const targetItem = this.$store.state.treasure.craftingSlots[craftIndex];
 
-                if (newItem) {
-                  if (targetItem) {
-                    // Exchange items
-                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
-                    this.$store.commit('treasure/updateCraftingSlotItem', { index: craftIndex, item: newItem });
-                  } else {
-                    // Simple move if target is empty
-                    this.$store.dispatch('treasure/moveToCraftingSlot', {
-                      fromType: 'newItem',
-                      fromIndex: -1,
-                      slotIndex: craftIndex
-                    });
-                  }
-                }
-              } else {
-                // Move inventory item to crafting slot
-                const sourceItem = this.$store.state.treasure.items[draggedId];
-                const targetItem = this.$store.state.treasure.craftingSlots[craftIndex];
+          const source = window.treasureDragSource;
 
-                if (sourceItem) {
-                  if (targetItem) {
-                    // Exchange items
-                    this.$store.commit('treasure/setItem', { id: draggedId, item: targetItem });
-                    this.$store.commit('treasure/updateCraftingSlotItem', { index: craftIndex, item: sourceItem });
-                    this.$store.dispatch('treasure/updateEffectCache');
-                  } else {
-                    // Simple move if target is empty
-                    this.$store.dispatch('treasure/moveToCraftingSlot', {
-                      fromType: 'inventory',
-                      fromIndex: draggedId,
-                      slotIndex: craftIndex
-                    });
-                  }
-                }
-              }
-              return;
-            }
+          if (treasureElem) {
+            // Target is inventory slot
+            const targetIndex = parseInt(treasureElem.id.split('_')[1]);
+            this.handleTouchMove(source, { type: 'inventory', index: targetIndex });
+          } else if (tempElem) {
+            // Target is temporary storage
+            const targetIndex = parseInt(tempElem.id.split('_')[1]);
+            this.handleTouchMove(source, { type: 'temporary', index: targetIndex });
+          } else if (craftElem) {
+            // Target is crafting slot
+            const targetIndex = parseInt(craftElem.id.split('_')[1]);
+            this.handleTouchMove(source, { type: 'crafting', index: targetIndex });
           }
         }
 
-        // Check for regular treasure slots (works for both enabled and disabled features)
-        const endElem = elemList.find(el => el.id && el.id.startsWith('treasure_'));
-        if (endElem) {
-          const startId = parseInt(draggedId);
-          const endId = parseInt(endElem.id.split('_')[1]);
-          if (startId !== endId && endId !== -1) {
-            if (isFeatureEnabled) {
-              // Use new drag system logic for exchange
-              if (startId === -1) {
-                // Handle new item to inventory exchange
-                const newItem = this.$store.state.treasure.newItem;
-                const targetItem = this.$store.state.treasure.items[endId];
+        // Clear drag source
+        window.treasureDragSource = null;
+      }
+    },
+    handleTouchMove(source, target) {
+      // Don't do anything if source and target are the same
+      if (source.type === target.type && source.index === target.index) {
+        return;
+      }
 
-                if (newItem) {
-                  if (targetItem) {
-                    // Exchange items
-                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
-                    this.$store.commit('treasure/setItem', { id: endId, item: newItem });
-                  } else {
-                    // Simple move if target is empty
-                    this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
-                    this.$store.commit('treasure/setItem', { id: endId, item: newItem });
-                  }
-                  this.$store.dispatch('treasure/updateEffectCache');
-                }
-              } else {
-                // Regular inventory to inventory move with exchange logic
-                this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
-              }
-            } else {
-              // Original behavior for disabled features
-              this.$store.dispatch('treasure/moveItem', {from: startId, to: endId});
-            }
-          }
+      // Get source item
+      let sourceItem = null;
+      if (source.type === 'inventory') {
+        if (source.index === -1) {
+          sourceItem = this.$store.state.treasure.newItem;
+        } else {
+          sourceItem = this.$store.state.treasure.items[source.index];
         }
+      } else if (source.type === 'temporary') {
+        sourceItem = this.$store.state.treasure.temporaryStorage[source.index];
+      } else if (source.type === 'crafting') {
+        sourceItem = this.$store.state.treasure.craftingSlots[source.index];
+      }
+
+      // Get target item
+      let targetItem = null;
+      if (target.type === 'inventory') {
+        if (target.index === -1) {
+          targetItem = this.$store.state.treasure.newItem;
+        } else {
+          targetItem = this.$store.state.treasure.items[target.index];
+        }
+      } else if (target.type === 'temporary') {
+        targetItem = this.$store.state.treasure.temporaryStorage[target.index];
+      } else if (target.type === 'crafting') {
+        targetItem = this.$store.state.treasure.craftingSlots[target.index];
+      }
+
+      // Don't do anything if no source item
+      if (!sourceItem) {
+        return;
+      }
+
+      // Set source item to null/empty
+      if (source.type === 'inventory') {
+        if (source.index === -1) {
+          this.$store.commit('treasure/updateKey', { key: 'newItem', value: null });
+        } else {
+          this.$store.commit('treasure/setItem', { id: source.index, item: null });
+        }
+      } else if (source.type === 'temporary') {
+        this.$store.commit('treasure/updateTemporaryStorageItem', { index: source.index, item: null });
+      } else if (source.type === 'crafting') {
+        this.$store.commit('treasure/updateCraftingSlotItem', { index: source.index, item: null });
+      }
+
+      // Set target item to source item
+      if (target.type === 'inventory') {
+        if (target.index === -1) {
+          this.$store.commit('treasure/updateKey', { key: 'newItem', value: sourceItem });
+        } else {
+          this.$store.commit('treasure/setItem', { id: target.index, item: sourceItem });
+        }
+      } else if (target.type === 'temporary') {
+        this.$store.commit('treasure/updateTemporaryStorageItem', { index: target.index, item: sourceItem });
+      } else if (target.type === 'crafting') {
+        this.$store.commit('treasure/updateCraftingSlotItem', { index: target.index, item: sourceItem });
+      }
+
+      // If there was a target item, put it in the source position (exchange)
+      if (targetItem) {
+        if (source.type === 'inventory') {
+          if (source.index === -1) {
+            this.$store.commit('treasure/updateKey', { key: 'newItem', value: targetItem });
+          } else {
+            this.$store.commit('treasure/setItem', { id: source.index, item: targetItem });
+          }
+        } else if (source.type === 'temporary') {
+          this.$store.commit('treasure/updateTemporaryStorageItem', { index: source.index, item: targetItem });
+        } else if (source.type === 'crafting') {
+          this.$store.commit('treasure/updateCraftingSlotItem', { index: source.index, item: targetItem });
+        }
+      }
+
+      // Update effect cache if inventory is involved
+      if (source.type === 'inventory' || target.type === 'inventory') {
+        this.$store.dispatch('treasure/updateEffectCache');
       }
     },
     buyFragments() {
