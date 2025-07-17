@@ -267,9 +267,9 @@ export default {
       if (this.showEquippedOnly) {
         arr = arr.filter(item => item.equipped === true);
       } else if (this.showRecommendedOnly) {
-        const currentZone = this.$store.state.horde.zone;
+        //const currentZone = this.$store.state.horde.zone;
 
-        console.log('Updating recommendations for zone:', currentZone);
+        //console.log('Updating recommendations for zone:', currentZone);
 
         const { getRecommendedEquipments } = require('../../../js/modules/horde/equipmentRecommendationDynamic');
         const recommendedNames = getRecommendedEquipments();
@@ -311,9 +311,9 @@ export default {
         return '';
       }
 
-      const currentZone = this.$store.state.horde.zone;
+      //const currentZone = this.$store.state.horde.zone;
 
-      console.log('Updating recommendation summary for zone:', currentZone);
+      //console.log('Updating recommendation summary for zone:', currentZone);
 
       const { getRecommendationSummary } = require('../../../js/modules/horde/equipmentRecommendationDynamic');
       return getRecommendationSummary();
