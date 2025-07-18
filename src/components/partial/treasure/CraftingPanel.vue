@@ -83,11 +83,36 @@
           </template>
           <div class="mt-0">
             <div class="font-weight-bold mb-2">合成规则：</div>
-            <div class="mb-1">• 需要3个同颜色宝藏才能合成</div>
-            <div class="mb-1">• 同颜色同效果：合成更高一级颜色的同效果宝藏</div>
-            <div class="mb-1">• 同颜色不同效果：随机合成同颜色或更高一级颜色的宝藏</div>
+            <div class="mb-1">• 需要3个同层数的宝藏才能合成</div>
+            <div class="mb-1">• 同层数的同效果：合成更高一级颜色的同效果宝藏（最高到当前最高层+1）</div>
+            <div class="mb-1">• 同层数的不同效果：随机合成同颜色或更高一级颜色的宝藏</div>
             <div class="mb-1">• 合成会退回消耗宝藏的碎片</div>
             <div class="mb-1">• 临时存放和合成槽中的宝藏不会生效</div>
+
+            <div class="font-weight-bold mt-3 mb-2">随机合成升级概率：</div>
+            <v-simple-table dense class="mb-2">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">当前层数</th>
+                    <th class="text-left">升级概率</th>
+                    <th class="text-left">保持概率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in probabilityTable" :key="index">
+                    <td>{{ item.tierName }}</td>
+                    <td :class="item.upgradeClass">{{ item.upgradeChance }}%</td>
+                    <td>{{ item.keepChance }}%</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+
+            <div class="caption grey--text">
+              * 最高层数基于当前全局等级动态计算<br>
+              * 普通合成最高限制为当前最高层+1
+            </div>
           </div>
         </gb-tooltip>
       </div>
@@ -107,8 +132,52 @@ export default {
       craftingSlots: state => state.treasure.craftingSlots
     }),
     ...mapGetters({
-      canCraft: 'treasure/canCraft'
-    })
+      canCraft: 'treasure/canCraft',
+      tierChances: 'treasure/tierChances',
+      tierChancesRaw: 'treasure/tierChancesRaw'
+    }),
+    probabilityTable() {
+      const tierChancesRaw = this.tierChancesRaw;
+      const maxTier = Math.max(...tierChancesRaw.map(item => item.tier)); // 实际最高层索引
+      const table = [];
+
+      const layersToShow = [maxTier - 1, maxTier, maxTier + 1];
+
+      if (maxTier > 1) {
+        table.push({
+          tierName: '其他层',
+          upgradeChance: 50,
+          keepChance: 50,
+          upgradeClass: 'success--text'
+        });
+      }
+
+      layersToShow.forEach(tier => {
+        if (tier >= 0) {
+          let upgradeChance, upgradeClass;
+
+          if (tier === maxTier - 1) {
+            upgradeChance = 30;
+            upgradeClass = 'success--text';
+          } else if (tier === maxTier) {
+            upgradeChance = 5;
+            upgradeClass = 'warning--text';
+          } else if (tier === maxTier + 1) {
+            upgradeChance = 0;
+            upgradeClass = 'error--text';
+          }
+
+          table.push({
+            tierName: `层${tier + 1}`,
+            upgradeChance,
+            keepChance: 100 - upgradeChance,
+            upgradeClass
+          });
+        }
+      });
+
+      return table;
+    }
   },
   methods: {
     drag(event, index, type) {

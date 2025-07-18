@@ -413,7 +413,7 @@ function loadFile(file, importNextSubfeature = true) {
         return;
     }
 
-    ['timestamp', 'currentDay', 'lastPlayedDays', 'theme', 'backupTimer', 'playerId', 'noteHint', 'cheaterSelfMark', 'cheatDetected', 'dailyCheckIn', 'updateNoticeVersion'].forEach(elem => {
+    ['timestamp', 'currentDay', 'lastPlayedDays', 'theme', 'backupTimer', 'playerId', 'noteHint', 'cheaterSelfMark', 'cheatDetected', 'dailyCheckIn', 'updateNoticeVersion', 'usedRedeemCodes'].forEach(elem => {
         if (save[elem]) {
             store.commit('system/updateKey', {key: elem, value: save[elem]});
         }
@@ -638,8 +638,10 @@ function loadFile(file, importNextSubfeature = true) {
         store.commit('system/updateKey', {key: 'timeMult', value: save.timeMult});
     }
 
-    if (store.state.system.usedRedeemCodes.includes('KSBBC') && store.state.system.timeMult !== 1.5) {
-        store.commit('system/updateKey', {key: 'timeMult', value: 1.5});
+    if (store.state.system.usedRedeemCodes.includes('KSBBC')) {
+        const globalLevel = store.state.meta.globalLevel || 0;
+        const dynamicTimeMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+        store.commit('system/updateKey', {key: 'timeMult', value: dynamicTimeMult});
     }
 
     // Update currency mults
@@ -855,9 +857,13 @@ function getSavefile() {
         save.autoplayChoice = store.state.system.autoplayChoice;
     }
 
+    if (store.state.system.usedRedeemCodes.length > 0) {
+        save.usedRedeemCodes = store.state.system.usedRedeemCodes;
+    }
+
     const hasKSBBC = store.state.system.usedRedeemCodes.includes('KSBBC');
     if (hasKSBBC) {
-        save.timeMult = 1;
+        save.timeMult = 1; 
     } else if (store.state.system.timeMult > 1) {
         save.timeMult = store.state.system.timeMult;
     }

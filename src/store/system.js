@@ -1053,13 +1053,19 @@ export default {
             }
             Vue.set(state, 'cheatDetected', newCheatObj);
         },
-        useCompensationCode(state, code) {
+        useCompensationCode(state, payload) {
+            const code = typeof payload === 'string' ? payload : payload.code;
+            const rootState = typeof payload === 'object' ? payload.rootState : null;
+
             const fixBugEnabled = state.settings.experiment.items.fixDoubleRewardBug.value;
             const alreadyUsed = state.usedRedeemCodes.includes('KSBBC');
             if (code === 'KSBBC' && fixBugEnabled && !alreadyUsed) {
                 const usedCodes = state.usedRedeemCodes || [];
                 Vue.set(state, 'usedRedeemCodes', [...usedCodes, 'KSBBC']);
-                Vue.set(state, 'timeMult', 1.5);
+                
+                const globalLevel = rootState ? (rootState.meta.globalLevel || 0) : 0;
+                const dynamicTimeMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+                Vue.set(state, 'timeMult', dynamicTimeMult);
                 return true;
             }
             return false;

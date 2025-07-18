@@ -1550,7 +1550,7 @@ export default {
         },
         fixDoubleRewardBug: {
           name: '修复卡双倍bug',
-          description: '修复开双倍bug。'
+          description: '修复开双倍bug。补偿彩蛋：开始吧飚车'
         }
       }
   },

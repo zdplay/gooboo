@@ -252,6 +252,20 @@ export default {
             const firstTier = items[0].tier;
             return items.every(item => item.tier === firstTier);
         },
+        getRandomCraftUpgradeChance: (state, getters) => (currentTier) => {
+            const tierChances = getters.tierChances;
+            const maxTier = tierChances.length - 1;
+
+            if (currentTier === maxTier - 1) {
+                return 30;
+            } else if (currentTier === maxTier) {
+                return 5;
+            } else if (currentTier === maxTier + 1) {
+                return 0;
+            } else {
+                return 50;
+            }
+        },
         craftingResult: (state, getters) => {
             if (!getters.canCraft) return null;
 
@@ -263,12 +277,26 @@ export default {
 
             if (sameEffect) {
                 // Same color same effect: upgrade tier by 1, keep same effect
-                const newTier = Math.min(firstTier + 1, state.tierColor.length - 1);
+                const tierChances = getters.tierChances;
+                const maxAllowedTier = tierChances.length;
+
+                if (firstTier >= maxAllowedTier) {
+                    return {
+                        type: 'upgrade',
+                        tier: firstTier,
+                        treasureType: firstType,
+                        targetEffect: firstEffect,
+                        maxReached: true
+                    };
+                }
+
+                const newTier = Math.min(firstTier + 1, maxAllowedTier);
                 return {
                     type: 'upgrade',
                     tier: newTier,
                     treasureType: firstType,
-                    targetEffect: firstEffect
+                    targetEffect: firstEffect,
+                    maxReached: newTier === maxAllowedTier
                 };
             } else {
                 // Same color different effects: random treasure
@@ -276,7 +304,8 @@ export default {
                     type: 'random',
                     tier: firstTier,
                     treasureType: 'regular', // Default type for random generation
-                    items: items // Pass items for seed generation
+                    items: items, // Pass items for seed generation
+                    upgradeChance: getters.getRandomCraftUpgradeChance(firstTier)
                 };
             }
         }
@@ -627,6 +656,18 @@ export default {
             const result = getters.craftingResult;
             if (!result) return;
 
+            if (result.maxReached && result.type === 'upgrade') {
+                dispatch('system/addNotification', {
+                    color: 'warning',
+                    timeout: 3000,
+                    message: {
+                        type: 'text',
+                        text: '已到最高合成，无法继续合成'
+                    }
+                }, { root: true });
+                return;
+            }
+
             const items = state.craftingSlots.filter(item => item !== null);
 
             // Calculate fragments to return from consumed items
@@ -664,7 +705,8 @@ export default {
 
                 // Use custom seed to determine if tier should be upgraded
                 const seedForTier = Math.abs(customSeed) % 100;
-                const shouldUpgradeTier = seedForTier < 30; // 30% chance to upgrade tier
+                const upgradeChance = result.upgradeChance || 30; // 使用动态概率
+                const shouldUpgradeTier = seedForTier < upgradeChance;
 
                 const finalTier = shouldUpgradeTier ?
                     Math.min(result.tier + 1, state.tierColor.length - 1) :

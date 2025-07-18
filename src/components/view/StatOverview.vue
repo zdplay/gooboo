@@ -136,7 +136,47 @@
               <v-text-field v-if="isEditingName" dense class="player-name-input ma-1" outlined hide-details v-model="playerName"></v-text-field>
               <div v-else class="ma-1">
                 {{ playerName }}
-                <span v-if="compensationCodeUsed" class="ml-2 orange--text font-weight-bold">x1.5</span>
+                <gb-tooltip v-if="compensationCodeUsed" :min-width="0">
+                  <template v-slot:activator="{ on, attrs }">
+                    <span class="ml-2 orange--text font-weight-bold" v-bind="attrs" v-on="on">x{{ currentTimeMult.toFixed(1) }}</span>
+                  </template>
+                  <div style="font-weight: bold; margin-bottom: 8px;">游戏速度补偿</div>
+                  <table style="border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                      <tr>
+                        <th style="border: 1px solid #666; padding: 4px 8px; text-align: center;">等级范围</th>
+                        <th style="border: 1px solid #666; padding: 4px 8px; text-align: center;">倍率</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">0-199级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.0倍</td>
+                      </tr>
+                      <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">200-399级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.1倍</td>
+                      </tr>
+                      <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">400-599级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.2倍</td>
+                      </tr>
+                      <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">600-799级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.3倍</td>
+                      </tr>
+                      <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">800-999级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.4倍</td>
+                      </tr>
+                      <tr style="background-color: rgba(255, 193, 7, 0.2);">
+                        <td style="border: 1px solid #666; padding: 4px 8px;">1000级+</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center; font-weight: bold;">1.5倍（最高）</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="margin-top: 8px; font-weight: bold; color: #ff9800;">当前倍率：{{ currentTimeMult.toFixed(1) }}倍</div>
+                </gb-tooltip>
               </div>
               <v-icon class="player-name-edit ml-2" @click="toggleEditingName">mdi-tag-edit</v-icon>
             </div>
@@ -516,6 +556,13 @@ export default {
     },
     compensationCodeUsed() {
       return this.$store.state.system.usedRedeemCodes.includes('KSBBC');
+    },
+    currentTimeMult() {
+      if (!this.compensationCodeUsed) {
+        return 1;
+      }
+      const globalLevel = this.globalLevel || 0;
+      return Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
     }
   },
   methods: {
@@ -576,9 +623,14 @@ export default {
             return;
           }
 
-          const success = this.$store.commit('system/useCompensationCode', this.redeemCode.trim().toUpperCase());
+          const success = this.$store.commit('system/useCompensationCode', {
+            code: this.redeemCode.trim().toUpperCase(),
+            rootState: this.$store.state
+          });
           if (success !== false) {
-            this.redeemMessage = '补偿激活成功！游戏速度提升至1.5倍';
+            const globalLevel = this.globalLevel || 0;
+            const currentMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+            this.redeemMessage = `补偿激活成功！当前游戏速度：${currentMult.toFixed(1)}倍`;
             this.redeemSuccess = true;
             this.redeemCode = '';
             return;
