@@ -134,7 +134,10 @@
           <v-card-title class="justify-center flex-column" style="font-size: 28px; padding-right: 100px;">
             <div class="d-flex align-center">
               <v-text-field v-if="isEditingName" dense class="player-name-input ma-1" outlined hide-details v-model="playerName"></v-text-field>
-              <div v-else class="ma-1">{{ playerName }}</div>
+              <div v-else class="ma-1">
+                {{ playerName }}
+                <span v-if="compensationCodeUsed" class="ml-2 orange--text font-weight-bold">x1.5</span>
+              </div>
               <v-icon class="player-name-edit ml-2" @click="toggleEditingName">mdi-tag-edit</v-icon>
             </div>
             <div class="d-flex align-center mt-2" style="font-size: 16px;">
@@ -510,6 +513,9 @@ export default {
     },
     cheetahIsPermanent() {
       return Object.keys(this.cheetahBreakdown).filter(elem => !this.cheetahFeatureList.includes(elem)).length > 0;
+    },
+    compensationCodeUsed() {
+      return this.$store.state.system.usedRedeemCodes.includes('KSBBC');
     }
   },
   methods: {
@@ -554,6 +560,35 @@ export default {
       this.redeemMessage = '';
 
       try {
+        if (this.redeemCode.trim().toUpperCase() === 'KSBBC') {
+          const fixBugEnabled = this.$store.state.system.settings.experiment.items.fixDoubleRewardBug.value;
+          const alreadyUsed = this.$store.state.system.usedRedeemCodes.includes('KSBBC');
+
+          if (!fixBugEnabled) {
+            this.redeemMessage = '兑换码错误';
+            this.redeemSuccess = false;
+            return;
+          }
+
+          if (alreadyUsed) {
+            this.redeemMessage = '该兑换码已使用过';
+            this.redeemSuccess = false;
+            return;
+          }
+
+          const success = this.$store.commit('system/useCompensationCode', this.redeemCode.trim().toUpperCase());
+          if (success !== false) {
+            this.redeemMessage = '补偿激活成功！游戏速度提升至1.5倍';
+            this.redeemSuccess = true;
+            this.redeemCode = '';
+            return;
+          } else {
+            this.redeemMessage = '兑换失败，请稍后重试';
+            this.redeemSuccess = false;
+            return;
+          }
+        }
+
         const secretCode = this.decryptSecretCode();
         if (this.redeemCode.trim().toLowerCase() === secretCode) {
           this.$store.commit('system/updateKey', {

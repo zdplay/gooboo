@@ -38,6 +38,11 @@ function advance() {
                 tick(timestamp, store.state.system.timestamp);
             }
 
+            const fixDoubleRewardBug = store.state.system.settings.experiment.items.fixDoubleRewardBug.value;
+            if (fixDoubleRewardBug) {
+                store.commit('system/updateKey', {key: 'timestamp', value: timestamp});
+            }
+
             // autosave stuff
             if (store.state.system.settings.general.items.autosaveTimer.value !== null && store.state.system.autosaveTimer !== null && !['offlineSummary', 'tab-duplicate'].includes(store.state.system.screen)) {
                 let newTimer = store.state.system.autosaveTimer - timeDiff;
@@ -96,7 +101,10 @@ function advance() {
         }
     }
 
-    store.commit('system/updateKey', {key: 'timestamp', value: timestamp});
+    const fixDoubleRewardBug = store.state.system.settings.experiment.items.fixDoubleRewardBug.value;
+    if (!fixDoubleRewardBug && store.state.system.timestamp !== null) {
+        store.commit('system/updateKey', {key: 'timestamp', value: timestamp});
+    }
 
     requestAnimationFrame(advance);
 }

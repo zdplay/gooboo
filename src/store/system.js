@@ -562,6 +562,13 @@ export default {
                         type: 'switch',
                         value: true,
                         defaultValue: true
+                    },
+                    fixDoubleRewardBug: {
+                        unlock: null,
+                        hasDescription: true,
+                        type: 'switch',
+                        value: false,
+                        defaultValue: false
                     }
                 }
             },
@@ -1045,6 +1052,22 @@ export default {
                 }
             }
             Vue.set(state, 'cheatDetected', newCheatObj);
+        },
+        useCompensationCode(state, code) {
+            const fixBugEnabled = state.settings.experiment.items.fixDoubleRewardBug.value;
+            const alreadyUsed = state.usedRedeemCodes.includes('KSBBC');
+            if (code === 'KSBBC' && fixBugEnabled && !alreadyUsed) {
+                const usedCodes = state.usedRedeemCodes || [];
+                Vue.set(state, 'usedRedeemCodes', [...usedCodes, 'KSBBC']);
+                Vue.set(state, 'timeMult', 1.5);
+                return true;
+            }
+            return false;
+        },
+        clearCompensationCode(state) {
+            const usedCodes = state.usedRedeemCodes || [];
+            Vue.set(state, 'usedRedeemCodes', usedCodes.filter(code => code !== 'KSBBC'));
+            Vue.set(state, 'timeMult', 1);
         }
     },
     actions: {
@@ -1386,6 +1409,11 @@ export default {
             }
             if (o.category === 'experiment' && o.name === 'extraHordeEquipment') {
                 dispatch('horde/checkExtraHordeEquipmentStatus', null, {root: true});
+            }
+            if (o.category === 'experiment' && o.name === 'fixDoubleRewardBug') {
+                if (!o.value) {
+                    commit('clearCompensationCode');
+                }
             }
         },
         buyTheme({ state, rootGetters, commit, dispatch }, name) {

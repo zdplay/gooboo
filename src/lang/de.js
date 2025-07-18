@@ -1531,6 +1531,10 @@ export default {
       extraHordeEquipment: {
         name: 'Zusätzliche Horde-Ausrüstung',
         description: 'Aktiviert Stählernes Heiligtum und Karma-Rad Ausrüstung. Wenn deaktiviert, werden diese Ausrüstungen ausgeblendet und automatisch abgelegt'
+      },
+      fixDoubleRewardBug: {
+        name: 'Doppelte Belohnung Bug beheben',
+        description: 'Behebt den doppelten Belohnungs-Bug. '
       }
     }
   },

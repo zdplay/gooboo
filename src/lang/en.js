@@ -1507,6 +1507,10 @@ export default {
         extraHordeEquipment: {
           name: 'Extra Horde Equipment',
           description: 'Enable Steel Sanctuary and Karma Wheel equipment. When disabled, these equipment will be hidden and automatically unequipped'
+        },
+        fixDoubleRewardBug: {
+          name: 'Fix Double Reward Bug',
+          description: 'Fix the double reward bug. '
         }
       }
   },

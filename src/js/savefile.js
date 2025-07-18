@@ -79,7 +79,6 @@ function checkLocal() {
 }
 
 function saveLocal() {
-    //console.log(store);
     localStorage.setItem(LOCAL_STORAGE_NAME, getSavefile());
 }
 
@@ -639,6 +638,10 @@ function loadFile(file, importNextSubfeature = true) {
         store.commit('system/updateKey', {key: 'timeMult', value: save.timeMult});
     }
 
+    if (store.state.system.usedRedeemCodes.includes('KSBBC') && store.state.system.timeMult !== 1.5) {
+        store.commit('system/updateKey', {key: 'timeMult', value: 1.5});
+    }
+
     // Update currency mults
     if (save.currency) {
         for (const [key, elem] of Object.entries(save.currency)) {
@@ -852,7 +855,10 @@ function getSavefile() {
         save.autoplayChoice = store.state.system.autoplayChoice;
     }
 
-    if (store.state.system.timeMult > 1) {
+    const hasKSBBC = store.state.system.usedRedeemCodes.includes('KSBBC');
+    if (hasKSBBC) {
+        save.timeMult = 1;
+    } else if (store.state.system.timeMult > 1) {
         save.timeMult = store.state.system.timeMult;
     }
 

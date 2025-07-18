@@ -1547,6 +1547,10 @@ export default {
         extraHordeEquipment: {
           name: '额外部落装备',
           description: '增加钢铁圣域（150）和业火轮回装备（170）。'
+        },
+        fixDoubleRewardBug: {
+          name: '修复卡双倍bug',
+          description: '修复开双倍bug。'
         }
       }
   },
