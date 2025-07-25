@@ -21,35 +21,37 @@
         <template v-slot:selection="{ item }"><card-pack :item="item"></card-pack></template>
         <template v-slot:item="{ item }"><card-pack :item="item"></card-pack></template>
       </v-select>
-      <gb-tooltip v-if="showPreview">
+      <gb-tooltip>
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on">
             <v-btn small class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(true)">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</v-btn>
           </div>
         </template>
-        <div class="mt-0 text-center">{{ canBuyPack ? '最大购买预览' : '单次购买预览' }}</div>
-        <div v-if="maxPreviewCards.length > 0" class="mt-2">
+        <div v-if="showPreview" class="mt-0 text-center">{{ canBuyPack ? '最大购买预览' : '单次购买预览' }}</div>
+        <div v-if="showPreview && maxPreviewCards.length > 0" class="mt-2">
           <div v-for="(item, key) in maxPreviewSummary" :key="key">
             <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
             <span v-if="item.isNew">&nbsp;(新!)</span>
             <span v-if="item.shinyCount">&nbsp;({{ item.shinyCount }}x 闪亮)</span>
           </div>
         </div>
+        <div v-if="!showPreview" class="mt-0 text-center">{{ $vuetify.lang.t('$vuetify.gooboo.max') }}</div>
       </gb-tooltip>
-      <gb-tooltip v-if="showPreview">
+      <gb-tooltip>
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on">
             <v-btn class="ma-1" color="primary" :disabled="!canBuyPack" @click="buyPack(false)">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
           </div>
         </template>
-        <div class="mt-0 text-center">{{ canBuyPack ? '单次购买预览' : '单次购买预览' }}</div>
-        <div v-if="singlePreviewCards.length > 0" class="mt-2">
+        <div v-if="showPreview" class="mt-0 text-center">{{ canBuyPack ? '单次购买预览' : '单次购买预览' }}</div>
+        <div v-if="showPreview && singlePreviewCards.length > 0" class="mt-2">
           <div v-for="(item, key) in singlePreviewSummary" :key="key">
             <span>{{ item.amount }}x {{ key }}: {{ $vuetify.lang.t(`$vuetify.card.card.${key}`) }}</span>
             <span v-if="item.isNew">&nbsp;(新!)</span>
             <span v-if="item.shinyCount">&nbsp;({{ item.shinyCount }}x 闪亮)</span>
           </div>
         </div>
+        <div v-if="!showPreview" class="mt-0 text-center">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</div>
       </gb-tooltip>
     </div>
     <div class="d-flex flex-wrap align-center ma-1">
@@ -207,15 +209,15 @@ export default {
       return this.$store.state.system.settings.experiment?.items?.cardPackPreview?.value || false;
     },
     singlePreviewCards() {
-      if (!this.selectedPack) return [];
-      
+      if (!this.showPreview || !this.selectedPack) return [];
+
       const pack = this.packList[this.selectedPack];
       if (!pack) return [];
 
       return this.generatePreviewCards(pack, 1);
     },
     maxPreviewCards() {
-      if (!this.selectedPack) return [];
+      if (!this.showPreview || !this.selectedPack) return [];
       const pack = this.packList[this.selectedPack];
       if (!pack) return [];
       const maxAfford = Math.floor(this.$store.state.currency.gem_emerald.value / pack.price);
