@@ -317,7 +317,7 @@ export default {
       { category: '部落', color: 'red', content: '增加装备最大化升级按钮，只能非折叠状态显示。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加部落声望自动化刷精通功能。在楼层切换右边的机器人按钮，完善自动升级、装备、技能。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加手机装备布局功能，在【设置】-【实验性】设置，只有小屏幕和手机才会显示。', isCurrentUpdate: false },
-      { category: '部落', color: 'red', content: '增加神秘碎片额外获得途径，在【设置】-【实验性】设置。', isCurrentUpdate: false },
+      { category: '部落', color: 'red', content: '增加神秘碎片额外获得途径，调整神秘碎片获得概率，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加塔楼技能冷却重置功能，每次进入塔楼时自动重置所有已装备的装备技能冷却时间。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加已装备和分类筛选，智能推荐装备功能，在【设置】-【实验性】设置。', isCurrentUpdate: false },
       { category: '部落', color: 'red', content: '增加即时复活按钮。', isCurrentUpdate: false },

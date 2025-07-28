@@ -1000,7 +1000,7 @@ export default {
         hordeNostalgia: {baseValue: 25, round: true},
         hordeCorruption: {display: 'percent', min: 0, roundNearZero: true},
         hordeItemMasteryGain: {},
-        hordeShardChance: {display: 'percent', baseValue: 0.001},
+        hordeShardChance: {display: 'percent', baseValue: 0.002},
         hordeTrinketGain: {},
         hordeTrinketQuality: {min: 0},
         hordeMaxSacrifice: {round: true, baseValue: 1},
