@@ -11,7 +11,10 @@
   </div>
   <mini v-else-if="prize.type === 'relic'" large :name="resolvedItem"></mini>
   <theme-item v-else-if="prize.type === 'theme'" :name="resolvedItem" hide-actions small></theme-item>
-  <item-slot v-else-if="prize.type === 'treasure'" :item-obj="prize.data"></item-slot>
+  <item-slot v-else-if="prize.type === 'treasure' && treasureModuleReady" :item-obj="prize.data"></item-slot>
+  <div v-else-if="prize.type === 'treasure' && !treasureModuleReady" class="d-flex align-center justify-center" style="width: 80px; height: 80px;">
+    <v-progress-circular indeterminate size="24" color="primary"></v-progress-circular>
+  </div>
 </template>
 
 <script>
@@ -110,6 +113,23 @@ export default {
     },
     cardPackAmount() {
       return this.prize.type === 'cardPack' ? this.$store.state.card.pack[this.resolvedItem].amount : 1;
+    },
+    treasureModuleReady() {
+      if (!this.prize.data) {
+        return true;
+      }
+
+      const { effectToFeature, effect: effectObj } = this.$store.state.treasure;
+      if (!effectToFeature || !effectObj) {
+        return false;
+      }
+      if (Object.keys(effectToFeature).length === 0 || Object.keys(effectObj).length === 0) {
+        return false;
+      }
+      return this.prize.data.effect.every(effectName => {
+        const featureName = effectToFeature[effectName];
+        return featureName && effectObj[featureName] && effectObj[featureName][effectName];
+      });
     }
   }
 }
