@@ -39,11 +39,11 @@ export default {
                 produces: 'coconut',
                 isLand: true,
                 terraform: {
-                    beach: {price: {}, reward: {event_coal: 400}},
-                    water: {price: {}, reward: {event_coal: 400}},
-                    forest: {price: {}, reward: {event_coal: 400}},
-                    mountain: {price: {}, reward: {event_coal: 400}},
-                    plain: {price: {}, reward: {event_coal: 400}}
+                    beach: {price: {}, reward: {event_coal: 50}},
+                    water: {price: {}, reward: {event_coal: 50}},
+                    forest: {price: {}, reward: {event_coal: 50}},
+                    mountain: {price: {}, reward: {event_coal: 50}},
+                    plain: {price: {}, reward: {event_coal: 50}}
                 }
             },
             forest: {
@@ -52,11 +52,11 @@ export default {
                 produces: 'log',
                 isLand: true,
                 terraform: {
-                    beach: {price: {}, reward: {event_coal: 400}},
-                    water: {price: {}, reward: {event_coal: 400}},
-                    palm: {price: {}, reward: {event_coal: 400}},
-                    mountain: {price: {}, reward: {event_coal: 400}},
-                    plain: {price: {}, reward: {event_coal: 400}}
+                    beach: {price: {}, reward: {event_coal: 50}},
+                    water: {price: {}, reward: {event_coal: 50}},
+                    palm: {price: {}, reward: {event_coal: 50}},
+                    mountain: {price: {}, reward: {event_coal: 50}},
+                    plain: {price: {}, reward: {event_coal: 50}}
                 }
             },
             mountain: {
