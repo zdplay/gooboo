@@ -209,7 +209,7 @@
         </div>
         <div>
           <v-icon small>mdi-timer</v-icon>
-          {{ $formatTime(item.timeNeeded(0)) }}
+          {{ $formatTime(item.timeNeeded(0) / $store.getters['mult/get']('summerFestivalBuildQueueSpeed')) }}
         </div>
         <div>{{ $vuetify.lang.t(`$vuetify.event.summerFestival.placeOn`) }}:</div>
         <ul>

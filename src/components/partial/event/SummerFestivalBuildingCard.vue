@@ -42,7 +42,7 @@
           </div>
           <div>
             <v-icon small>mdi-timer</v-icon>
-            {{ $formatTime(buildingType.timeNeeded(effectiveLevel)) }}
+            {{ $formatTime(buildingType.timeNeeded(effectiveLevel) / $store.getters['mult/get']('summerFestivalBuildQueueSpeed')) }}
           </div>
         </gb-tooltip>
         <gb-tooltip :min-width="0">
@@ -54,7 +54,7 @@
           <div class="mt-0">{{ $vuetify.lang.t('$vuetify.event.summerFestival.deleteDescription') }}</div>
           <div>
             <v-icon small>mdi-timer</v-icon>
-            {{ $formatTime(buildingType.timeNeeded(0)) }}
+            {{ $formatTime(buildingType.timeNeeded(0) / $store.getters['mult/get']('summerFestivalBuildQueueSpeed')) }}
           </div>
         </gb-tooltip>
       </template>
