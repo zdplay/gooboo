@@ -12,14 +12,26 @@ export default {
                 color: 'beige',
                 produces: 'shell',
                 isLand: true,
-                terraform: {}
+                terraform: {
+                    water: {price: {event_cocktail: 100}, reward: {}},
+                    palm: {price: {event_cocktail: 100}, reward: {}},
+                    forest: {price: {event_cocktail: 100}, reward: {}},
+                    mountain: {price: {event_cocktail: 100}, reward: {}},
+                    plain: {price: {event_cocktail: 100}, reward: {}}
+                }
             },
             water: {
                 icon: null,
                 color: 'blue',
                 produces: null,
                 isLand: false,
-                terraform: {}
+                terraform: {
+                    beach: {price: {event_cocktail: 100}, reward: {}},
+                    palm: {price: {event_cocktail: 100}, reward: {}},
+                    forest: {price: {event_cocktail: 100}, reward: {}},
+                    mountain: {price: {event_cocktail: 100}, reward: {}},
+                    plain: {price: {event_cocktail: 100}, reward: {}}
+                }
             },
             palm: {
                 icon: 'mdi-palm-tree',
@@ -27,6 +39,10 @@ export default {
                 produces: 'coconut',
                 isLand: true,
                 terraform: {
+                    beach: {price: {}, reward: {event_coal: 400}},
+                    water: {price: {}, reward: {event_coal: 400}},
+                    forest: {price: {}, reward: {event_coal: 400}},
+                    mountain: {price: {}, reward: {event_coal: 400}},
                     plain: {price: {}, reward: {event_coal: 400}}
                 }
             },
@@ -36,6 +52,10 @@ export default {
                 produces: 'log',
                 isLand: true,
                 terraform: {
+                    beach: {price: {}, reward: {event_coal: 400}},
+                    water: {price: {}, reward: {event_coal: 400}},
+                    palm: {price: {}, reward: {event_coal: 400}},
+                    mountain: {price: {}, reward: {event_coal: 400}},
                     plain: {price: {}, reward: {event_coal: 400}}
                 }
             },
@@ -44,7 +64,13 @@ export default {
                 color: 'grey',
                 produces: 'stoneBlock',
                 isLand: false,
-                terraform: {}
+                terraform: {
+                    beach: {price: {event_cocktail: 100}, reward: {}},
+                    water: {price: {event_cocktail: 100}, reward: {}},
+                    palm: {price: {event_cocktail: 100}, reward: {}},
+                    forest: {price: {event_cocktail: 100}, reward: {}},
+                    plain: {price: {event_cocktail: 100}, reward: {}}
+                }
             },
             plain: {
                 icon: null,
@@ -52,8 +78,11 @@ export default {
                 produces: null,
                 isLand: true,
                 terraform: {
+                    beach: {price: {event_cocktail: 100}, reward: {}},
+                    water: {price: {event_cocktail: 100}, reward: {}},
+                    palm: {price: {event_cocktail: 100}, reward: {}},
                     forest: {price: {event_cocktail: 100}, reward: {}},
-                    palm: {price: {event_cocktail: 125}, reward: {}}
+                    mountain: {price: {event_cocktail: 100}, reward: {}}
                 }
             }
         },
@@ -668,13 +697,36 @@ export default {
             const tile = state.island[o.y][o.x];
             const terraform = state.cellType[tile.tile].terraform[o.tile];
             if (tile.unlocked && tile.building === null) {
+                // Check terrain count limits
+                let canTransform = true;
+                if (o.tile === 'mountain' || o.tile === 'beach') {
+                    let currentCount = 0;
+                    state.island.forEach(row => {
+                        row.forEach(cell => {
+                            // Count both unlocked and unlocked terrain of target type
+                            if (cell.tile === o.tile) {
+                                currentCount++;
+                            }
+                        });
+                    });
+
+                    // If current tile is not the target type, we're adding one
+                    if (tile.tile !== o.tile) {
+                        const maxCount = o.tile === 'mountain' ? 3 : 4; // mountain: 3, beach: 4
+                        if (currentCount >= maxCount) {
+                            canTransform = false;
+                        }
+                    }
+                }
+
                 let canAfford = true;
                 for (const [key, elem] of Object.entries(terraform.price)) {
                     if (rootGetters['currency/value'](key) < elem) {
                         canAfford = false;
                     }
                 }
-                if (canAfford) {
+
+                if (canAfford && canTransform) {
                     commit('updateIslandKey', {x: o.x, y: o.y, key: 'drop', value: 0});
                     commit('updateIslandKey', {x: o.x, y: o.y, key: 'tile', value: o.tile});
                     for (const [key, elem] of Object.entries(terraform.price)) {

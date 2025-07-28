@@ -144,7 +144,7 @@ export default {
         maxLevel: 1,
         maxAmount: 1,
         price() {
-            return {event_solidPlate: buildNum(120, 'K'), event_sandstone: buildNum(10, 'K'), event_cocktail: 25};
+            return {event_solidPlate: 1200, event_cocktail: 200};
         },
         timeNeeded: () => 3600,
         effect: [

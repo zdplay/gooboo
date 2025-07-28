@@ -262,7 +262,7 @@
           <gb-tooltip v-for="(item, key) in cellType[island[selectedCell.y][selectedCell.x].tile].terraform" :key="`terraform-${ key }`" :min-width="0">
             <template v-slot:activator="{ on, attrs }">
               <div class="ma-1" v-bind="attrs" v-on="on">
-                <v-btn color="primary" :disabled="!canAfford(item.price)" @click="terraformTile(key)">{{ $vuetify.lang.t(`$vuetify.event.summerFestival.tile.${ key }`) }}</v-btn>
+                <v-btn color="primary" :disabled="!canAfford(item.price) || !canTerraformToTile(key)" @click="terraformTile(key)">{{ $vuetify.lang.t(`$vuetify.event.summerFestival.tile.${ key }`) }}</v-btn>
               </div>
             </template>
             <div class="d-flex flex-wrap mt-0">
@@ -394,6 +394,34 @@ export default {
       if (this.selectedCell !== null) {
         this.$store.dispatch('summerFestival/terraformTile', {x: this.selectedCell.x, y: this.selectedCell.y, tile});
       }
+    },
+    canTerraformToTile(targetTile) {
+      if (!this.selectedCell) return false;
+
+      const currentTile = this.island[this.selectedCell.y][this.selectedCell.x].tile;
+
+      // If transforming to the same tile type, always allow
+      if (currentTile === targetTile) return true;
+
+      // Check terrain count limits for mountain and beach
+      if (targetTile === 'mountain' || targetTile === 'beach') {
+        let currentCount = 0;
+        this.island.forEach(row => {
+          row.forEach(cell => {
+            // Count both unlocked and unlocked terrain of target type
+            if (cell.tile === targetTile) {
+              currentCount++;
+            }
+          });
+        });
+
+        const maxCount = targetTile === 'mountain' ? 3 : 4; // mountain: 3, beach: 4
+        if (currentCount >= maxCount) {
+          return false;
+        }
+      }
+
+      return true;
     }
   }
 }
