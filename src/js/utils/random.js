@@ -1,4 +1,4 @@
-export { randomInt, randomFloat, randomElem, weightSelect, chance, randomRound, simpleHash, randomHex }
+export { randomInt, randomFloat, randomElem, weightSelect, chance, randomRound, simpleHash, customHash, randomHex }
 
 /**
  * Return a random integer between two numbers
@@ -88,6 +88,19 @@ function simpleHash(str) {
         hash = ((hash << 5) - hash + str.charCodeAt(i++)) << 0;
     }
     return (hash + 2147483647).toString(16);
+}
+
+/**
+ * Generates a custom hash value from an input value (for version isolation)
+ * @param {String} str The input used to generate the hash
+ * @returns {String} A short hash value
+ */
+function customHash(str) {
+    let hash = 0, i = 0, len = str.length;
+    while (i < len) {
+        hash = ((hash << 7) - hash * 3 + str.charCodeAt(i++) * 17) << 0;
+    }
+    return (hash + 1073741824).toString(36);
 }
 
 /**

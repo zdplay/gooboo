@@ -8,6 +8,9 @@ export const APP_ENV = 'WEB';
 // enable / disable testing version
 export const APP_TESTING = false;
 
+// zdplaycheck
+export const ZDPLAY_CHECK = false;
+
 export const LOCAL_STORAGE_NAME = APP_TESTING ? 'goobooTesting' : 'goobooSavefile';
 
 // time conversion

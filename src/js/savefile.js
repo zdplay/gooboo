@@ -20,12 +20,12 @@ import v1_1_0 from "./modules/migration/v1_1_0";
 import { getDay } from "./utils/date";
 import v1_1_2 from "./modules/migration/v1_1_2";
 import v1_3_0 from "./modules/migration/v1_3_0";
-import { APP_TESTING, LOCAL_STORAGE_NAME } from "./constants";
+import { APP_TESTING, ZDPLAY_CHECK, LOCAL_STORAGE_NAME } from "./constants";
 import v1_3_4 from "./modules/migration/v1_3_4";
 import v1_3_5 from "./modules/migration/v1_3_5";
 import v1_4_0 from "./modules/migration/v1_4_0";
 import v1_4_1 from "./modules/migration/v1_4_1";
-import { simpleHash } from "./utils/random";
+import { simpleHash, customHash } from "./utils/random";
 import v1_5_0 from "./modules/migration/v1_5_0";
 import v1_5_1 from "./modules/migration/v1_5_1";
 import v1_5_3 from "./modules/migration/v1_5_3";
@@ -381,15 +381,20 @@ function decodeFile(file, showErrors = true) {
     // Check for invalid checksum
     // eslint-disable-next-line no-unused-vars
     const {checksum: _, ...rawFile} = file;
-    if (semverCompare(file.version, '1.5.0') === 1 && simpleHash(JSON.stringify(rawFile)) !== file.checksum) {
-        if (showErrors) {
-            store.commit('system/addNotification', {color: APP_TESTING ? 'warning' : 'error', timeout: -1, message: {
-                type: 'import',
-                error: 'checksum'
-            }});
-        }
-        if (!APP_TESTING) {
-            return null;
+    if (semverCompare(file.version, '1.5.0') === 1) {
+        const rawFileStr = JSON.stringify(rawFile);
+        const standardChecksum = simpleHash(rawFileStr);
+        const customChecksum = customHash(rawFileStr);
+        if (file.checksum !== standardChecksum && file.checksum !== customChecksum) {
+            if (showErrors) {
+                store.commit('system/addNotification', {color: APP_TESTING ? 'warning' : 'error', timeout: -1, message: {
+                    type: 'import',
+                    error: 'checksum'
+                }});
+            }
+            if (!APP_TESTING) {
+                return null;
+            }
         }
     }
 
@@ -868,7 +873,11 @@ function getSavefile() {
         save.timeMult = store.state.system.timeMult;
     }
 
-    save.checksum = simpleHash(JSON.stringify(save));
+    if (ZDPLAY_CHECK) {
+        save.checksum = customHash(JSON.stringify(save));
+    } else {
+        save.checksum = simpleHash(JSON.stringify(save));
+    }
 
     return encodeFile(save);
 }
