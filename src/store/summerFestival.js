@@ -41,7 +41,7 @@ export default {
                 terraform: {
                     beach: {price: {}, reward: {event_coal: 50}},
                     water: {price: {}, reward: {event_coal: 50}},
-                    forest: {price: {}, reward: {event_coal: 50}},
+                    forest: {price: {event_cocktail: 100}, reward: {}},
                     mountain: {price: {}, reward: {event_coal: 50}},
                     plain: {price: {}, reward: {event_coal: 50}}
                 }
@@ -54,7 +54,7 @@ export default {
                 terraform: {
                     beach: {price: {}, reward: {event_coal: 50}},
                     water: {price: {}, reward: {event_coal: 50}},
-                    palm: {price: {}, reward: {event_coal: 50}},
+                    palm: {price: {event_cocktail: 100}, reward: {}},
                     mountain: {price: {}, reward: {event_coal: 50}},
                     plain: {price: {}, reward: {event_coal: 50}}
                 }
