@@ -253,8 +253,9 @@ export default {
             return items.every(item => item.tier === firstTier);
         },
         getRandomCraftUpgradeChance: (state, getters) => (currentTier) => {
-            const tierChances = getters.tierChances;
-            const maxTier = tierChances.length - 1;
+            const tierChancesRaw = getters.tierChancesRaw;
+            // Use the maximum tier from tierChancesRaw instead of tierChances.length
+            const maxTier = Math.max(...tierChancesRaw.map(item => item.tier));
 
             if (currentTier === maxTier - 1) {
                 return 30;
@@ -277,8 +278,9 @@ export default {
 
             if (sameEffect) {
                 // Same color same effect: upgrade tier by 1, keep same effect
-                const tierChances = getters.tierChances;
-                const maxAllowedTier = tierChances.length;
+                const tierChancesRaw = getters.tierChancesRaw;
+                // Use the maximum tier from tierChancesRaw instead of tierChances.length
+                const maxAllowedTier = Math.max(...tierChancesRaw.map(item => item.tier)) + 1;
 
                 if (firstTier >= maxAllowedTier) {
                     return {
