@@ -150,28 +150,24 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <td style="border: 1px solid #666; padding: 4px 8px;">0-199级</td>
-                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.0倍</td>
-                      </tr>
-                      <tr>
                         <td style="border: 1px solid #666; padding: 4px 8px;">200-399级</td>
-                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.1倍</td>
-                      </tr>
-                      <tr>
-                        <td style="border: 1px solid #666; padding: 4px 8px;">400-599级</td>
                         <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.2倍</td>
                       </tr>
                       <tr>
+                        <td style="border: 1px solid #666; padding: 4px 8px;">400-599级</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.4倍</td>
+                      </tr>
+                      <tr>
                         <td style="border: 1px solid #666; padding: 4px 8px;">600-799级</td>
-                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.3倍</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.6倍</td>
                       </tr>
                       <tr>
                         <td style="border: 1px solid #666; padding: 4px 8px;">800-999级</td>
-                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.4倍</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center;">1.8倍</td>
                       </tr>
                       <tr style="background-color: rgba(255, 193, 7, 0.2);">
                         <td style="border: 1px solid #666; padding: 4px 8px;">1000级+</td>
-                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center; font-weight: bold;">1.5倍（最高）</td>
+                        <td style="border: 1px solid #666; padding: 4px 8px; text-align: center; font-weight: bold;">2.0倍（最高）</td>
                       </tr>
                     </tbody>
                   </table>
@@ -562,7 +558,7 @@ export default {
         return 1;
       }
       const globalLevel = this.globalLevel || 0;
-      return Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+      return Math.min(2.0, 1 + Math.floor(globalLevel / 200) * 0.2);
     }
   },
   methods: {
@@ -629,7 +625,7 @@ export default {
           });
           if (success !== false) {
             const globalLevel = this.globalLevel || 0;
-            const currentMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+            const currentMult = Math.min(2.0, 1 + Math.floor(globalLevel / 200) * 0.2);
             this.redeemMessage = `补偿激活成功！当前游戏速度：${currentMult.toFixed(1)}倍`;
             this.redeemSuccess = true;
             this.redeemCode = '';

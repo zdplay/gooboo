@@ -645,7 +645,7 @@ function loadFile(file, importNextSubfeature = true) {
 
     if (store.state.system.usedRedeemCodes.includes('KSBBC')) {
         const globalLevel = store.state.meta.globalLevel || 0;
-        const dynamicTimeMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+        const dynamicTimeMult = Math.min(2.0, 1 + Math.floor(globalLevel / 200) * 0.2);
         store.commit('system/updateKey', {key: 'timeMult', value: dynamicTimeMult});
     }
 

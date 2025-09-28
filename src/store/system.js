@@ -1064,7 +1064,7 @@ export default {
                 Vue.set(state, 'usedRedeemCodes', [...usedCodes, 'KSBBC']);
                 
                 const globalLevel = rootState ? (rootState.meta.globalLevel || 0) : 0;
-                const dynamicTimeMult = Math.min(1.5, 1 + Math.floor(globalLevel / 200) * 0.1);
+                const dynamicTimeMult = Math.min(2.0, 1 + Math.floor(globalLevel / 200) * 0.2);
                 Vue.set(state, 'timeMult', dynamicTimeMult);
                 return true;
             }
