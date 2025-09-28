@@ -352,7 +352,6 @@ export default {
       { category: '事件', color: 'dark-blue', content: '调整天气混乱事件鱼哨的钓鱼力量加成为2倍，调整2图垃圾增益为塑料，藻类增益改到4图。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '增加紫水晶时间沙漏功能，可用紫水晶加速大事件进程，1个紫水晶=1.5分钟。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '增加宾果预测和撤销功能，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
-      { category: '事件', color: 'dark-blue', content: '增加【指定赌场事件】功能，开启后可手动选择进入宾果或转盘，在【设置】-【实验性】中开关。', isCurrentUpdate: false },
       { category: '事件', color: 'dark-blue', content: '增加累签圣遗物系统，在【设置】-【实验性】中开关。', isCurrentUpdate: true },
       { category: '事件', color: 'dark-blue', content: '降低夏日祭典黄宝石需求，调整部分内容。', isCurrentUpdate: true },
       { category: '事件', color: 'dark-blue', content: '降低夏日祭典挖掘机，调整改造地形功能。', isCurrentUpdate: true },

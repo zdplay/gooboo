@@ -16,6 +16,7 @@
   width: 500px;
   height: 500px;
   border-radius: 100%;
+  background-color: #1e1e1e; /* 添加默认背景色 */
 }
 .wheel-point {
   position: absolute;
@@ -96,6 +97,7 @@
       <div class="d-flex align-center bg-tile-default rounded ma-1 pa-1">
         <price-tag class="ma-1" currency="gem_topaz" :amount="wheelCost"></price-tag>
         <v-btn class="primary ma-1" :disabled="!canAffordWheel" @click="buy">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+        <v-btn class="secondary ma-1 ml-2" @click="switchToBingo">{{ $vuetify.lang.t('$vuetify.gooboo.switchToBingo') }}</v-btn>
       </div>
     </div>
   </div>
@@ -147,6 +149,14 @@ export default {
         }});
       } else {
         this.$store.dispatch('event/casinoWheelSpin');
+      }
+    },
+    switchToBingo() {
+      // 切换到宾果，如果宾果未初始化则进行初始化
+      this.$store.commit('event/updateKey', {key: 'casino_type', value: 'bingo'});
+      // 检查宾果是否已初始化，如果没有则初始化
+      if (this.$store.state.event.casino_bingo_card === null) {
+        this.$store.dispatch('event/casinoBingoCardGenerate');
       }
     }
   }

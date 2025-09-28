@@ -72,6 +72,8 @@ export default {
     levelSuffix: '等级',
     delete: '删除',
     convert: '转换',
+    switchToWheel:'切换到轮盘',
+    switchToBingo: '切换到bingo',
     add: '增加',
     cloudlogin: '云登录',
     playedBefore: {

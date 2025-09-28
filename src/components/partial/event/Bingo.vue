@@ -69,6 +69,7 @@
       <div v-else class="d-flex align-center bg-tile-default rounded ma-1 pa-1">
         <price-tag class="ma-1" currency="gem_topaz" :amount="bingoCardCost"></price-tag>
         <v-btn class="primary ma-1" :disabled="!canAffordCard" @click="buy">{{ $vuetify.lang.t('$vuetify.gooboo.buy') }}</v-btn>
+        <v-btn class="secondary ma-1 ml-2" @click="switchToWheelOfFortune">{{ $vuetify.lang.t('$vuetify.gooboo.switchToWheel') }}</v-btn>
       </div>
     </div>
   </div>
@@ -203,6 +204,14 @@ export default {
         }});
       } else {
         this.$store.dispatch('event/casinoBingoBuy');
+      }
+    },
+    switchToWheelOfFortune() {
+      // 切换到轮盘，如果轮盘未初始化则进行初始化
+      this.$store.commit('event/updateKey', {key: 'casino_type', value: 'wheelOfFortune'});
+      // 检查轮盘是否已初始化，如果没有则初始化
+      if (this.$store.state.event.casino_wheel_segments.length === 0) {
+        this.$store.dispatch('event/casinoWheelGenerate');
       }
     }
   }

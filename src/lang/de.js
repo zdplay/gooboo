@@ -73,6 +73,8 @@ export default {
     delete: 'Löschen',
     convert: 'Umwandeln',
     add: 'Hinzufügen',
+    switchToWheel:'switchToWheel',
+    switchToBingo: 'switchToBingo',
     cloudlogin: 'cloudlogin',
     playedBefore: {
       0: 'Schon mal gespielt? Lade deinen Spielstand ',

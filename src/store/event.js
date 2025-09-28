@@ -384,7 +384,7 @@ export default {
                 commit('updateBankProjectKey', {name: key, key: 'spent', value: 0});
             }
         },
-        start({ state, getters, rootState, rootGetters, commit, dispatch }, name) {
+        start({ state, getters, rootGetters, commit, dispatch }, name) {
             switch (name) {
                 case 'merchant': {
                     dispatch('generateShops', 'merchant');
@@ -392,23 +392,19 @@ export default {
                     break;
                 }
                 case 'casino': {
-                    if (rootState.system.settings.experiment.items.customCasinoEvent.value) {
-                        commit('updateKey', {key: 'casino_type_selection_dialog', value: true});
-                    } else {
-                        let rngGen = rootGetters['system/getRng']('casino_type');
-                        commit('system/nextRng', {name: 'casino_type', amount: 1}, {root: true});
-                        commit('updateKey', {key: 'casino_type', value: randomElem(state.casino_types, rngGen())});
-                        switch (state.casino_type) {
-                            case 'bingo': {
-                                dispatch('casinoBingoCardGenerate');
-                                dispatch('note/find', 'event_4', {root: true});
-                                break;
-                            }
-                            case 'wheelOfFortune': {
-                                dispatch('casinoWheelGenerate');
-                                dispatch('note/find', 'event_5', {root: true});
-                                break;
-                            }
+                    let rngGen = rootGetters['system/getRng']('casino_type');
+                    commit('system/nextRng', {name: 'casino_type', amount: 1}, {root: true});
+                    commit('updateKey', {key: 'casino_type', value: randomElem(state.casino_types, rngGen())});
+                    switch (state.casino_type) {
+                        case 'bingo': {
+                            dispatch('casinoBingoCardGenerate');
+                            dispatch('note/find', 'event_4', {root: true});
+                            break;
+                        }
+                        case 'wheelOfFortune': {
+                            dispatch('casinoWheelGenerate');
+                            dispatch('note/find', 'event_5', {root: true});
+                            break;
                         }
                     }
                     break;
