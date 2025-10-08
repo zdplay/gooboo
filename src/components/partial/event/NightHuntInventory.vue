@@ -135,6 +135,22 @@
       </gb-tooltip>
       <gb-tooltip :min-width="0">
         <template v-slot:activator="{ on, attrs }">
+          <div v-bind="attrs" v-on="on">
+            <v-btn class="ma-1" color="secondary" :disabled="availableCollectiblesCount === 0" @click="collectAllIngredients">
+              {{ $vuetify.lang.t(`$vuetify.event.nightHunt.collectIngredients`) }}
+            </v-btn>
+          </div>
+        </template>
+        <div class="mt-0">{{ $vuetify.lang.t(`$vuetify.event.nightHunt.collectIngredientsDescription`) }}</div>
+        <div>{{ $vuetify.lang.t(`$vuetify.event.nightHunt.availableCollectibles`, availableCollectiblesCount) }}</div>
+        <div v-for="(item, key) in collectibleIngredients" :key="'collectible-' + key" class="d-flex align-center mt-2">
+          <v-icon :color="item.currency.color" class="mr-2">{{ item.currency.icon }}</v-icon>
+          <span>{{ $vuetify.lang.t(`$vuetify.currency.event_${item.name}.name`) }}</span>
+          <span class="ml-1">: {{ item.count }}</span>
+        </div>
+      </gb-tooltip>
+      <gb-tooltip :min-width="0">
+        <template v-slot:activator="{ on, attrs }">
           <v-icon
             large
             class="ma-1"
@@ -286,6 +302,71 @@ export default {
     },
     canSeeSackDescription() {
       return this.$store.getters['currency/value']('event_magic') >= 1000;
+    },
+    availableCollectiblesCount() {
+      return Object.keys(this.$store.state.nightHunt.changedCurrency).length;
+    },
+    collectibleIngredients() {
+      const changedCurrency = this.$store.state.nightHunt.changedCurrency;
+      const ingredients = [];
+      const ingredientSize = this.$store.getters['mult/get']('nightHuntIngredientSize');
+      const favouriteIngredientSize = this.$store.getters['mult/get']('nightHuntFavouriteIngredientSize');
+      const favouriteIngredient = this.$store.state.nightHunt.favouriteIngredient;
+      
+      const ingredientMap = {};
+      
+      for (const [, value] of Object.entries(changedCurrency)) {
+        const ingredientName = value === 'sack' ? 'sack' : value;
+
+        let count = 0;
+        if (value === 'sack') {
+          count = ingredientSize * 10;
+        } else {
+          count = ingredientSize;
+        }
+
+        if (ingredientMap[ingredientName]) {
+          ingredientMap[ingredientName] += count;
+        } else {
+          ingredientMap[ingredientName] = count;
+        }
+        
+        if (favouriteIngredient === 'copy' && value !== 'sack' && favouriteIngredientSize > 0) {
+          if (ingredientMap[ingredientName]) {
+            ingredientMap[ingredientName] += favouriteIngredientSize;
+          } else {
+            ingredientMap[ingredientName] = favouriteIngredientSize;
+          }
+        }
+      }
+      
+      if (favouriteIngredient !== 'copy' && favouriteIngredientSize > 0) {
+        let favouriteCount = 0;
+        for (const [, value] of Object.entries(changedCurrency)) {
+          if (value !== 'sack') {
+            favouriteCount += favouriteIngredientSize;
+          }
+        }
+        
+        if (favouriteCount > 0) {
+          if (ingredientMap[favouriteIngredient]) {
+            ingredientMap[favouriteIngredient] += favouriteCount;
+          } else {
+            ingredientMap[favouriteIngredient] = favouriteCount;
+          }
+        }
+      }
+      
+      for (const [name, count] of Object.entries(ingredientMap)) {
+        const currency = this.$store.state.currency[`event_${name}`] || {};
+        ingredients.push({
+          name: name,
+          count: count,
+          currency: currency
+        });
+      }
+      
+      return ingredients;
     }
   },
   mounted() {
@@ -301,6 +382,11 @@ export default {
     },
     performRitual() {
       this.$store.dispatch('nightHunt/performRitual');
+    },
+    collectAllIngredients() {
+      Object.keys(this.$store.state.nightHunt.changedCurrency).forEach(key => {
+        this.$store.dispatch('nightHunt/claimChangedCurrency', key);
+      });
     },
     selectFavourite() {
       this.$store.commit('nightHunt/updateKey', {key: 'favouriteIngredient', value: this.favouriteIngredient});

@@ -24,7 +24,7 @@
     <div class="temporary-storage-title">临时存放</div>
     <div class="storage-slots" @touchmove="handleTouchMove">
       <item-slot
-        v-for="i in 10"
+        v-for="i in 30"
         :key="'temp-' + (i - 1)"
         :id="'temp_' + (i - 1)"
         :slot-id="i - 1"

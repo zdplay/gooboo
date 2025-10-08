@@ -360,7 +360,7 @@ export default {
             }
         },
         updateTemporaryStorageItem(state, { index, item }) {
-            if (index >= 0 && index < 10) {
+            if (index >= 0 && index < 30) {
                 Vue.set(state.temporaryStorage, index, item);
             }
         },
@@ -370,15 +370,15 @@ export default {
             }
         },
         initializeTemporaryStorage(state) {
-            // Initialize temporary storage with 10 empty slots
-            state.temporaryStorage = new Array(10).fill(null);
+            // Initialize temporary storage with 32 empty slots
+            state.temporaryStorage = new Array(30).fill(null);
         },
         initializeCraftingSlots(state) {
             // Initialize crafting slots with 3 empty slots
             state.craftingSlots = new Array(3).fill(null);
         },
         clearTemporaryStorage(state) {
-            state.temporaryStorage = new Array(10).fill(null);
+            state.temporaryStorage = new Array(30).fill(null);
         },
         clearCraftingSlots(state) {
             state.craftingSlots = new Array(3).fill(null);
@@ -597,7 +597,7 @@ export default {
         moveToTemporaryStorage({ state, commit, dispatch }, { itemIndex, storageIndex }) {
             // Move item from main inventory to temporary storage
             const item = state.items[itemIndex];
-            if (item && storageIndex >= 0 && storageIndex < 10) {
+            if (item && storageIndex >= 0 && storageIndex < 30) {
                 commit('setItem', { id: itemIndex, item: null });
                 commit('updateTemporaryStorageItem', { index: storageIndex, item });
                 dispatch('updateEffectCache');
