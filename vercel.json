@@ -9,6 +9,13 @@
         "destination": "/index.html"
       }
     ],
+    "git": {
+      "deploymentEnabled": {
+        "1.58": false,
+        "Tendsty-main": false,
+        "gh-pages": false
+      }
+    },
     "cleanUrls": true,
     "trailingSlash": false
   }
