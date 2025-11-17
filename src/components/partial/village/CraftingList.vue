@@ -81,7 +81,7 @@
             <v-icon>mdi-currency-usd</v-icon>
             <span>/</span>
             <v-icon>mdi-clock</v-icon>
-            <span class="ml-2">{{ parseFloat(craftObj.value / craftObj.timeNeeded).toFixed(3) }}</span>
+            <span class="ml-2">{{ parseFloat(craftObj.sellPrice / craftObj.timeNeeded).toFixed(3) }}</span>
           </v-chip>
         </div>
         <div class="d-flex align-center my-1">
