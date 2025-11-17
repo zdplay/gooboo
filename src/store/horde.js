@@ -1787,7 +1787,10 @@ export default {
             if (skill.type === 'active') {
                 if (skillLevel > 0 && state.skillActive[name] === undefined) {
                     commit('updateSubkey', {name: 'skillActive', key: `skill_${ name }`, value: 0});
+                } else {
+                    delete state.skillActive[`skill_${ name }`];
                 }
+                
             } else {
                 skill.effect.forEach(eff => {
                     if (skillLevel > 0) {
@@ -1815,6 +1818,19 @@ export default {
                 commit('updateSubkey', {name: 'skillLevel', key: name, value: skillLevel + 1});
                 dispatch('applySkillEffects', name);
             }
+        },
+        resetSkillPoints({ state, commit, dispatch }) {
+            const skills = state.fighterClass[state.selectedClass].skills;
+            const upgradedSkills = { ...state.skillLevel};
+            let skillPoints = 0;
+            for(const skillName in upgradedSkills) {
+                if(skills[skillName].cost) {
+                    skillPoints += upgradedSkills[skillName] * skills[skillName].cost;
+                    commit('updateSubkey', {name: 'skillLevel', key: skillName, value: 0});
+                    dispatch('applySkillEffects', skillName);
+                }
+            }
+            commit('updateKey', {key: 'skillPoints', value: state.skillPoints + skillPoints});
         },
         applyClassEffects({ state, dispatch }) {
             const value = state.fighterClass[state.selectedClass].courageMult;
