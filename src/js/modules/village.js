@@ -303,7 +303,12 @@ export default {
                 return Math.min(taxpayers, nextAmount) * VILLAGE_COINS_PER_FOOD;
             }).reduce((a, b) => a + b, 0));
         }, timerIsEstimate: true},
-        copperCoin: {overcapMult: 0.5, color: 'orange', icon: 'mdi-circle-multiple', gainMult: {}, capMult: {baseValue: 4000}},
+        copperCoin: {overcapMult: 0.5, color: 'orange', icon: 'mdi-circle-multiple', gainMult: {display: 'perSecond'}, showGainMult: true, capMult: {baseValue: 4000}, gainTimerFunction() {
+            return store.getters['mult/get']('currencyVillageCopperCoinGain', Object.values(store.state.village.crafting)
+                .filter((elem) => elem.isSelling && elem.owned)
+                .map((elem) => elem.sellPrice * elem.cacheSellChance)
+                .reduce((a, b) => a + b, 0));
+        }, timerIsEstimate: true},
 
         // Basic material
         plantFiber: {subtype: 'material', overcapMult: 0.4, color: 'green', icon: 'mdi-leaf', gainMult: {display: 'perSecond'}, showGainMult: true, showGainTimer: true, capMult: {baseValue: 2000}},

@@ -26,6 +26,7 @@
       <span v-else-if="splitName[0] === 'villageHappiness'">{{ $vuetify.lang.t(`$vuetify.mult.villageHappiness`) }}</span>
       <span v-else-if="splitName[0] === 'villagePollution'"><v-icon small class="mr-1">mdi-smoke</v-icon>{{ $vuetify.lang.t(`$vuetify.mult.villagePollution`) }}</span>
       <span v-else-if="splitName[0] === 'villagePower'"><v-icon small class="mr-1">mdi-lightning-bolt</v-icon>{{ $vuetify.lang.t(`$vuetify.mult.villagePower`) }}</span>
+      <span v-else-if="splitName[0] === 'villageCraft'"><v-icon small class="mr-1">mdi-currency-usd</v-icon>{{ $vuetify.lang.t(`$vuetify.village.crafting.${ splitName[1] }`) }}</span>
       <span v-else-if="splitName[0] === 'villageSpecialCraft'"><v-icon small class="mr-1">mdi-hammer</v-icon>{{ $vuetify.lang.t(`$vuetify.village.crafting.${ splitName[1] }`) }}</span>
       <span v-else-if="splitName[0] === 'hordeHeirloom'"><v-icon small class="mr-1">mdi-necklace</v-icon>{{ $vuetify.lang.t(`$vuetify.horde.heirloom.${splitName[1]}`) }}</span>
       <span v-else-if="splitName[0] === 'hordeTower'"><v-icon small class="mr-1">mdi-office-building</v-icon>{{ $vuetify.lang.t(`$vuetify.horde.tower.${ name.split('_')[1] }`) }} ({{ name.split('_')[2] }})</span>
