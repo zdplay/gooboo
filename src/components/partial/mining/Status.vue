@@ -261,7 +261,8 @@
                       <v-btn :value="1" small class="mb-1">1次</v-btn>
                       <v-btn :value="10" small class="mb-1">10次</v-btn>
                       <v-btn :value="100" small class="mb-1">100次</v-btn>
-                      <v-btn :value="1000" small>1000次</v-btn>
+                      <v-btn :value="1000" small class="mb-1">1000次</v-btn>
+                      <v-btn :value="10000" small class="mb-1">10000次</v-btn>
                     </v-btn-toggle>
                   </v-card-text>
                 </v-card>
